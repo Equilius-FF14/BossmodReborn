@@ -35,4 +35,5 @@ Phase 4:
 - Need spread / stacks show for a frame - can be easily avoided by just setting it to where numcasts is >1 or remove the baits
 
 Phase 5:
-- Needs completing still
+- add safe spots to MaddeningOrchestra, add config option of 1-6 (somehow don't include tanks or set them to 0), 0 players will not be included
+    Lowest number is left, highest number is right, last number remaining is middle

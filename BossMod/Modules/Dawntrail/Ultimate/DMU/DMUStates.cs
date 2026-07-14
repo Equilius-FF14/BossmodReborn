@@ -17,14 +17,14 @@ sealed class DMUStates : StateMachineBuilder {
             .Raw.Update = () => _module.ChaosP3()?.IsDeadOrDestroyed == true && _module.ExdeathP3()?.IsDeadOrDestroyed == true;
         SimplePhase(3, Phase4, "P4")
             .SetHint(StateMachine.PhaseHint.StartWithDowntime)
-            .Raw.Update = () => _module.KefkaP4()?.IsDeadOrDestroyed == true;
+            .Raw.Update = () => _module.KefkaP4() is { IsTargetable: false, HPRatio: < 1 };
         SimplePhase(4, Phase5, "P5")
             .SetHint(StateMachine.PhaseHint.StartWithDowntime)
             .Raw.Update = () => _module.KefkaP5()?.IsDeadOrDestroyed == true;
     }
 
     private void Phase5(uint id) {
-        ActorTargetable(id, _module.KefkaP5, true, 0.1f, "Boss appears")
+        ActorTargetable(id, _module.KefkaP5, true, 31.0f, "Boss appears")
             .SetHint(StateMachine.StateHint.DowntimeEnd);
 
         ActorCast(id + 0x10, _module.KefkaP5, (uint)AID.UltimaRepeaterCast, 3.0f, 5.0f, true, "Ultima Repeater")
@@ -81,7 +81,9 @@ sealed class DMUStates : StateMachineBuilder {
         ComponentCondition<CatastrophicChoice>(id + 0x155, 0.2f, o => o.NumCasts > 0, "In/Out");
         ComponentCondition<Celestriad>(id + 0x160, 5.8f, o => o.NumCasts > 4, "2nd Tower Set");
         ComponentCondition<Celestriad>(id + 0x170, 6.0f, o => o.NumCasts > 8, "3rd Tower Set");
-        ComponentCondition<CatastrophicChoice>(id + 0x175, 0.2f, o => o.NumCasts > 1, "2nd In/Out");
+        ComponentCondition<CatastrophicChoice>(id + 0x175, 0.2f, o => o.NumCasts > 1, "2nd In/Out")
+            .DeactivateOnExit<Celestriad>()
+            .DeactivateOnExit<CatastrophicChoice>();
 
         ActorCast(id + 0x180, _module.KefkaP5, (uint)AID.UltimaRepeaterCast, 4.0f, 4.0f, true, "Ultima Repeater")
             .ActivateOnEnter<UltimaRepeater>()
@@ -123,13 +125,48 @@ sealed class DMUStates : StateMachineBuilder {
         ComponentCondition<FellForces>(id + 0x280, 4.7f, o => o.NumCasts > 0, "1st Auto Attack Stack");
         ComponentCondition<FellForces>(id + 0x290, 3.1f, o => o.NumCasts > 3, "2nd Auto Attack Stack");
         ComponentCondition<FellForces>(id + 0x300, 3.1f, o => o.NumCasts > 6, "3rd Auto Attack Stack")
-            .DeactivateOnExit<FellForces>()
-            .ActivateOnEnter<P5ForsakenBait>()
-            .ActivateOnEnter<P5ForsakenRaidWide>()
-            .ActivateOnEnter<P5ForsakenGround>()
-            .ActivateOnEnter<P5ForsakenStack>();
+            .DeactivateOnExit<FellForces>();
 
-        Timeout(id + 0x500000, 30.0f, "P5 Unknown");
+        ActorCastStart(id + 0x310, _module.KefkaP5, (uint)AID.P5ForsakenCast, 1.3f, true, "Forsaken Start")
+            .ActivateOnExit<P5ForsakenRaidWide>()
+            .ActivateOnExit<P5ForsakenStack>()
+            .ActivateOnExit<P5ForsakenBait>()
+            .ActivateOnExit<P5ForsakenBaitAOE>()
+            .ActivateOnExit<P5ForsakenGround>();
+
+        Condition(id + 0x320, 10.0f, () => Module.FindComponent<P5ForsakenRaidWide>()!.NumCasts > 0 &&
+                                           Module.FindComponent<P5ForsakenBait>()!.active == false, "Raidwide + Bait");
+
+        ComponentCondition<P5ForsakenStack>(id + 0x330, 5.1f, o => o.NumFinishedStacks > 0, "1st Stack Resolve");
+
+        Condition(id + 0x340, 3.1f, () => Module.FindComponent<P5ForsakenRaidWide>()!.NumCasts > 1 &&
+                                           Module.FindComponent<P5ForsakenBait>()!.active == false, "Raidwide + Bait")
+            .ExecOnEnter<P5ForsakenRaidWide>(o => o.raidwideIncoming = true)
+            .ExecOnExit<P5ForsakenRaidWide>(o => o.raidwideIncoming = false);
+
+        ComponentCondition<P5ForsakenStack>(id + 0x350, 5.0f, o => o.NumFinishedStacks > 1, "2nd Stack Resolve");
+
+        Condition(id + 0x360, 3.1f, () => Module.FindComponent<P5ForsakenRaidWide>()!.NumCasts > 2 &&
+                                           Module.FindComponent<P5ForsakenBait>()!.active == false, "Raidwide + Bait")
+            .ExecOnEnter<P5ForsakenRaidWide>(o => o.raidwideIncoming = true)
+            .ExecOnExit<P5ForsakenRaidWide>(o => o.raidwideIncoming = false);
+
+        ComponentCondition<P5ForsakenStack>(id + 0x370, 5.0f, o => o.NumFinishedStacks > 2, "3rd Stack Resolve");
+
+        Condition(id + 0x380, 3.1f, () => Module.FindComponent<P5ForsakenRaidWide>()!.NumCasts > 3 &&
+                                           Module.FindComponent<P5ForsakenBait>()!.active == false, "Raidwide + Bait")
+            .ExecOnEnter<P5ForsakenRaidWide>(o => o.raidwideIncoming = true)
+            .ExecOnExit<P5ForsakenRaidWide>(o => o.raidwideIncoming = false)
+            .DeactivateOnExit<P5ForsakenRaidWide>();
+
+        ComponentCondition<P5ForsakenStack>(id + 0x390, 5.1f, o => o.NumFinishedStacks > 3, "4th Stack Resolve")
+            .DeactivateOnExit<P5ForsakenStack>();
+
+        ActorCast(id + 0x400, _module.KefkaP5, (uint)AID.P5ForsakenCast, 5.0f, 26.0f, true, "Enrage Cast")
+            .ActivateOnEnter<P5Enrage>()
+            .DeactivateOnExit<P5Enrage>();
+
+        Timeout(id + 0x410, 4.4f, "Enrage");
     }
 
     // TODO update raidwides to actually use actors instead since it should now be fixed and able to find the boss correctly
@@ -257,11 +294,9 @@ sealed class DMUStates : StateMachineBuilder {
             .DeactivateOnExit<TsunamiInfernoOrder>()
             .DeactivateOnExit<KefkaOrder>();
 
-        ActorCast(id + 0x40000, _module.KefkaP4, (uint)AID.UltimaUpsurge, 4.2f, 5.0f, true, "Enrage")
+        ActorCast(id + 0x230, _module.KefkaP4, (uint)AID.UltimaUpsurge, 7.5f, 5.0f, true, "Enrage")
             .ActivateOnEnter<UltimaUpsurge>()
             .DeactivateOnExit<UltimaUpsurge>();
-
-        Timeout(id + 0x40010, 31.0f, "Downtime");
     }
 
     private void Phase3(uint id) {

@@ -617,62 +617,86 @@ class StrayEntropy(BossModule module) : Components.UniformStackSpread(module, 0f
     }
 }
 
-class P5ForsakenRaidWide(BossModule module) : Components.RaidwideCast(module, (uint)AID.ForsakenCast);
+class P5ForsakenRaidWide(BossModule module) : Components.RaidwideCast(module, (uint)AID.P5ForsakenCast) {
+    public bool raidwideIncoming = false;
 
-// TODO update to use MapEffects maybe?
-class P5ForsakenGround(BossModule module) : Components.SimpleAOEs(module, (uint)AID.ForsakenGround, new AOEShapeCircle(8.0f)) {
-    private List<AOEInstance> aoes = [];
+    public override void OnEventCast(Actor caster, ActorCastEvent spell) {
+        base.OnEventCast(caster, spell);
+        if (spell.Action.ID == (uint)AID.P5ForsakenInstant) {
+            NumCasts++;
+        }
+    }
+
+    public override void AddGlobalHints(GlobalHints hints) {
+        base.AddGlobalHints(hints);
+        if (raidwideIncoming == true) {
+            hints.Add("Raidwide");
+        }
+    }
+}
+
+class P5ForsakenStack(BossModule module) : Components.StackWithIcon(module, (uint)IconID.StackShare, (uint)AID.ForsakenBonds, 6.0f, 5.0f, 8);
+
+class P5ForsakenBait : Components.GenericBaitProximity {
+    public bool active = true;
+
+    private List<WPos> positions = new List<WPos> {
+        new WPos(100.000f, 110.000f),
+        new WPos(92.700f, 107.000f),
+        new WPos(93.300f, 92.700f),
+        new WPos(106.500f, 93.300f),
+        new WPos(106.500f, 106.500f)
+    };
+
+    public P5ForsakenBait(BossModule module) : base(module, onlyShowOutlines: true) {
+        EnableHints = false;
+    }
 
     public override void OnCastStarted(Actor caster, ActorCastInfo spell) {
-        if (spell.Action.ID == (uint)AID.ForsakenGround) {
-            aoes.Add(new(new AOEShapeCircle(8.0f), caster.Position, actorID: caster.InstanceID));
+        if (spell.Action.ID == (uint)AID.ForsakenAOEBait) {
+            NumCasts++;
+
+            if (positions.Count > 0) {
+                positions.RemoveAt(0);
+            }
+
+            active = false;
         }
     }
 
     public override void OnEventCast(Actor caster, ActorCastEvent spell) {
-        if (spell.Action.ID == (uint)AID.ForsakenGround) {
-            NumCasts++;
-            if (aoes.Count > 0) {
-                var aoeIndex = aoes.FindIndex(a => a.ActorID == caster.InstanceID && a.Color != Colors.Danger);
-                if (aoeIndex >= 0) {
-                    var aoe = aoes[aoeIndex];
-                    aoe.Color = Colors.Danger;
-                    aoes[aoeIndex] = aoe;
-                }
-            }
-        }
-    }
-
-    public override ReadOnlySpan<AOEInstance> ActiveAOEs(int slot, Actor actor) {
-        return CollectionsMarshal.AsSpan(aoes);
-    }
-}
-
-class P5ForsakenBait(BossModule module) : Components.GenericBaitProximity(module) {
-    private bool active = true;
-
-    public override void OnCastStarted(Actor caster, ActorCastInfo spell) {
         if (spell.Action.ID == (uint)AID.ForsakenAOEBait) {
+            if (NumCasts == 4) {
+                positions.Clear();
+                return;
+            }
+
             active = true;
         }
     }
 
-    public override void OnEventCast(Actor caster, ActorCastEvent spell) {
-        if (spell.Action.ID == (uint)AID.ForsakenAOEBait) {
-            CurrentBaits.Clear();
-            NumCasts++;
-        }
-    }
-
-    // Says baited onto an inter/card closest to a random player
-    public override void Update() {
-        if (active == true) {
-            OnlyShowOutlines = false;
+    public override void DrawArenaForeground(int pcSlot, Actor pc) {
+        base.DrawArenaForeground(pcSlot, pc);
+        if (positions.Count == 0) {
             return;
         }
 
+        var currentPositions = positions.Take(2).ToList();
+        if (currentPositions.Count == 2) {
+            Arena.AddCircle(currentPositions.First(), 1.0f, Colors.Safe, 2.0f);
+            Arena.AddCircle(currentPositions.Last(), 1.0f, Colors.Danger, 2.0f);
+            return;
+        }
+
+        Arena.AddCircle(currentPositions.First(), 1.0f, Colors.Safe, 2.0f);
+    }
+
+    public override void Update() {
         CurrentBaits.Clear();
-        OnlyShowOutlines = true;
+
+        if (active == false) {
+            return;
+        }
 
         var boss = ((DMU)Module).KefkaP5();
         if (boss == null) {
@@ -684,24 +708,23 @@ class P5ForsakenBait(BossModule module) : Components.GenericBaitProximity(module
             return;
         }
 
-        CurrentBaits.Add(new(target.Position, new AOEShapeCircle(8.0f)));
+        CurrentBaits.Add(new(target.Position, new AOEShapeCircle(8.0f), stack: true, maxStack: 8));
     }
 }
 
-class P5ForsakenStack(BossModule module) : Components.StackTogether(module, (uint)IconID.StackShare, 5.0f, 6.0f);
+class P5ForsakenBaitAOE(BossModule module) : Components.SimpleAOEs(module, (uint)AID.ForsakenAOEBait, new AOEShapeCircle(8.0f));
 
+// TODO update to use MapEffects maybe?
+class P5ForsakenGround(BossModule module) : Components.SimpleAOEs(module, (uint)AID.ForsakenGround, new AOEShapeCircle(8.0f)) {
+    private List<AOEInstance> aoes = [];
 
+    public override void OnCastStarted(Actor caster, ActorCastInfo spell) {
+        if (spell.Action.ID == (uint)AID.ForsakenGround) {
+            aoes.Add(new(new AOEShapeCircle(8.0f), caster.Position, actorID: caster.InstanceID));
+        }
+    }
 
-/*
-    ForsakenAOEBait = 47928, // Helper->self, 5.0s cast, range 8 circle - Bait puddle
-    ForsakenBonds = 47929, // Helper->players, no cast, range 6 circle - Stack
- */
+    public override ReadOnlySpan<AOEInstance> ActiveAOEs(int slot, Actor actor) => CollectionsMarshal.AsSpan(aoes);
+}
 
-
-// TODO
-//  6. Make Forsaken
-//  7. Fix timeline upon entering P5
-
-
-// TODO add safe spots to MaddeningOrchestra, add config option of 1-6 (somehow don't include tanks or set them to 0), 0 players will not be included
-//  Lowest number is left, highest number is right, last number remaining is middle
+class P5Enrage(BossModule module) : Components.RaidwideCast(module, (uint)AID.ForsakenNullEnrage, "Enrage");

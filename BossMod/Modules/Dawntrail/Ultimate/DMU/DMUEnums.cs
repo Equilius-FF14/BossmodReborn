@@ -275,14 +275,13 @@ public enum AID : uint {
     StrayEntropyCast = 47934, // KefkaP5->self, 5.0s cast, single-target
     StrayEntropySpread = 47935, // Helper->player, no cast, range 5 circle
 
-    ForsakenCast = 47925, // KefkaP5->self, 10.0s cast, range 100 circle - Cast - Raidwide
+    P5ForsakenCast = 47925, // KefkaP5->self, 10.0s cast, range 100 circle - Cast - Raidwide
+    P5ForsakenInstant = 47926, // KefkaP5->self, no cast, range 100 circle
     ForsakenGround = 47927, // Helper->self, 5.0s cast, range 8 circle - AOEs that just spawn
     ForsakenAOEBait = 47928, // Helper->self, 5.0s cast, range 8 circle - Bait puddle
     ForsakenBonds = 47929, // Helper->players, no cast, range 6 circle - Stack
 
-    _Ability_Forsaken2 = 47926, // KefkaP5->self, no cast, range 100 circle
-
-    _Ability_ForsakenNull = 47930, // KefkaP5->self, 26.0s cast, range 100 circle - Enrage
+    ForsakenNullEnrage = 47930, // KefkaP5->self, 26.0s cast, range 100 circle - Enrage
 }
 
 public enum SID : uint {
