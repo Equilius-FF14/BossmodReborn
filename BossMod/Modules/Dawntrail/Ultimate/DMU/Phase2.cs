@@ -747,7 +747,7 @@ sealed class ForsakenSolverSet1(BossModule module) : BossComponent(module)
                 var toCenter = (center - posSE).Normalized();
                 if (assignment is PartyRolesConfig.Assignment.M1 or PartyRolesConfig.Assignment.M2 or PartyRolesConfig.Assignment.R1 or PartyRolesConfig.Assignment.R2)
                 {
-                    Arena.ZoneCircleOutline(posSE + 4.5f * toCenter - toCenter.OrthoL(), 1.0f, colourCircle, 2.0f);
+                    Arena.ZoneCircleOutline(posSE + 4.5f * toCenter + toCenter.OrthoL(), 1.0f, colourCircle, 2.0f);
                 }
             }
         }
