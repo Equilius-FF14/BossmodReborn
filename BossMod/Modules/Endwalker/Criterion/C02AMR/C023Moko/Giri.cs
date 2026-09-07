@@ -9,9 +9,9 @@ sealed class TripleKasumiGiri(BossModule module) : Components.GenericAOEs(module
     private BitMask _ins; // [i] == true if i'th aoe is in
     private readonly List<AOEInstance> _aoes = [];
 
-    private static readonly AOEShapeCone _shapeCone = new(60f, 135f.Degrees());
-    private static readonly AOEShapeCircle _shapeOut = new(6f);
-    private static readonly AOEShapeDonut _shapeIn = new(6f, 40f);
+    private readonly AOEShapeCone _shapeCone = new(60f, 135f.Degrees());
+    private readonly AOEShapeCircle _shapeOut = new(6f);
+    private readonly AOEShapeDonut _shapeIn = new(6f, 40f);
 
     public override ReadOnlySpan<AOEInstance> ActiveAOEs(int slot, Actor actor)
     {

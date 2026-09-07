@@ -35,7 +35,7 @@
     <Using Include="System.Runtime.CompilerServices" />
     <Using Include="System.Linq" />
     <Using Include="System.Numerics" />
-    <Using Include="System.Threading.Tasks;" />
+    <Using Include="System.Threading.Tasks" />
     <Using Include="System.Text" />
   </ItemGroup>
 
@@ -55,7 +55,6 @@
 
   <ItemGroup>
     <PackageReference Include="DalamudPackager" Version="15.0.0" />
-    <PackageReference Include="PInvoke.User32" Version="0.7.124" />
     <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.26100.6" />
     <Reference Include="FFXIVClientStructs">
       <HintPath>$(DalamudLibPath)FFXIVClientStructs.dll</HintPath>
@@ -130,7 +129,7 @@
 
   <Target Name="CleanupOutput" AfterTargets="Build" BeforeTargets="DalamudPackage">
     <ItemGroup>
-      <_ExtraOutputFiles Include="$(OutputPath)*" Exclude="$(OutputPath)BossModReborn.*;$(OutputPath)DefaultRotationPresets.json;$(OutputPath)RebornPresets.json;$(OutputPath)PInvoke.User32.dll" />
+      <_ExtraOutputFiles Include="$(OutputPath)*" Exclude="$(OutputPath)BossModReborn.*;$(OutputPath)DefaultRotationPresets.json;$(OutputPath)RebornPresets.json;" />
     </ItemGroup>
     <Delete Files="@(_ExtraOutputFiles)" />
   </Target>

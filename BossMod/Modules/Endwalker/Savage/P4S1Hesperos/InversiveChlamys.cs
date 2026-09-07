@@ -2,14 +2,14 @@
 
 // state related to inversive chlamys mechanic (tethers)
 // note that forbidden targets are selected either from bloodrake tethers (first instance of mechanic) or from tower types (second instance of mechanic)
-class InversiveChlamys(BossModule module) : BossComponent(module)
+sealed class InversiveChlamys(BossModule module) : BossComponent(module)
 {
     private bool _assigned;
     private BitMask _tetherForbidden;
     private BitMask _tetherTargets;
     private BitMask _tetherInAOE;
 
-    private const float _aoeRange = 5;
+    private const float _aoeRange = 5f;
 
     public bool TethersActive => _tetherTargets.Any();
 

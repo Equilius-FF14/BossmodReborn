@@ -1,6 +1,6 @@
 ﻿namespace BossMod.Endwalker.Extreme.Ex2Hydaelyn;
 
-class Crystallize : BossComponent
+sealed class Crystallize : BossComponent
 {
     public enum Element { None, Water, Earth, Ice }
     public Element CurElement;
@@ -11,11 +11,11 @@ class Crystallize : BossComponent
 
     public Crystallize(BossModule module) : base(module)
     {
-        CurElement = (AID)(Module.PrimaryActor.CastInfo?.Action.ID ?? 0) switch
+        CurElement = (Module.PrimaryActor.CastInfo?.Action.ID ?? 0u) switch
         {
-            AID.CrystallizeSwordStaffWater or AID.CrystallizeChakramWater => Element.Water,
-            AID.CrystallizeStaffEarth or AID.CrystallizeChakramEarth => Element.Earth,
-            AID.CrystallizeStaffIce or AID.CrystallizeChakramIce => Element.Ice,
+            (uint)AID.CrystallizeSwordStaffWater or (uint)AID.CrystallizeChakramWater => Element.Water,
+            (uint)AID.CrystallizeStaffEarth or (uint)AID.CrystallizeChakramEarth => Element.Earth,
+            (uint)AID.CrystallizeStaffIce or (uint)AID.CrystallizeChakramIce => Element.Ice,
             _ => Element.None
         };
         if (CurElement == Element.None)
@@ -91,7 +91,7 @@ class Crystallize : BossComponent
     // note: this is pure validation, we currently rely on crystallize cast id to determine element...
     public override void OnStatusGain(Actor actor, ref ActorStatus status)
     {
-        if (actor != Module.PrimaryActor || (SID)status.ID != SID.CrystallizeElement)
+        if (actor != Module.PrimaryActor || status.ID != (uint)SID.CrystallizeElement)
             return;
 
         var element = status.Extra switch
@@ -110,11 +110,11 @@ class Crystallize : BossComponent
         if (CurElement == Element.None)
             return;
 
-        var element = (AID)spell.Action.ID switch
+        var element = spell.Action.ID switch
         {
-            AID.CrystallineWater => Element.Water,
-            AID.CrystallineStone => Element.Earth,
-            AID.CrystallineBlizzard => Element.Ice,
+            (uint)AID.CrystallineWater => Element.Water,
+            (uint)AID.CrystallineStone => Element.Earth,
+            (uint)AID.CrystallineBlizzard => Element.Ice,
             _ => Element.None
         };
 

@@ -196,9 +196,9 @@ public sealed class CLL1Brionac4thLegionHelldiver : BossModule
     }
 
     public static readonly WPos ArenaCenterBottom = new(80f, -179.41f);
-    public static readonly ArenaBoundsRect ArenaBottom = new(29.58f, 24.59f);
+    public static readonly ArenaBoundsRect ArenaBottom = new(29.58f, 24.59f) { Y = 230f, BorderY = 230f };
     public static readonly WPos ArenaCenterTop = new(80f, -222f);
-    public static readonly ArenaBoundsRect ArenaTop = new(29.5f, 14.5f);
+    public static readonly ArenaBoundsRect ArenaTop = new(29.5f, 14.5f) { Y = 249.5f, BorderY = 249.5f };
 
     protected override void CalculateModuleAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints)
     {

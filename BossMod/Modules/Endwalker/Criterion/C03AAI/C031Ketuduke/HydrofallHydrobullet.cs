@@ -1,6 +1,6 @@
 ﻿namespace BossMod.Endwalker.VariantCriterion.C03AAI.C031Ketuduke;
 
-class HydrofallHydrobullet(BossModule module) : Components.UniformStackSpread(module, 6f, 15f)
+sealed class HydrofallHydrobullet(BossModule module) : Components.UniformStackSpread(module, 6f, 15f)
 {
     public struct Mechanic
     {

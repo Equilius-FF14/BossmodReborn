@@ -19,7 +19,6 @@ public enum StrategyTarget
     Count
 }
 
-[Flags]
 public enum StrategyContext
 {
     None = 0,
@@ -30,7 +29,6 @@ public enum StrategyContext
 }
 
 // parameter for party member filtering
-[Flags]
 public enum StrategyPartyFiltering : int
 {
     None = 0,

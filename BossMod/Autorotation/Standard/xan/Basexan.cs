@@ -252,7 +252,7 @@ public abstract class Basexan<AID, TraitID, TValues>(RotationModuleManager manag
 
         Vector3 targetPos = default;
 
-        if (def.AllowedTargets.HasFlag(ActionTargets.Area))
+        if ((def.AllowedTargets & ActionTargets.Area) != 0)
         {
             if (def.Range == 0)
                 targetPos = Player.PosRot.XYZ();

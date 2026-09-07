@@ -2,14 +2,14 @@
 
 // state related to act 3 wreath of thorns
 // note: there should be four tethered helpers on activation
-class WreathOfThorns3(BossModule module) : BossComponent(module)
+sealed class WreathOfThorns3(BossModule module) : BossComponent(module)
 {
     public enum State { RangedTowers, Knockback, MeleeTowers, Done }
 
-    public State CurState { get; private set; } = State.RangedTowers;
-    public int NumJumps { get; private set; }
-    public int NumCones { get; private set; }
-    private readonly AOEShapeCone _coneAOE = new(50, 45.Degrees()); // not sure about half-width...
+    public State CurState = State.RangedTowers;
+    public int NumJumps;
+    public int NumCones;
+    private readonly AOEShapeCone _coneAOE = new(50f, 45f.Degrees()); // not sure about half-width...
     private readonly List<Actor> _relevantHelpers = []; // 4 towers -> knockback -> 4 towers
     private Actor? _jumpTarget; // either predicted (if jump is imminent) or last actual (if cones are imminent)
     private BitMask _coneTargets;
@@ -19,7 +19,7 @@ class WreathOfThorns3(BossModule module) : BossComponent(module)
     //private IEnumerable<Actor> _knockbackThorn => _relevantHelpers.Skip(4).Take(1);
     private IEnumerable<Actor> MeleeTowers => _relevantHelpers.Skip(5);
 
-    private const float _jumpAOERadius = 10;
+    private const float _jumpAOERadius = 10f;
 
     public override void Update()
     {

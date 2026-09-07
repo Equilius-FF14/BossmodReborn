@@ -172,8 +172,10 @@ public static class UIStrategyValue
                 modified |= DrawEditorTargetParamCombo<PartyRolesConfig.Assignment>(ref value.TargetParam, "Assignment");
                 break;
             case StrategyTarget.PartyWithLowestHP:
-                if (supportedTargets.HasFlag(ActionTargets.Self))
+                if ((supportedTargets & ActionTargets.Self) != 0)
+                {
                     modified |= DrawEditorTargetParamFlags(ref value.TargetParam, StrategyPartyFiltering.IncludeSelf, "Allow self", false);
+                }
                 modified |= DrawEditorTargetParamFlags(ref value.TargetParam, StrategyPartyFiltering.ExcludeTanks, "Allow tanks", true);
                 modified |= DrawEditorTargetParamFlags(ref value.TargetParam, StrategyPartyFiltering.ExcludeHealers, "Allow healers", true);
                 modified |= DrawEditorTargetParamFlags(ref value.TargetParam, StrategyPartyFiltering.ExcludeMelee, "Allow melee", true);
@@ -204,7 +206,7 @@ public static class UIStrategyValue
                 break;
         }
 
-        if (supportedTargets.HasFlag(ActionTargets.Area))
+        if ((supportedTargets & ActionTargets.Area) != 0)
         {
             if (value.Target == StrategyTarget.PointAbsolute)
             {
@@ -223,21 +225,21 @@ public static class UIStrategyValue
         return modified;
     }
 
-    public static bool AllowTarget(StrategyTarget t, ActionTargets supported, BossModuleRegistry.Info? moduleInfo) => supported.HasFlag(ActionTargets.Area) || t switch
+    public static bool AllowTarget(StrategyTarget t, ActionTargets supported, BossModuleRegistry.Info? moduleInfo) => (supported & ActionTargets.Area) != 0 || t switch
     {
-        StrategyTarget.Self => supported.HasFlag(ActionTargets.Self),
-        StrategyTarget.PartyByAssignment => supported.HasFlag(ActionTargets.Party),
-        StrategyTarget.PartyWithLowestHP => supported.HasFlag(ActionTargets.Party),
-        StrategyTarget.EnemyWithHighestPriority => supported.HasFlag(ActionTargets.Hostile),
-        StrategyTarget.EnemyByOID => supported.HasFlag(ActionTargets.Hostile) && moduleInfo != null,
+        StrategyTarget.Self => (supported & ActionTargets.Self) != 0,
+        StrategyTarget.PartyByAssignment => (supported & ActionTargets.Party) != 0,
+        StrategyTarget.PartyWithLowestHP => (supported & ActionTargets.Party) != 0,
+        StrategyTarget.EnemyWithHighestPriority => (supported & ActionTargets.Hostile) != 0,
+        StrategyTarget.EnemyByOID => (supported & ActionTargets.Hostile) != 0 && moduleInfo != null,
         StrategyTarget.PointAbsolute or StrategyTarget.PointCenter or StrategyTarget.PointWaymark => false,
         _ => true
     };
 
     private static string PreviewParam(StrategyPartyFiltering pf)
     {
-        string excludeIfSet(StrategyPartyFiltering flag, string value) => pf.HasFlag(flag) ? $", exclude {value}" : "";
-        return $"{(pf.HasFlag(StrategyPartyFiltering.IncludeSelf) ? "include" : "exclude")} self"
+        string excludeIfSet(StrategyPartyFiltering flag, string value) => (pf & flag) != 0 ? $", exclude {value}" : "";
+        return $"{((pf & StrategyPartyFiltering.IncludeSelf) != 0 ? "include" : "exclude")} self"
             + excludeIfSet(StrategyPartyFiltering.ExcludeTanks, "tanks")
             + excludeIfSet(StrategyPartyFiltering.ExcludeHealers, "healers")
             + excludeIfSet(StrategyPartyFiltering.ExcludeMelee, "melee")
@@ -256,7 +258,7 @@ public static class UIStrategyValue
 
     private static bool DrawEditorTargetParamFlags(ref int current, StrategyPartyFiltering flag, string text, bool inverted)
     {
-        var isChecked = ((StrategyPartyFiltering)current).HasFlag(flag) != inverted;
+        var isChecked = (((StrategyPartyFiltering)current) & flag) != 0 != inverted;
         if (!ImGui.Checkbox(text, ref isChecked))
             return false;
         current ^= (int)flag;
@@ -270,7 +272,7 @@ public sealed class RendererAttribute(Type type) : Attribute
     public Type Type => type;
 }
 
-public class RendererFactory
+public sealed class RendererFactory
 {
     private static RendererFactory? _instance;
     private readonly Dictionary<Type, IStrategyRenderer> _dict = [];
@@ -328,7 +330,7 @@ public class TrackRenderer : IStrategyRenderer
     }
 }
 
-public class FloatRenderer : IStrategyRenderer
+public sealed class FloatRenderer : IStrategyRenderer
 {
     public void DrawLabel(StrategyContext context, StrategyConfig config) => ImGui.TextWrapped(config.UIName);
     public bool DrawValue(StrategyContext context, StrategyConfig config, ref StrategyValue value)
@@ -357,7 +359,7 @@ public class FloatRenderer : IStrategyRenderer
     }
 }
 
-public class IntRenderer : IStrategyRenderer
+public sealed class IntRenderer : IStrategyRenderer
 {
     public void DrawLabel(StrategyContext context, StrategyConfig config) => ImGui.TextWrapped(config.UIName);
     public bool DrawValue(StrategyContext context, StrategyConfig config, ref StrategyValue value)
@@ -386,7 +388,7 @@ public class IntRenderer : IStrategyRenderer
     }
 }
 
-public class FakeFloatRenderer : TrackRenderer
+public sealed class FakeFloatRenderer : TrackRenderer
 {
     public override bool DrawValue(StrategyContext context, StrategyConfigTrack config, ref StrategyValueTrack value)
     {

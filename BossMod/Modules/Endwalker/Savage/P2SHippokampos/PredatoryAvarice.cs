@@ -1,7 +1,7 @@
 ﻿namespace BossMod.Endwalker.Savage.P2SHippokampos;
 
 // state related to predatory avarice mechanic
-class PredatoryAvarice(BossModule module) : BossComponent(module)
+sealed class PredatoryAvarice(BossModule module) : BossComponent(module)
 {
     private BitMask _playersWithTides;
     private BitMask _playersWithDepths;
@@ -93,12 +93,12 @@ class PredatoryAvarice(BossModule module) : BossComponent(module)
 
     public override void OnStatusGain(Actor actor, ref ActorStatus status)
     {
-        switch ((SID)status.ID)
+        switch (status.ID)
         {
-            case SID.MarkOfTides:
+            case (uint)SID.MarkOfTides:
                 _playersWithTides.Set(Raid.FindSlot(actor.InstanceID));
                 break;
-            case SID.MarkOfDepths:
+            case (uint)SID.MarkOfDepths:
                 _playersWithDepths.Set(Raid.FindSlot(actor.InstanceID));
                 break;
         }
@@ -106,12 +106,12 @@ class PredatoryAvarice(BossModule module) : BossComponent(module)
 
     public override void OnStatusLose(Actor actor, ref ActorStatus status)
     {
-        switch ((SID)status.ID)
+        switch (status.ID)
         {
-            case SID.MarkOfTides:
+            case (uint)SID.MarkOfTides:
                 _playersWithTides.Clear(Raid.FindSlot(actor.InstanceID));
                 break;
-            case SID.MarkOfDepths:
+            case (uint)SID.MarkOfDepths:
                 _playersWithDepths.Clear(Raid.FindSlot(actor.InstanceID));
                 break;
         }

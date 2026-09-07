@@ -4,7 +4,7 @@
 public class Exaflare(BossModule module, AOEShape shape, uint aid = default) : GenericAOEs(module, aid, "GTFO from exaflare!")
 {
     public sealed class Line(WPos next, WDir advance, DateTime nextExplosion, double timeToMove, int explosionsLeft, int maxShownExplosions, Angle rotation = default,
-        int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false)
+        int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false)
     {
         public WPos Next = next;
         public WDir Advance = advance;
@@ -14,7 +14,7 @@ public class Exaflare(BossModule module, AOEShape shape, uint aid = default) : G
         public int MaxShownExplosions = maxShownExplosions;
         public Angle Rotation = rotation;
         public int? ArenaProjectionLayer = arenaProjectionLayer;
-        public bool RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
+        public bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
     }
 
     public readonly AOEShape Shape = shape;
@@ -35,7 +35,7 @@ public class Exaflare(BossModule module, AOEShape shape, uint aid = default) : G
         var linesCount = Lines.Count;
         if (lastCount != linesCount || currentVersion != lastVersion)
         {
-            var futureProjectionLayers = new List<(int? layer, bool restrict)>();
+            var futureProjectionLayers = new List<(int? layer, bool? restrict)>();
             var futureAOEs = CollectionsMarshal.AsSpan(FutureAOEs(linesCount, futureProjectionLayers));
             var imminentAOEs = ImminentAOEs(linesCount);
             var futureLen = futureAOEs.Length;
@@ -82,7 +82,7 @@ public class Exaflare(BossModule module, AOEShape shape, uint aid = default) : G
 
     protected List<(WPos, DateTime, Angle)> FutureAOEs(int count) => FutureAOEs(count, null);
 
-    private List<(WPos, DateTime, Angle)> FutureAOEs(int count, List<(int? layer, bool restrict)>? projectionLayers)
+    private List<(WPos, DateTime, Angle)> FutureAOEs(int count, List<(int? layer, bool? restrict)>? projectionLayers)
     {
         var exas = new List<(WPos, DateTime, Angle)>(count);
         var currentTime = WorldState.CurrentTime;
@@ -113,7 +113,7 @@ public class Exaflare(BossModule module, AOEShape shape, uint aid = default) : G
 }
 
 public class SimpleExaflare(BossModule module, AOEShape shape, uint aidFirst, uint aidRest, float distance, double timeToMove, int explosionsLeft, int maxShownExplosions, bool castEvent = false,
-bool locationBased = false, Angle rotation = default, float[]? arenaProjectionLayers = null, bool restrictToArenaProjectionLayer = true) : Exaflare(module, shape)
+bool locationBased = false, Angle rotation = default, float[]? arenaProjectionLayers = null, bool? restrictToArenaProjectionLayer = true) : Exaflare(module, shape)
 {
     private readonly uint AIDFirst = aidFirst;
     private readonly uint AIDRest = aidRest;
@@ -125,11 +125,11 @@ bool locationBased = false, Angle rotation = default, float[]? arenaProjectionLa
     private readonly bool LocationBased = locationBased; // if cast is location based
     private readonly Angle Rotation = rotation;
     public float[]? ArenaProjectionLayers = arenaProjectionLayers;
-    public bool RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
+    public bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
     public int NumLinesFinished;
 
     public SimpleExaflare(BossModule module, float radius, uint aidFirst, uint aidRest, float distance, double timeToMove, int explosionsLeft, int maxShownExplosions, bool castEvent = false, bool locationBased = false,
-        float[]? arenaProjectionLayers = null, bool restrictToArenaProjectionLayer = true)
+        float[]? arenaProjectionLayers = null, bool? restrictToArenaProjectionLayer = true)
     : this(module, new AOEShapeCircle(radius), aidFirst, aidRest, distance, timeToMove, explosionsLeft, maxShownExplosions, castEvent, locationBased, default, arenaProjectionLayers, restrictToArenaProjectionLayer) { }
 
     private int? ResolveArenaProjectionLayer(float y)

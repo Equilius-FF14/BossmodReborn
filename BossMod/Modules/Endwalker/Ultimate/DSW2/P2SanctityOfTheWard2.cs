@@ -48,7 +48,6 @@ sealed class P2SanctityOfTheWard2Towers1(BossModule module) : Components.CastTow
         public int NonPreySlot;
     }
 
-    //[Flags]
     //enum AssignmentDebug
     //{
     //    PreySwapLazy = 0x01,
@@ -568,7 +567,7 @@ sealed class P2SanctityOfTheWard2Towers1(BossModule module) : Components.CastTow
 
 // identifiers used by this component:
 // - towers 2: [0,7] - CW order, starting from N
-sealed class P2SanctityOfTheWard2Towers2(BossModule module) : Components.CastTowers(module, (uint)AID.Conviction3AOE, 3)
+sealed class P2SanctityOfTheWard2Towers2(BossModule module) : Components.CastTowers(module, (uint)AID.Conviction3AOE, 3f)
 {
     private bool _preyOnTH;
     private BitMask _preyTargets;

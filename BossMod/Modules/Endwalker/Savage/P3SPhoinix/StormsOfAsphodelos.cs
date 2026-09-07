@@ -1,7 +1,7 @@
 ﻿namespace BossMod.Endwalker.Savage.P3SPhoinix;
 
 // state related to storms of asphodelos mechanics
-class StormsOfAsphodelos(BossModule module) : BossComponent(module)
+sealed class StormsOfAsphodelos(BossModule module) : BossComponent(module)
 {
     private readonly AOEShapeCone _windsAOE = new(50f, 30f.Degrees());
     private readonly AOEShapeCircle _beaconAOE = new(6);

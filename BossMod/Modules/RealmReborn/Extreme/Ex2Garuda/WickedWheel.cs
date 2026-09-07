@@ -1,6 +1,6 @@
 ﻿namespace BossMod.RealmReborn.Extreme.Ex2Garuda;
 
-class WickedWheel(BossModule module) : Components.CastCounter(module, (uint)AID.WickedWheel)
+sealed class WickedWheel(BossModule module) : Components.CastCounter(module, (uint)AID.WickedWheel)
 {
     private DateTime _expectedNext = module.WorldState.FutureTime(25d);
     private const float _radius = 8.7f;

@@ -1,13 +1,13 @@
 ﻿namespace BossMod.Endwalker.Extreme.Ex6Golbez;
 
-class GaleSphere(BossModule module) : Components.GenericAOEs(module)
+sealed class GaleSphere(BossModule module) : Components.GenericAOEs(module)
 {
     public enum Side { S, E, N, W } // direction = value * 90deg
 
     private readonly List<Side> _sides = [];
     private readonly List<Actor>[] _spheres = [[], [], [], []];
 
-    private static readonly AOEShapeRect _shape = new(30f, 2.5f);
+    private readonly AOEShapeRect _shape = new(30f, 2.5f);
 
     public override ReadOnlySpan<AOEInstance> ActiveAOEs(int slot, Actor actor)
     {

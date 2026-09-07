@@ -1,6 +1,6 @@
 ﻿namespace BossMod.Endwalker.Extreme.Ex2Hydaelyn;
 
-class Spectrum(BossModule module) : Components.CastCounter(module, (uint)AID.BrightSpectrum)
+sealed class Spectrum(BossModule module) : Components.CastCounter(module, (uint)AID.BrightSpectrum)
 {
     private const float _radius = 5;
 

@@ -105,26 +105,41 @@ sealed class RedRush(BossModule module) : Components.BaitAwayTethers(module, new
 
 sealed class ArenaChange(BossModule module) : BossComponent(module)
 {
-
     public override void OnCastFinished(Actor caster, ActorCastInfo spell)
     {
         if (spell.Action.ID == (uint)AID.StrengthOfSpirit) // in phase 2 the arena no longer got a wall and we need to add back the player hitboxradius
         {
-            Arena.Bounds = Seiryu.Phase2Bounds;
+            Arena.Bounds = SeiryuTrial.GetPhase2Arena();
         }
     }
 }
 
-public abstract class Seiryu(WorldState ws, Actor primary) : BossModule(ws, primary, arenaCenter, phase1Bounds)
+public abstract class SeiryuTrial : BossModule
 {
-    private static readonly WPos arenaCenter = new(100f, 100f);
-    private static readonly ArenaBoundsCustom phase1Bounds = new([new Polygon(arenaCenter, 19.5f, 48)]);
-    public static readonly ArenaBoundsCustom Phase2Bounds = new([new Polygon(arenaCenter, 20f, 48)]);
-    public static readonly ArenaBoundsCustom Phase2WaterBounds = new([new Polygon(arenaCenter, 44.5f, 48)]);
+    public SeiryuTrial(WorldState ws, Actor primary) : this(ws, primary, BuildArena()) { }
+
+    private SeiryuTrial(WorldState ws, Actor primary, (WPos center, ArenaBoundsCustom arena) a) : base(ws, primary, a.center, a.arena) { }
+
+    private static (WPos center, ArenaBoundsCustom arena) BuildArena()
+    {
+        var arena = new ArenaBoundsCustom([new Polygon(new(100f, 100f), 19.5f, 48)]);
+        return (arena.Center, arena);
+    }
+
+    public static ArenaBoundsCustom GetPhase2Arena()
+    {
+        var center = new WPos(100f, 100f);
+        Polygon[] phase2withwater = [new Polygon(center, 44.5f, 48)];
+        var phase2nowater = new Polygon(center, 20f, 48);
+        var polywithwater = new RelSimplifiedComplexPolygon(phase2withwater[0].Contour(center));
+        var polynowater = new RelSimplifiedComplexPolygon(phase2nowater.Contour(center));
+        var arena = new ArenaBoundsCustom(phase2withwater, WorldProjectionLayers: [new(polywithwater, -0.75f, borderY: -0.75f), new(polynowater, 0.03f, borderY: 0.03f)]);
+        return arena;
+    }
 }
 
-[ModuleInfo(BossModuleInfo.Maturity.Verified, Contributors = "The Combat Reborn Team (Malediktus, LTS)", PrimaryActorOID = (uint)OID.Seiryu, GroupType = BossModuleInfo.GroupType.CFC, GroupID = 637u, NameID = 7922u, Category = BossModuleInfo.Category.Trial, Expansion = BossModuleInfo.Expansion.Stormblood)]
-public sealed class T09Seiryu(WorldState ws, Actor primary) : Seiryu(ws, primary)
+[ModuleInfo(BossModuleInfo.Maturity.Verified, Contributors = "The Combat Reborn Team (Malediktus, LTS)", PrimaryActorOID = (uint)OID.Seiryu, GroupType = BossModuleInfo.GroupType.CFC, GroupID = 637u, NameID = 7922u)]
+public sealed class T09Seiryu(WorldState ws, Actor primary) : SeiryuTrial(ws, primary)
 {
     protected override void DrawEnemies(int pcSlot, Actor pc)
     {

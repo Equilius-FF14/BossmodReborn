@@ -12,7 +12,7 @@ public abstract class GenericGaze(BossModule module, uint aid = default) : CastC
         ulong actorID = default,
         WPos? eyeCenter = null,
         int? arenaProjectionLayer = null,
-        bool restrictToArenaProjectionLayer = false)
+        bool? restrictToArenaProjectionLayer = false)
     {
         public readonly WPos Position = position;
         public readonly DateTime Activation = activation;
@@ -22,7 +22,7 @@ public abstract class GenericGaze(BossModule module, uint aid = default) : CastC
         public readonly ulong ActorID = actorID;
         public readonly WPos? EyeCenter = eyeCenter; // optional world position where the eye should be drawn
         public readonly int? ArenaProjectionLayer = arenaProjectionLayer;
-        public readonly bool RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
+        public readonly bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
     }
 
     public abstract ReadOnlySpan<Eye> ActiveEyes(int slot, Actor actor);
@@ -135,12 +135,12 @@ public abstract class GenericGaze(BossModule module, uint aid = default) : CastC
 }
 
 // gaze that happens on cast end
-public class CastGaze(BossModule module, uint aid, bool inverted = false, float range = 10000f, int maxCasts = int.MaxValue, float[]? arenaProjectionLayers = null, bool restrictToArenaProjectionLayer = true) : GenericGaze(module, aid)
+public class CastGaze(BossModule module, uint aid, bool inverted = false, float range = 10000f, int maxCasts = int.MaxValue, float[]? arenaProjectionLayers = null, bool? restrictToArenaProjectionLayer = true) : GenericGaze(module, aid)
 {
     public readonly List<Eye> Eyes = [];
     public int MaxCasts = maxCasts; // used for staggered gazes, when showing all active would be pointless
     public float[]? ArenaProjectionLayers = arenaProjectionLayers;
-    public bool RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
+    public bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
 
     protected int? ResolveArenaProjectionLayer(float y)
         => ArenaProjectionLayers is { Length: > 0 } layers ? GenericAOEs.IndexOfClosestLayer(layers, y) : null;
@@ -185,7 +185,7 @@ public class CastGaze(BossModule module, uint aid, bool inverted = false, float 
     }
 }
 
-public class CastGazes(BossModule module, uint[] aids, bool inverted = false, float range = 10000f, int maxCasts = int.MaxValue, int expectedNumCasters = 99, float[]? arenaProjectionLayers = null, bool restrictToArenaProjectionLayer = true)
+public class CastGazes(BossModule module, uint[] aids, bool inverted = false, float range = 10000f, int maxCasts = int.MaxValue, int expectedNumCasters = 99, float[]? arenaProjectionLayers = null, bool? restrictToArenaProjectionLayer = true)
     : CastGaze(module, default, maxCasts: maxCasts, arenaProjectionLayers: arenaProjectionLayers, restrictToArenaProjectionLayer: restrictToArenaProjectionLayer)
 {
     protected readonly uint[] AIDs = aids;
@@ -244,15 +244,15 @@ public class CastGazes(BossModule module, uint[] aids, bool inverted = false, fl
 
 // cast weakpoint component: a number of casts (with supposedly non-intersecting shapes), player should face specific side determined by active status to the caster for aoe he's in
 public class CastWeakpoint(BossModule module, uint aid, AOEShape shape, uint statusForward, uint statusBackward, uint statusLeft, uint statusRight,
-    int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false) : GenericGaze(module, aid)
+    int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false) : GenericGaze(module, aid)
 {
     public CastWeakpoint(BossModule module, uint aid, float radius, uint statusForward, uint statusBackward, uint statusLeft, uint statusRight,
-        int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false)
+        int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false)
         : this(module, aid, new AOEShapeCircle(radius), statusForward, statusBackward, statusLeft, statusRight, arenaProjectionLayer, restrictToArenaProjectionLayer) { }
     public AOEShape Shape = shape;
     public readonly uint[] Statuses = [statusForward, statusLeft, statusBackward, statusRight]; // 4 elements: fwd, left, back, right
     public int? ArenaProjectionLayer = arenaProjectionLayer;
-    public bool RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
+    public bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
     protected readonly List<Actor> _casters = [];
     private readonly Dictionary<ulong, Angle> _playerWeakpoints = [];
     protected float fallbackTime;

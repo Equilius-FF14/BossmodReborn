@@ -1,6 +1,5 @@
 namespace BossMod.Dawntrail.Quantum.Q1FinalVerse;
 
-[SkipLocalsInit]
 sealed class LightAndDark(Q1FinalVerse module) : DeepDungeon.PilgrimsTraverse.LightAndDarkBase(module)
 {
     private bool boundsOfSinTowers;
@@ -185,7 +184,6 @@ sealed class LightAndDark(Q1FinalVerse module) : DeepDungeon.PilgrimsTraverse.Li
     }
 }
 
-[SkipLocalsInit]
 sealed class LightDarkNeutralize(BossModule module) : Components.GenericStackSpread(module)
 {
     public int NumCasts;
@@ -207,7 +205,6 @@ sealed class LightDarkNeutralize(BossModule module) : Components.GenericStackSpr
     }
 }
 
-[SkipLocalsInit]
 sealed class BoundsOfSinTowers(BossModule module) : Components.GenericTowers(module, damageType: AIHints.PredictedDamageType.Raidwide)
 {
     private BitMask forbidden = ~(BitMask)default;

@@ -10,7 +10,6 @@ public sealed record class Preset(string Name)
 {
     public bool HiddenByDefault;
 
-    [Flags]
     public enum Modifier
     {
         None = 0,

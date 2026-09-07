@@ -25,8 +25,8 @@ sealed class AccursedEdge : Components.GenericBaitAway
     private Mechanic _curMechanic;
     private readonly Clearout? _clearout;
 
-    private static readonly AOEShapeCircle _shape = new(6f);
-    private static readonly WDir[] _safespotDirections = [new(1f, default), new(-1f, default), new(default, 1f), new(default, -1f)];
+    private readonly AOEShapeCircle _shape = new(6f);
+    private readonly WDir[] _safespotDirections = [new(1f, default), new(-1f, default), new(default, 1f), new(default, -1f)];
 
     public AccursedEdge(BossModule module) : base(module, centerAtTarget: true)
     {

@@ -19,12 +19,10 @@ public abstract class AkechiTools<AID, TraitID>(RotationModuleManager manager, A
     protected bool QueueAction(AID aid, Actor? target, float priority, float delay, float castTime, Vector3 targetPos = default, Angle? facingAngle = null)
     {
         var ability = ActionDefinitions.Instance.Spell(aid);
-        if (ability == null ||
-            (uint)(object)aid == 0 ||
-            (ability.Range != 0 && target == null))
+        if (ability == null || (uint)(object)aid == 0 || ability.Range != 0 && target == null)
             return false;
 
-        if (ability.AllowedTargets.HasFlag(ActionTargets.Area))
+        if ((ability.AllowedTargets & ActionTargets.Area) != 0)
         {
             if (ability.Range == 0)
                 targetPos = Player.PosRot.XYZ();

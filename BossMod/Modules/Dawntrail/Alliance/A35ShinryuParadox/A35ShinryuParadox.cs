@@ -114,7 +114,6 @@ sealed class FloorAOEs(BossModule module) : Components.GenericAOEs(module)
     }
 }
 
-[SkipLocalsInit]
 sealed class P2ArenaChange(BossModule module) : BossComponent(module)
 {
     public override void OnMapEffect(byte index, uint state)
@@ -127,14 +126,11 @@ sealed class P2ArenaChange(BossModule module) : BossComponent(module)
 }
 
 // Starflare: Two sets of crisscrossing line AoE telegraphs, hitting both levels at once.
-[SkipLocalsInit]
 sealed class StarflareP1(BossModule module) : Components.SimpleAOEGroups(module, [(uint)AID.StarflareP1Fast, (uint)AID.StarflareP1Slow], new AOEShapeRect(60f, 5f), 10, 20, arenaProjectionLayers: [-900f, -879f]);
 
-[SkipLocalsInit]
 sealed class StarflareP2(BossModule module) : Components.SimpleAOEGroups(module, [(uint)AID.StarflareP2Fast, (uint)AID.StarflareP2Slow], new AOEShapeRect(60f, 5f), 5, 10);
 
 // Icon to look away from the boss
-[SkipLocalsInit]
 sealed class VortexGaze(BossModule module) : Components.GenericGaze(module)
 {
     private BitMask _affectedLook;
@@ -188,7 +184,6 @@ sealed class VortexGaze(BossModule module) : Components.GenericGaze(module)
     }
 }
 
-[SkipLocalsInit]
 sealed class VortexStayMove(BossModule module) : Components.StayMove(module)
 {
     public override void OnEventIcon(Actor actor, uint iconID, ulong targetID)
@@ -217,10 +212,8 @@ sealed class VortexStayMove(BossModule module) : Components.StayMove(module)
     }
 }
 
-[SkipLocalsInit]
 sealed class UpDownCounter(BossModule module) : Components.CastCounterMulti(module, [(uint)AID.CosmicBreath, (uint)AID.CosmicTail]);
 
-[SkipLocalsInit]
 sealed class DarkNova(BossModule module) : Components.BaitAwayIconMulti(module, 6f, (uint)IconID.Tankbuster, [(uint)AID.DarkNova, (uint)AID.DarkNovaP2],
     centerAtTarget: true, restrictToArenaProjectionLayer: true, damageType: AIHints.PredictedDamageType.Tankbuster)
 {
@@ -252,7 +245,6 @@ sealed class DarkNova(BossModule module) : Components.BaitAwayIconMulti(module, 
  * heavy damage, receive a 20-second HP Recovery Down debuff, and be knocked back slightly.
  * Another set of eight towers will then spawn and should be taken by players without the debuff.
  */
-[SkipLocalsInit]
 sealed class CelestialTrail(BossModule module) : Components.CastTowers(module, (uint)AID.CelestialTrailTower, 2f, 1, 1)
 {
     private BitMask _forbidden;
@@ -279,20 +271,14 @@ sealed class CelestialTrail(BossModule module) : Components.CastTowers(module, (
         }
     }
 }
-[SkipLocalsInit]
+
 sealed class EmptyProclamation(BossModule module) : Components.RaidwideCast(module, (uint)AID.EmptyProclamation);
-[SkipLocalsInit]
 sealed class Swordscross1(BossModule module) : Components.SimpleAOEGroups(module, [(uint)AID.RightSwordscross1, (uint)AID.LeftSwordscross1], new AOEShapeRect(60f, 15f));
-[SkipLocalsInit]
 sealed class Swordscross2(BossModule module) : Components.SimpleAOEGroups(module, [(uint)AID.RightSwordscross2, (uint)AID.LeftSwordscross2], new AOEShapeRect(70f, 18f));
-[SkipLocalsInit]
 sealed class TwinBlaze1(BossModule module) : Components.SimpleAOEs(module, (uint)AID.TwinBlazeIn, new AOEShapeDonutSector(20f, 60f, 45f.Degrees()));
-[SkipLocalsInit]
 sealed class TwinBlaze2(BossModule module) : Components.SimpleAOEs(module, (uint)AID.TwinBlazeOut, new AOEShapeCone(35f, 45f.Degrees()));
-[SkipLocalsInit]
 sealed class CataclysmicBlade(BossModule module) : Components.SimpleAOEs(module, (uint)AID.CataclysmicBladeCone, new AOEShapeCone(60f, 22.5f.Degrees()));
 
-[SkipLocalsInit]
 sealed class Burst(BossModule module) : Components.ConcentricAOEs(module, [new AOEShapeCircle(10f), new AOEShapeDonut(10f, 20f), new AOEShapeDonut(20f, 30f)])
 {
     public override void OnCastStarted(Actor caster, ActorCastInfo spell)
@@ -316,7 +302,6 @@ sealed class Burst(BossModule module) : Components.ConcentricAOEs(module, [new A
     }
 }
 
-[SkipLocalsInit]
 sealed class CosmicFlame(BossModule module) : Components.Exaflare(module, 6f)
 {
     public override void OnCastStarted(Actor caster, ActorCastInfo spell)
@@ -351,7 +336,6 @@ sealed class CosmicFlame(BossModule module) : Components.Exaflare(module, 6f)
     }
 }
 
-[SkipLocalsInit]
 sealed class AtomicRay(BossModule module) : Components.GenericAOEs(module, (uint)AID.AtomicRay)
 {
     private readonly AOEShapeRect rect = new(60f, 7.5f);
@@ -459,10 +443,8 @@ sealed class AtomicRay(BossModule module) : Components.GenericAOEs(module, (uint
     }
 }
 
-[SkipLocalsInit]
 sealed class GyreCharge(BossModule module) : Components.RaidwideCastDelay(module, (uint)AID.AtomicTailVisual1, (uint)AID.GyreCharge, 6.3d);
 
-[SkipLocalsInit]
 sealed class SuperNova(BossModule module) : Components.StackWithIcon(module, (uint)IconID.Stack, (uint)AID.SuperNova, 6f, 6.1d, minStackSize: 8)
 {
     public int NumCasts;
@@ -482,11 +464,9 @@ sealed class SuperNova(BossModule module) : Components.StackWithIcon(module, (ui
 }
 
 [ModuleInfo(BossModuleInfo.Maturity.Contributed, PrimaryActorOID = (uint)OID.ShinryuParadox, Contributors = "Xan, ported by wen", GroupType = BossModuleInfo.GroupType.CFC, GroupID = 1117u, NameID = 14729u)]
-
-// Set up base logic for what level of arena and which phase boss pc is fighting.
-[SkipLocalsInit]
 public sealed class A35ShinryuParadox : BossModule
 {
+    // Set up base logic for what level of arena and which phase boss pc is fighting.
     public A35ShinryuParadox(WorldState ws, Actor primary) : this(ws, primary, BuildArena()) { }
 
     private A35ShinryuParadox(WorldState ws, Actor primary, (WPos center, ArenaBoundsCustom arena) a) : base(ws, primary, a.center, a.arena) { }

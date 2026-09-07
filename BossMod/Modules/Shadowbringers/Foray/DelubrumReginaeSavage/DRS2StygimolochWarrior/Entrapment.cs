@@ -12,7 +12,7 @@ sealed class EntrapmentAttract(BossModule module) : Components.GenericKnockback(
     public override void OnCastStarted(Actor caster, ActorCastInfo spell)
     {
         if (spell.Action.ID == (uint)AID.Entrapment)
-            _activation = Module.CastFinishAt(spell, 0.8f);
+            _activation = Module.CastFinishAt(spell, 0.8d);
     }
 }
 

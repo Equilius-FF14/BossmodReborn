@@ -60,7 +60,7 @@ sealed class ForbiddenArts(BossModule module) : Components.GenericBaitStack(modu
                     var p = player.Item2;
                     if (p.Role == Role.Healer && player.Item1 != slotT)
                     {
-                        CurrentBaits.Add(new(source, p, rect, act.AddSeconds(2d), forbidden: forbidden));
+                        CurrentBaits.Add(new(source, p, rect, act.AddSeconds(2d), forbidden: forbidden, restrictToArenaProjectionLayer: null));
                         break;
                     }
                 }

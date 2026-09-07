@@ -1,6 +1,6 @@
 ﻿namespace BossMod.Endwalker.Savage.P10SPandaemonium;
 
-class DaemoniacBonds(BossModule module) : Components.UniformStackSpread(module, 4f, 6f)
+sealed class DaemoniacBonds(BossModule module) : Components.UniformStackSpread(module, 4f, 6f)
 {
     public int NumMechanics;
     private readonly List<Actor> _spreadTargets = [];

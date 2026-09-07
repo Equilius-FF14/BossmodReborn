@@ -5,7 +5,7 @@
 // otherwise we show own bait as as outline (and warn if player is clipping someone) and other baits as filled (and warn if player is being clipped)
 public class GenericBaitAway(BossModule module, uint aid = default, bool alwaysDrawOtherBaits = true, bool centerAtTarget = false, bool tankbuster = false, bool onlyShowOutlines = false, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.None) : CastCounter(module, aid)
 {
-    public struct Bait(Actor source, Actor target, AOEShape shape, DateTime activation = default, BitMask forbidden = default, Angle? customRotation = null, int maxCasts = 1, WDir offset = default, int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false)
+    public struct Bait(Actor source, Actor target, AOEShape shape, DateTime activation = default, BitMask forbidden = default, Angle? customRotation = null, int maxCasts = 1, WDir offset = default, int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false)
     {
         public Angle? CustomRotation = customRotation;
         public AOEShape Shape = shape;
@@ -16,11 +16,11 @@ public class GenericBaitAway(BossModule module, uint aid = default, bool alwaysD
         public int MaxCasts = maxCasts;
         public WDir Offset = offset;
         public int? ArenaProjectionLayer = arenaProjectionLayer;
-        public bool RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
+        public bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
 
         public readonly Angle Rotation => CustomRotation ?? (Source != Target ? Angle.FromDirection(Target.Position - Source.Position) : Source.Rotation);
 
-        public Bait(WPos source, Actor target, AOEShape shape, DateTime activation = default, Angle? customRotation = null, BitMask forbidden = default, int maxCasts = 1, WDir offset = default, int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false)
+        public Bait(WPos source, Actor target, AOEShape shape, DateTime activation = default, Angle? customRotation = null, BitMask forbidden = default, int maxCasts = 1, WDir offset = default, int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false)
             : this(new(default, default, default, default, default!, default, default, default, default, source.ToVec4()), target, shape, activation, forbidden, customRotation, maxCasts, offset, arenaProjectionLayer, restrictToArenaProjectionLayer) { }
     }
 
@@ -233,7 +233,7 @@ public class GenericBaitAway(BossModule module, uint aid = default, bool alwaysD
             if (bait.Target != actor || !BaitParticipantAppliesToArenaProjectionLayer(actor, bait))
             {
                 hints.AddForbiddenZone(bait.Shape, BaitOrigin(ref bait), bait.Rotation, bait.Activation,
-                    arenaProjectionLayer: bait.ArenaProjectionLayer);
+                    arenaProjectionLayer: ArenaProjectionLayerForAI(bait.ArenaProjectionLayer, bait.RestrictToArenaProjectionLayer));
             }
             else
             {
@@ -272,19 +272,19 @@ public class GenericBaitAway(BossModule module, uint aid = default, bool alwaysD
                 case AOEShapeDonut:
                 case AOEShapeCircle:
                     hints.AddForbiddenZone(bait.Shape, a.Position - bait.Offset, default, bait.Activation,
-                        arenaProjectionLayer: bait.ArenaProjectionLayer);
+                        arenaProjectionLayer: ArenaProjectionLayerForAI(bait.ArenaProjectionLayer, bait.RestrictToArenaProjectionLayer));
                     break;
                 case AOEShapeCone cone:
                     hints.AddForbiddenZone(new SDCone(bait.Source.Position, 100f, bait.Source.AngleTo(a), cone.HalfAngle), bait.Activation,
-                        arenaProjectionLayer: bait.ArenaProjectionLayer);
+                        arenaProjectionLayer: ArenaProjectionLayerForAI(bait.ArenaProjectionLayer, bait.RestrictToArenaProjectionLayer));
                     break;
                 case AOEShapeRect rect:
                     hints.AddForbiddenZone(new SDCone(bait.Source.Position, 100f, bait.Source.AngleTo(a), Angle.Asin(rect.HalfWidth / (a.Position - bait.Source.Position).Length())), bait.Activation,
-                        arenaProjectionLayer: bait.ArenaProjectionLayer);
+                        arenaProjectionLayer: ArenaProjectionLayerForAI(bait.ArenaProjectionLayer, bait.RestrictToArenaProjectionLayer));
                     break;
                 case AOEShapeCross cross:
                     hints.AddForbiddenZone(cross, a.Position - bait.Offset, bait.Rotation, bait.Activation,
-                        arenaProjectionLayer: bait.ArenaProjectionLayer);
+                        arenaProjectionLayer: ArenaProjectionLayerForAI(bait.ArenaProjectionLayer, bait.RestrictToArenaProjectionLayer));
                     break;
             }
         }
@@ -486,16 +486,16 @@ public class BaitAwayTethers(BossModule module, AOEShape shape, uint tetherID, u
 
 // component for mechanics requiring icon targets to bait their aoe away from raid
 
-public class BaitAwayIcon(BossModule module, AOEShape shape, uint iconID, uint aid = default, double activationDelay = 5.1d, bool centerAtTarget = false, Actor? source = null, bool tankbuster = false, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.Raidwide, bool restrictToArenaProjectionLayer = false)
+public class BaitAwayIcon(BossModule module, AOEShape shape, uint iconID, uint aid = default, double activationDelay = 5.1d, bool centerAtTarget = false, Actor? source = null, bool tankbuster = false, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.Raidwide, bool? restrictToArenaProjectionLayer = false)
     : GenericBaitAway(module, aid, centerAtTarget: centerAtTarget, tankbuster: tankbuster, damageType: damageType)
 {
-    public BaitAwayIcon(BossModule module, float radius, uint iconID, uint aid = default, double activationDelay = 5.1d, bool centerAtTarget = true, Actor? source = null, bool tankbuster = false, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.Raidwide, bool restrictToArenaProjectionLayer = false)
+    public BaitAwayIcon(BossModule module, float radius, uint iconID, uint aid = default, double activationDelay = 5.1d, bool centerAtTarget = true, Actor? source = null, bool tankbuster = false, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.Raidwide, bool? restrictToArenaProjectionLayer = false)
         : this(module, new AOEShapeCircle(radius), iconID, aid, activationDelay, centerAtTarget, source, tankbuster, damageType, restrictToArenaProjectionLayer) { }
 
     public AOEShape Shape = shape;
     public uint IID = iconID;
     public double ActivationDelay = activationDelay;
-    public bool RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
+    public bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
 
     public virtual Actor? BaitSource(Actor target) => source ?? Module.PrimaryActor;
 
@@ -530,10 +530,10 @@ public class BaitAwayIcon(BossModule module, AOEShape shape, uint iconID, uint a
     }
 }
 
-public class BaitAwayIconMulti(BossModule module, AOEShape shape, uint iconID, uint[] aids, double activationDelay = 5.1d, bool centerAtTarget = false, Actor? source = null, bool tankbuster = false, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.Raidwide, bool restrictToArenaProjectionLayer = false)
+public class BaitAwayIconMulti(BossModule module, AOEShape shape, uint iconID, uint[] aids, double activationDelay = 5.1d, bool centerAtTarget = false, Actor? source = null, bool tankbuster = false, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.Raidwide, bool? restrictToArenaProjectionLayer = false)
     : BaitAwayIcon(module, shape, iconID, activationDelay: activationDelay, source: source, centerAtTarget: centerAtTarget, tankbuster: tankbuster, damageType: damageType, restrictToArenaProjectionLayer: restrictToArenaProjectionLayer)
 {
-    public BaitAwayIconMulti(BossModule module, float radius, uint iconID, uint[] aids, double activationDelay = 5.1d, bool centerAtTarget = true, Actor? source = null, bool tankbuster = false, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.Raidwide, bool restrictToArenaProjectionLayer = false)
+    public BaitAwayIconMulti(BossModule module, float radius, uint iconID, uint[] aids, double activationDelay = 5.1d, bool centerAtTarget = true, Actor? source = null, bool tankbuster = false, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.Raidwide, bool? restrictToArenaProjectionLayer = false)
         : this(module, new AOEShapeCircle(radius), iconID, aids, activationDelay, centerAtTarget, source, tankbuster, damageType, restrictToArenaProjectionLayer) { }
 
     protected readonly uint[] AIDs = aids;
@@ -762,7 +762,7 @@ public class BaitAwayChargeTether(BossModule module, float halfWidth, double act
 
 public class GenericBaitProximity(BossModule module, bool alwaysDrawOtherBaits = true, bool onlyShowOutlines = false) : CastCounter(module, default)
 {
-    public struct Bait(WPos source, AOEShape shape, DateTime activation = default, int numTargets = 1, bool nearest = true, bool stack = false, int minStack = 1, int maxStack = 1, bool centerAtTarget = false, bool tankbuster = false, uint caster = default, Role role = Role.None, BitMask forbidden = default, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.None, Angle? customRotation = null, WDir offset = default, int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false)
+    public struct Bait(WPos source, AOEShape shape, DateTime activation = default, int numTargets = 1, bool nearest = true, bool stack = false, int minStack = 1, int maxStack = 1, bool centerAtTarget = false, bool tankbuster = false, uint caster = default, Role role = Role.None, BitMask forbidden = default, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.None, Angle? customRotation = null, WDir offset = default, int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false)
     {
         public WPos Position = source;
         public AOEShape Shape = shape;
@@ -781,9 +781,9 @@ public class GenericBaitProximity(BossModule module, bool alwaysDrawOtherBaits =
         public AIHints.PredictedDamageType DamageType = damageType;
         public Angle? CustomRotation = customRotation;
         public int? ArenaProjectionLayer = arenaProjectionLayer;
-        public bool RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
+        public bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
 
-        public Bait(Actor source, AOEShape shape, DateTime activation = default, int numTargets = 1, bool nearest = true, bool stack = false, int minStack = 1, int maxStack = 1, bool centerAtTarget = false, bool tankbuster = false, uint caster = default, Role role = Role.None, BitMask forbidden = default, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.None, Angle? customRotation = null, WDir offset = default, int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false)
+        public Bait(Actor source, AOEShape shape, DateTime activation = default, int numTargets = 1, bool nearest = true, bool stack = false, int minStack = 1, int maxStack = 1, bool centerAtTarget = false, bool tankbuster = false, uint caster = default, Role role = Role.None, BitMask forbidden = default, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.None, Angle? customRotation = null, WDir offset = default, int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false)
             : this(source.Position, shape, activation, numTargets, nearest, stack, minStack, maxStack, centerAtTarget, tankbuster, caster, role, forbidden, damageType, customRotation, offset, arenaProjectionLayer, restrictToArenaProjectionLayer) { }
     }
 

@@ -10,8 +10,8 @@ sealed class P6CosmoArrow(BossModule module) : Components.GenericAOEs(module)
 
     public bool Active => _lines.Count > 0;
 
-    private static readonly AOEShapeRect _shapeFirst = new(40f, 5f);
-    private static readonly AOEShapeRect _shapeRest = new(100f, 2.5f);
+    private readonly AOEShapeRect _shapeFirst = new(40f, 5f);
+    private readonly AOEShapeRect _shapeRest = new(100f, 2.5f);
 
     public override ReadOnlySpan<AOEInstance> ActiveAOEs(int slot, Actor actor)
     {

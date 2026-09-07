@@ -6,7 +6,7 @@ sealed class BombarianSpecial(BossModule module) : Components.UniformStackSpread
 
     public Mechanic CurMechanic;
 
-    public void Show(float delay)
+    public void Show(double delay)
     {
         switch (CurMechanic)
         {

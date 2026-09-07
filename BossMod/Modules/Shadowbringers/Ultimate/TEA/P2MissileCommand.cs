@@ -1,9 +1,7 @@
 ﻿namespace BossMod.Shadowbringers.Ultimate.TEA;
 
-[SkipLocalsInit]
 sealed class P2EarthMissileBaited(BossModule module) : Components.VoidzoneAtCastTarget(module, 5f, (uint)AID.EarthMissileBaited, m => m.Enemies((uint)OID.VoidzoneEarthMissileBaited).Where(z => z.EventState != 7), 0.9d);
 
-[SkipLocalsInit]
 sealed class P2EarthMissileIce(BossModule module) : Components.VoidzoneAtCastTarget(module, 10f, (uint)AID.EarthMissileIce, Voidzones, 0.8d) // TODO: verify larger radius...
 {
     private static IEnumerable<Actor> Voidzones(BossModule m)
@@ -54,7 +52,6 @@ sealed class P2Enumeration(BossModule module) : Components.UniformStackSpread(mo
     }
 }
 
-[SkipLocalsInit]
 sealed class P2HiddenMinefield(BossModule module) : Components.SimpleAOEs(module, (uint)AID.HiddenMinefield, 5f)
 {
     private readonly List<WPos> _mines = [];

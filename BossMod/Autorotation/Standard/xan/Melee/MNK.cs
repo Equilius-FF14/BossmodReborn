@@ -221,8 +221,8 @@ public sealed class MNK(RotationModuleManager manager, Actor player) : Attackxan
     private Enemy? WindTarget; // wind's reply
     private Enemy? EnlightenmentTarget;
 
-    public bool HaveLunar => Nadi.HasFlag(NadiFlags.Lunar);
-    public bool HaveSolar => Nadi.HasFlag(NadiFlags.Solar);
+    public bool HaveLunar => (Nadi & NadiFlags.Lunar) != 0;
+    public bool HaveSolar => (Nadi & NadiFlags.Solar) != 0;
     public bool HaveBothNadi => HaveLunar && HaveSolar;
 
     protected override float GetCastTime(AID aid) => 0;

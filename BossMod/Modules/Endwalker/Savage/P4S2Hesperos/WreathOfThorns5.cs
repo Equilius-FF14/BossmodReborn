@@ -1,7 +1,7 @@
 ﻿namespace BossMod.Endwalker.Savage.P4S2Hesperos;
 
 // state related to act 5 (finale) wreath of thorns
-class WreathOfThorns5(BossModule module) : BossComponent(module)
+sealed class WreathOfThorns5(BossModule module) : BossComponent(module)
 {
     private readonly List<ulong> _playersOrder = [];
     private readonly List<Actor> _towersOrder = [];
@@ -61,12 +61,12 @@ class WreathOfThorns5(BossModule module) : BossComponent(module)
 
     public override void OnEventCast(Actor caster, ActorCastEvent spell)
     {
-        switch ((AID)spell.Action.ID)
+        switch (spell.Action.ID)
         {
-            case AID.FleetingImpulseAOE:
+            case (uint)AID.FleetingImpulseAOE:
                 _playersOrder.Add(spell.MainTargetID);
                 break;
-            case AID.AkanthaiExplodeTower:
+            case (uint)AID.AkanthaiExplodeTower:
                 ++_castsDone;
                 break;
         }

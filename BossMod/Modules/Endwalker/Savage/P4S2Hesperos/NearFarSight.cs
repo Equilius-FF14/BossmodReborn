@@ -1,11 +1,11 @@
 ﻿namespace BossMod.Endwalker.Savage.P4S2Hesperos;
 
 // state related to nearsight & farsight mechanics
-class NearFarSight : BossComponent
+sealed class NearFarSight : BossComponent
 {
     public enum State { Near, Far, Done }
 
-    public State CurState { get; private set; }
+    public State CurState;
     private BitMask _targets;
     private BitMask _inAOE;
 

@@ -6,7 +6,7 @@
 [SkipLocalsInit]
 public abstract class GenericStackSpread(BossModule module, bool raidwideOnResolve = true, bool includeDeadTargets = false) : BossComponent(module)
 {
-    public struct Stack(Actor target, float radius, int minSize = 2, int maxSize = int.MaxValue, DateTime activation = default, BitMask forbiddenPlayers = default, int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false)
+    public struct Stack(Actor target, float radius, int minSize = 2, int maxSize = int.MaxValue, DateTime activation = default, BitMask forbiddenPlayers = default, int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false)
     {
         public Actor Target = target;
         public float Radius = radius;
@@ -15,7 +15,7 @@ public abstract class GenericStackSpread(BossModule module, bool raidwideOnResol
         public DateTime Activation = activation;
         public BitMask ForbiddenPlayers = forbiddenPlayers; // raid members that aren't allowed to participate in the stack
         public int? ArenaProjectionLayer = arenaProjectionLayer;
-        public bool RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
+        public bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
 
         public readonly int NumInside(BossModule module)
         {
@@ -40,13 +40,13 @@ public abstract class GenericStackSpread(BossModule module, bool raidwideOnResol
         public readonly bool IsInside(Actor actor) => IsInside(actor.Position);
     }
 
-    public struct Spread(Actor target, float radius, DateTime activation = default, int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false)
+    public struct Spread(Actor target, float radius, DateTime activation = default, int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false)
     {
         public Actor Target = target;
         public float Radius = radius;
         public DateTime Activation = activation;
         public int? ArenaProjectionLayer = arenaProjectionLayer;
-        public bool RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
+        public bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
     }
 
     public readonly bool RaidwideOnResolve = raidwideOnResolve; // if true, assume even if mechanic is correctly resolved everyone will still take damage
@@ -378,7 +378,7 @@ public abstract class GenericStackSpread(BossModule module, bool raidwideOnResol
             if (t != actor || !SpreadParticipantAppliesToArenaProjectionLayer(actor, s))
             {
                 hints.AddForbiddenZone(new SDCircle(t.Position.Quantized(), s.Radius + ExtraAISpreadThreshold), s.Activation,
-                    arenaProjectionLayer: s.ArenaProjectionLayer);
+                    arenaProjectionLayer: ArenaProjectionLayerForAI(s.ArenaProjectionLayer, s.RestrictToArenaProjectionLayer));
             }
             else
             {
@@ -404,7 +404,7 @@ public abstract class GenericStackSpread(BossModule module, bool raidwideOnResol
                     }
 
                     hints.AddForbiddenZone(new SDCircle(p.Position.Quantized(), radius + ExtraAISpreadThreshold), act,
-                        arenaProjectionLayer: s.ArenaProjectionLayer);
+                        arenaProjectionLayer: ArenaProjectionLayerForAI(s.ArenaProjectionLayer, s.RestrictToArenaProjectionLayer));
                 done:
                     ;
                 }
@@ -463,7 +463,7 @@ public abstract class GenericStackSpread(BossModule module, bool raidwideOnResol
                 if (stacksIFzTarget.Count > 0)
                 {
                     hints.AddForbiddenZone(new SDIntersection([.. stacksIFzTarget]), s.Activation,
-                        arenaProjectionLayer: s.ArenaProjectionLayer);
+                        arenaProjectionLayer: ArenaProjectionLayerForAI(s.ArenaProjectionLayer, s.RestrictToArenaProjectionLayer));
                 }
             }
         }
@@ -494,7 +494,7 @@ public abstract class GenericStackSpread(BossModule module, bool raidwideOnResol
                 if (!isSpreadTarget && (!isInside && numInside < max || isInside && numInside <= max))  // don't try to stack if spread target
                 {
                     stacksIFz.Add(new SDInvertedCircle(targetPos, radius));
-                    var layer = s.ArenaProjectionLayer ?? -1;
+                    var layer = ArenaProjectionLayerForAI(s.ArenaProjectionLayer, s.RestrictToArenaProjectionLayer) ?? -1;
                     stacksIFzLayer = stacksIFzLayer == -2 || stacksIFzLayer == layer ? layer : -1;
                     stacksIFzActivation = stacksIFzActivation < act ? stacksIFzActivation : act;
                     continue;
@@ -503,7 +503,7 @@ public abstract class GenericStackSpread(BossModule module, bool raidwideOnResol
                 // avoid stack if forbidden or enough players inside
                 // double radius if stack target to prevent standing next to other stack markers or overlapping them
                 hints.AddForbiddenZone(new SDCircle(targetPos, !isStackTarget ? radius : 2f * radius), act,
-                    arenaProjectionLayer: s.ArenaProjectionLayer);
+                    arenaProjectionLayer: ArenaProjectionLayerForAI(s.ArenaProjectionLayer, s.RestrictToArenaProjectionLayer));
             }
         }
 
@@ -670,16 +670,16 @@ public abstract class UniformStackSpread(BossModule module, float stackRadius, f
     public int MinStackSize = minStackSize;
     public int MaxStackSize = maxStackSize;
 
-    public void AddStack(Actor target, DateTime activation = default, BitMask forbiddenPlayers = default, int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false) => Stacks.Add(new(target, StackRadius, MinStackSize, MaxStackSize, activation, forbiddenPlayers, arenaProjectionLayer, restrictToArenaProjectionLayer));
-    public void AddStacks(IEnumerable<Actor> targets, DateTime activation = default, int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false)
+    public void AddStack(Actor target, DateTime activation = default, BitMask forbiddenPlayers = default, int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false) => Stacks.Add(new(target, StackRadius, MinStackSize, MaxStackSize, activation, forbiddenPlayers, arenaProjectionLayer, restrictToArenaProjectionLayer));
+    public void AddStacks(IEnumerable<Actor> targets, DateTime activation = default, int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false)
     {
         foreach (var target in targets)
         {
             Stacks.Add(new(target, StackRadius, MinStackSize, MaxStackSize, activation, arenaProjectionLayer: arenaProjectionLayer, restrictToArenaProjectionLayer: restrictToArenaProjectionLayer));
         }
     }
-    public void AddSpread(Actor target, DateTime activation = default, int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false) => Spreads.Add(new(target, SpreadRadius, activation, arenaProjectionLayer, restrictToArenaProjectionLayer));
-    public void AddSpreads(IEnumerable<Actor> targets, DateTime activation = default, int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false)
+    public void AddSpread(Actor target, DateTime activation = default, int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false) => Spreads.Add(new(target, SpreadRadius, activation, arenaProjectionLayer, restrictToArenaProjectionLayer));
+    public void AddSpreads(IEnumerable<Actor> targets, DateTime activation = default, int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false)
     {
         foreach (var target in targets)
         {
@@ -937,7 +937,7 @@ UniformStackSpread(module, innerRadius / 3f, default, minStackSize, maxStackSize
                 continue;
             }
             forbidden.Add(new SDInvertedCircle(s.Target.Position, radius));
-            var layer = s.ArenaProjectionLayer ?? -1;
+            var layer = ArenaProjectionLayerForAI(s.ArenaProjectionLayer, s.RestrictToArenaProjectionLayer) ?? -1;
             forbiddenLayer = forbiddenLayer == -2 || forbiddenLayer == layer ? layer : -1;
         }
         if (forbidden.Count != 0)
@@ -1010,12 +1010,12 @@ public abstract class GenericBaitStack(BossModule module, uint aid = default, bo
                 if (!b.Forbidden[slot])
                 {
                     forbiddenInverted.Add(b.Shape.InvertedDistance(origin, angle));
-                    var layer = b.ArenaProjectionLayer ?? -1;
+                    var layer = ArenaProjectionLayerForAI(b.ArenaProjectionLayer, b.RestrictToArenaProjectionLayer) ?? -1;
                     forbiddenInvertedLayer = forbiddenInvertedLayer == -2 || forbiddenInvertedLayer == layer ? layer : -1;
                 }
                 else
                 {
-                    hints.AddForbiddenZone(b.Shape.Distance(origin, angle), b.Activation, arenaProjectionLayer: b.ArenaProjectionLayer);
+                    hints.AddForbiddenZone(b.Shape.Distance(origin, angle), b.Activation, arenaProjectionLayer: ArenaProjectionLayerForAI(b.ArenaProjectionLayer, b.RestrictToArenaProjectionLayer));
                 }
             }
             else if (t != actor && isBaitTarget)
@@ -1023,17 +1023,17 @@ public abstract class GenericBaitStack(BossModule module, uint aid = default, bo
                 if (b.Shape is AOEShapeCone cone)
                 {
                     hints.AddForbiddenZone(new SDCone(origin, cone.Radius, angle, cone.HalfAngle * 2f), b.Activation,
-                        arenaProjectionLayer: b.ArenaProjectionLayer);
+                        arenaProjectionLayer: ArenaProjectionLayerForAI(b.ArenaProjectionLayer, b.RestrictToArenaProjectionLayer));
                 }
                 else if (b.Shape is AOEShapeRect rect)
                 {
                     hints.AddForbiddenZone(new SDRect(origin, angle, rect.LengthFront, rect.LengthBack, rect.HalfWidth * 2f), b.Activation,
-                        arenaProjectionLayer: b.ArenaProjectionLayer);
+                        arenaProjectionLayer: ArenaProjectionLayerForAI(b.ArenaProjectionLayer, b.RestrictToArenaProjectionLayer));
                 }
                 else if (b.Shape is AOEShapeCircle circle)
                 {
                     forbiddenInverted.Add(new SDCircle(origin, circle.Radius * 2f));
-                    var layer = b.ArenaProjectionLayer ?? -1;
+                    var layer = ArenaProjectionLayerForAI(b.ArenaProjectionLayer, b.RestrictToArenaProjectionLayer) ?? -1;
                     forbiddenInvertedLayer = forbiddenInvertedLayer == -2 || forbiddenInvertedLayer == layer ? layer : -1;
                 }
             }
@@ -1071,7 +1071,7 @@ public abstract class GenericBaitStack(BossModule module, uint aid = default, bo
                 }
                 if (forbiddenB.Count != 0)
                 {
-                    hints.AddForbiddenZone(new SDIntersection([.. forbiddenB]), b.Activation, arenaProjectionLayer: b.ArenaProjectionLayer);
+                    hints.AddForbiddenZone(new SDIntersection([.. forbiddenB]), b.Activation, arenaProjectionLayer: ArenaProjectionLayerForAI(b.ArenaProjectionLayer, b.RestrictToArenaProjectionLayer));
                 }
             }
         }

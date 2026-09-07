@@ -6,7 +6,7 @@ sealed class TrinityOfSouls(BossModule module) : Components.GenericAOEs(module)
     private uint _moves; // bit 0 - move after first, bit1 - move after second
     private readonly List<AOEInstance> _aoes = [];
 
-    private static readonly AOEShapeCone _shape = new(60f, 90f.Degrees());
+    private readonly AOEShapeCone _shape = new(60f, 90f.Degrees());
 
     public override ReadOnlySpan<AOEInstance> ActiveAOEs(int slot, Actor actor) => _aoes.Count != 0 ? CollectionsMarshal.AsSpan(_aoes)[..1] : [];
 

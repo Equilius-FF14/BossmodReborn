@@ -1,7 +1,6 @@
 ﻿namespace BossMod.Shadowbringers.Ultimate.TEA;
 
 // TODO: consider drawing tethers & shared sentence?..
-[SkipLocalsInit]
 sealed class P4FateCalibrationBetaDebuffs(BossModule module) : P4ForcedMarchDebuffs(module)
 {
     private enum Color { Unknown, Light, Dark }
@@ -110,13 +109,12 @@ sealed class P4FateCalibrationBetaDebuffs(BossModule module) : P4ForcedMarchDebu
     }
 }
 
-[SkipLocalsInit]
 sealed class P4FateCalibrationBetaJJump(BossModule module) : Components.GenericBaitAway(module, centerAtTarget: true)
 {
     private bool _enabled;
     private readonly List<Actor> _jumpers = [];
 
-    private static readonly AOEShapeCircle _shape = new(10);
+    private readonly AOEShapeCircle _shape = new(10f);
 
     public void Show() => _enabled = true;
 
@@ -149,7 +147,6 @@ sealed class P4FateCalibrationBetaJJump(BossModule module) : Components.GenericB
     }
 }
 
-[SkipLocalsInit]
 sealed class P4FateCalibrationBetaOpticalSight(BossModule module) : Components.UniformStackSpread(module, 6f, 6f, 4, 4)
 {
     private enum Mechanic { Unknown, Stack, Spread }
@@ -202,7 +199,6 @@ sealed class P4FateCalibrationBetaOpticalSight(BossModule module) : Components.U
     }
 }
 
-[SkipLocalsInit]
 sealed class P4FateCalibrationBetaRadiantSacrament(BossModule module) : Components.GenericAOEs(module)
 {
     private Actor? _caster;

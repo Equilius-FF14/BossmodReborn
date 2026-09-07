@@ -1,7 +1,6 @@
 ﻿namespace BossMod;
 
 // allowed categories of targets for an action
-[Flags]
 public enum ActionTargets
 {
     None = 0,

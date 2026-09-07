@@ -34,8 +34,8 @@ sealed class P3GnashAndLash(BossModule module) : Components.GenericAOEs(module)
 {
     private readonly List<AOEInstance> _aoes = [];
 
-    private static readonly AOEShapeCircle _aoeGnash = new(8f);
-    private static readonly AOEShapeDonut _aoeLash = new(8f, 40f);
+    private readonly AOEShapeCircle _aoeGnash = new(8f);
+    private readonly AOEShapeDonut _aoeLash = new(8f, 40f);
 
     public override ReadOnlySpan<AOEInstance> ActiveAOEs(int slot, Actor actor) => _aoes.Count != 0 ? CollectionsMarshal.AsSpan(_aoes)[..1] : [];
 

@@ -328,20 +328,6 @@ sealed class QuadrilogyOfImplements(BossModule module) : Components.GenericAOEs(
     }
 }
 
-sealed class RomeosBallad(BossModule module) : Components.SimpleAOEs(module, (uint)AID.RomeosBallad1, 15f)
-{
-    private readonly Predict _predict = module.FindComponent<Predict>()!;
-
-    public override ReadOnlySpan<AOEInstance> ActiveAOEs(int slot, Actor actor) => _predict.ActiveAOEs(slot, actor).Length != 0 ? [] : base.ActiveAOEs(slot, actor);
-}
-
-sealed class Aim(BossModule module) : Components.SimpleAOEs(module, (uint)AID.Aim1, 11f)
-{
-    private readonly Predict _predict = module.FindComponent<Predict>()!;
-
-    public override ReadOnlySpan<AOEInstance> ActiveAOEs(int slot, Actor actor) => _predict.ActiveAOEs(slot, actor).Length != 0 ? [] : base.ActiveAOEs(slot, actor);
-}
-
 sealed class SealedImplements(BossModule module) : Components.GenericAOEs(module)
 {
     private readonly Predict _predict = module.FindComponent<Predict>()!;
@@ -575,7 +561,7 @@ sealed class BladeBlitz(BossModule module) : Components.SimpleAOEs(module, (uint
     }
 }
 
-[ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.Index, Contributors = "gynorhino", Expansion = BossModuleInfo.Expansion.Dawntrail,  GroupType = BossModuleInfo.GroupType.TheForkedTowerMagicExtreme, GroupID = 1114u, NameID = 14717u, PlanLevel = 100)]
+[ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.Index, Contributors = "gynorhino", GroupType = BossModuleInfo.GroupType.TheForkedTowerMagicExtreme, GroupID = 1114u, NameID = 14717u, PlanLevel = 100)]
 public sealed class FTME4Index : BossModule
 {
     public FTME4Index(WorldState ws, Actor primary) : this(ws, primary, Normal.FTMN4Index.FTMN4Index.BuildInitialArena()) { }

@@ -1,9 +1,9 @@
 ﻿namespace BossMod.Endwalker.Savage.P1SErichthonios;
 
 // state related to normal and fourfold shackles
-class Shackles(BossModule module) : BossComponent(module)
+sealed class Shackles(BossModule module) : BossComponent(module)
 {
-    public int NumExpiredDebuffs { get; private set; }
+    public int NumExpiredDebuffs;
     private bool _active;
     private BitMask _debuffsBlueImminent;
     private BitMask _debuffsBlueFuture;
@@ -15,8 +15,8 @@ class Shackles(BossModule module) : BossComponent(module)
     private BitMatrix _redExplosionMatrix; // bit (8*i+j) is set if player i is inside explosion of player j; bit [i,i] is never set
     private readonly WPos[] _preferredPositions = new WPos[8];
 
-    private const float _blueExplosionRadius = 4;
-    private const float _redExplosionRadius = 8;
+    private const float _blueExplosionRadius = 4f;
+    private const float _redExplosionRadius = 8f;
     private static uint TetherColor(bool blue, bool red) => blue ? (red ? Colors.Danger : Colors.Other1) : (red ? Colors.Other2 : Colors.PlayerGeneric);
 
     public override void Update()

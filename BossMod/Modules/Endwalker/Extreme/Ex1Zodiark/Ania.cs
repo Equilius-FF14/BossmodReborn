@@ -1,11 +1,11 @@
 ﻿namespace BossMod.Endwalker.Extreme.Ex1Zodiark;
 
 // state related to ania mechanic
-class Ania(BossModule module) : BossComponent(module)
+sealed class Ania(BossModule module) : BossComponent(module)
 {
     private Actor? _target;
 
-    private const float _aoeRadius = 3;
+    private const float _aoeRadius = 3f;
 
     public bool Done => _target == null;
 
@@ -49,13 +49,13 @@ class Ania(BossModule module) : BossComponent(module)
 
     public override void OnCastStarted(Actor caster, ActorCastInfo spell)
     {
-        if ((AID)spell.Action.ID == AID.AniaAOE)
+        if (spell.Action.ID == (uint)AID.AniaAOE)
             _target = WorldState.Actors.Find(spell.TargetID);
     }
 
     public override void OnCastFinished(Actor caster, ActorCastInfo spell)
     {
-        if ((AID)spell.Action.ID == AID.AniaAOE)
+        if (spell.Action.ID == (uint)AID.AniaAOE)
             _target = null;
     }
 }

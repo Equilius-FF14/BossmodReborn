@@ -1,6 +1,6 @@
 ﻿namespace BossMod.Endwalker.Savage.P9SKokytos;
 
-class DualspellFire(BossModule module) : Components.GenericStackSpread(module)
+sealed class DualspellFire(BossModule module) : Components.GenericStackSpread(module)
 {
     private bool _active;
 
@@ -33,7 +33,7 @@ class DualspellFire(BossModule module) : Components.GenericStackSpread(module)
     }
 }
 
-class DualspellLightning(BossModule module) : Components.GenericBaitAway(module)
+sealed class DualspellLightning(BossModule module) : Components.GenericBaitAway(module)
 {
     private bool _active;
 
@@ -66,7 +66,7 @@ class DualspellLightning(BossModule module) : Components.GenericBaitAway(module)
     }
 }
 
-class DualspellIce(BossModule module) : Components.GenericAOEs(module)
+sealed class DualspellIce(BossModule module) : Components.GenericAOEs(module)
 {
     public enum Mechanic { None, In, Out };
 

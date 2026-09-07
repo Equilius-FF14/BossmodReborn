@@ -55,7 +55,8 @@ sealed class OmniElementPanels(BossModule module) : BossComponent(module)
 sealed class Flare(BossModule module) : Components.RaidwideCast(module, (uint)AID.Flare);
 sealed class Bombs(BossModule module) : Components.Adds(module, (uint)OID.SummonedBomb, 2)
 {
-    private readonly IndexConfig _config = Service.Config.Get<IndexConfig>();
+    private readonly FTMN4IndexConfig _config = Service.Config.Get<FTMN4IndexConfig>();
+
     public override void AddGlobalHints(GlobalHints hints)
     {
         if (ActiveActors.Count != 0)
@@ -99,21 +100,24 @@ sealed class Bombs(BossModule module) : Components.Adds(module, (uint)OID.Summon
 }
 sealed class Aim(BossModule module) : Components.SimpleAOEs(module, (uint)AID.Aim, 11f)
 {
+    private Shockwave? shockwave;
+    private Predict? predict;
     // resolves after shockwave and predict; ignore until predict AOEs are gone
     public override void AddHints(int slot, Actor actor, TextHints hints)
     {
-        var knockbacks = Module.FindComponent<Shockwave>();
-        var predict = Module.FindComponent<Predict>();
-        if (knockbacks?.ActiveKnockbacks(slot, actor).Length == 0 && predict?.ActiveAOEs(slot, actor).Length == 0)
+        shockwave ??= Module.FindComponent<Shockwave>();
+        predict ??= Module.FindComponent<Predict>();
+        if (shockwave?.ActiveKnockbacks(slot, actor).Length == 0 && predict?.ActiveAOEs(slot, actor).Length == 0)
         {
             base.AddHints(slot, actor, hints);
         }
     }
+
     public override void AddAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints)
     {
-        var knockbacks = Module.FindComponent<Shockwave>();
-        var predict = Module.FindComponent<Predict>();
-        if (knockbacks?.ActiveKnockbacks(slot, actor).Length == 0 && predict?.ActiveAOEs(slot, actor).Length == 0)
+        shockwave ??= Module.FindComponent<Shockwave>();
+        predict ??= Module.FindComponent<Predict>();
+        if (shockwave?.ActiveKnockbacks(slot, actor).Length == 0 && predict?.ActiveAOEs(slot, actor).Length == 0)
         {
             base.AddAIHints(slot, actor, assignment, hints);
         }
@@ -121,21 +125,24 @@ sealed class Aim(BossModule module) : Components.SimpleAOEs(module, (uint)AID.Ai
 }
 sealed class RomeosBallad(BossModule module) : Components.SimpleAOEs(module, (uint)AID.RomeosBallad, 15f)
 {
+    private Shockwave? shockwave;
+    private Predict? predict;
     // resolves after shockwave and predict; ignore until predict AOEs are gone
     public override void AddHints(int slot, Actor actor, TextHints hints)
     {
-        var knockbacks = Module.FindComponent<Shockwave>();
-        var predict = Module.FindComponent<Predict>();
-        if (knockbacks?.ActiveKnockbacks(slot, actor).Length == 0 && predict?.ActiveAOEs(slot, actor).Length == 0)
+        shockwave ??= Module.FindComponent<Shockwave>();
+        predict ??= Module.FindComponent<Predict>();
+        if (shockwave?.ActiveKnockbacks(slot, actor).Length == 0 && predict?.ActiveAOEs(slot, actor).Length == 0)
         {
             base.AddHints(slot, actor, hints);
         }
     }
+
     public override void AddAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints)
     {
-        var knockbacks = Module.FindComponent<Shockwave>();
-        var predict = Module.FindComponent<Predict>();
-        if (knockbacks?.ActiveKnockbacks(slot, actor).Length == 0 && predict?.ActiveAOEs(slot, actor).Length == 0)
+        shockwave ??= Module.FindComponent<Shockwave>();
+        predict ??= Module.FindComponent<Predict>();
+        if (shockwave?.ActiveKnockbacks(slot, actor).Length == 0 && predict?.ActiveAOEs(slot, actor).Length == 0)
         {
             base.AddAIHints(slot, actor, assignment, hints);
         }

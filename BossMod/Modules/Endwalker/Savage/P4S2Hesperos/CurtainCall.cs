@@ -1,7 +1,7 @@
 ﻿namespace BossMod.Endwalker.Savage.P4S2Hesperos;
 
 // state related to curtain call mechanic
-class CurtainCall(BossModule module) : BossComponent(module)
+sealed class CurtainCall(BossModule module) : BossComponent(module)
 {
     private readonly int[] _playerOrder = new int[8];
     private List<Actor>? _playersInBreakOrder;

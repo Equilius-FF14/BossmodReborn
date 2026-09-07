@@ -390,10 +390,10 @@ public static unsafe partial class Dx11ArenaRenderer
         public static WorldProjectedShapeInstance Sdf(Vector3 referenceOrigin, Vector2 boundsMinXZ, Vector2 boundsMaxXZ, uint color, float projectionHeight, float outlineWidth = 0f)
             => new(referenceOrigin, projectionHeight, boundsMinXZ, boundsMaxXZ, default, default, default, default, color, WorldProjectedShapeKind.Sdf, outlineWidth, waveOriginXZ: referenceOrigin.XZ());
 
-        private WorldProjectedShapeInstance(in WorldProjectedShapeInstance source, Vector4 params1, uint packed)
+        private WorldProjectedShapeInstance(in WorldProjectedShapeInstance source, Vector4 params1, uint packed, Vector3 origin, float projectionHeight)
         {
-            Origin = source.Origin;
-            ProjectionHeight = source.ProjectionHeight;
+            Origin = origin;
+            ProjectionHeight = projectionHeight;
             BoundsMinXZ = source.BoundsMinXZ;
             BoundsMaxXZ = source.BoundsMaxXZ;
             DirectionXZ = source.DirectionXZ;
@@ -407,12 +407,26 @@ public static unsafe partial class Dx11ArenaRenderer
             WaveOriginXZ = source.WaveOriginXZ;
         }
 
+        // Reuse a terrain footprint on another physical floor without changing its X/Z geometry,
+        // padding or style. Eye3D has an authoritative height and does not use this operation.
+        public WorldProjectedShapeInstance WithProjectionLayer(float y, float projectionHeight, float holeFillRadius)
+        {
+            var height = Math.Max(0f, projectionHeight);
+            var params1 = Params1;
+            if ((Packed & 0xFFu) == (uint)WorldProjectedShapeKind.Triangle)
+            {
+                params1.X = height; // the triangle's conservative vertical bound follows this floor too
+            }
+            params1.Y = Math.Clamp(holeFillRadius, 0f, 2f);
+            return new(this, params1, Packed, new Vector3(Origin.X, y, Origin.Z), height);
+        }
+
         // Params1.y carries the optional world-space closing radius without growing the instance or input layout. ProjectionHeight == 0 selects the authored reference plane.
         public WorldProjectedShapeInstance WithHoleFillRadius(float holeFillRadius)
         {
             var params1 = Params1;
             params1.Y = Math.Clamp(holeFillRadius, 0f, 2f);
-            return new(this, params1, Packed);
+            return new(this, params1, Packed, Origin, ProjectionHeight);
         }
     }
 

@@ -2,7 +2,7 @@
 
 // state related to large bird tethers
 // TODO: simplify and make more robust, e.g. in case something goes wrong and bird dies without tether update
-class BirdTether(BossModule module) : BossComponent(module)
+sealed class BirdTether(BossModule module) : BossComponent(module)
 {
     public int NumFinishedChains { get; private set; }
     private readonly (Actor?, Actor?, int)[] _chains = new (Actor?, Actor?, int)[4]; // actor1, actor2, num-charges

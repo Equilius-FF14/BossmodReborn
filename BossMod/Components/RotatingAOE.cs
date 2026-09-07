@@ -5,7 +5,7 @@
 public class GenericRotatingAOE(BossModule module) : GenericAOEs(module)
 {
     public struct Sequence(AOEShape shape, WPos origin, Angle rotation, Angle increment, DateTime nextActivation, double secondsBetweenActivations, int numRemainingCasts, int maxShownAOEs = 2, ulong actorID = default,
-        int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false)
+        int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false)
     {
         public AOEShape Shape = shape;
         public WPos Origin = origin;
@@ -17,7 +17,7 @@ public class GenericRotatingAOE(BossModule module) : GenericAOEs(module)
         public int MaxShownAOEs = maxShownAOEs;
         public ulong ActorID = actorID;
         public int? ArenaProjectionLayer = arenaProjectionLayer;
-        public bool RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
+        public bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
     }
 
     public readonly List<Sequence> Sequences = [];

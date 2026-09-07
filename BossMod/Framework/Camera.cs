@@ -24,6 +24,19 @@ sealed class Camera
         public int CurveLineCount;
     }
 
+    // MiniArena temporarily installs these targets for an explicitly all-layer mechanic. Null
+    // retains ordinary submission. Explicit actor/physical-layer scopes suspend and restore them.
+    public readonly struct WorldProjectionLayer(float y, float projectionHeight, float holeFillRadius, RelSimplifiedComplexPolygon? arenaClip, WPos arenaOrigin)
+    {
+        public readonly float Y = y;
+        public readonly float ProjectionHeight = projectionHeight;
+        public readonly float HoleFillRadius = holeFillRadius;
+        public readonly RelSimplifiedComplexPolygon? ArenaClip = arenaClip;
+        public readonly WPos ArenaOrigin = arenaOrigin;
+    }
+
+    public WorldProjectionLayer[]? ProjectedShapeLayers;
+
     private readonly struct WorldProjectedShapeBinding(
         RelSimplifiedComplexPolygon? shapeSdf, WPos shapeSdfOrigin,
         RelSimplifiedComplexPolygon? arenaSdf, WPos arenaSdfOrigin)
@@ -227,6 +240,21 @@ sealed class Camera
         RelSimplifiedComplexPolygon? arenaSdf = null, WPos arenaSdfOrigin = default, float holeFillRadius = 0f)
     {
         var index = _worldProjectedShapes.Count;
+        if (ProjectedShapeLayers is { Length: > 0 } layers && (shape.Packed & 0xFFu) != (uint)Dx11ArenaRenderer.WorldProjectedShapeKind.Eye3D)
+        {
+            // All-layer mechanics keep one 2D copy, but get a terrain-projected copy on each
+            // physical floor, with that floor's receiver height and independent world-only clip.
+
+            var len = layers.Length;
+            for (var i = 0; i < len; ++i)
+            {
+                ref readonly var layer = ref layers[i];
+                _worldProjectedShapes.Add(shape.WithProjectionLayer(layer.Y, layer.ProjectionHeight, layer.HoleFillRadius));
+                _worldProjectedShapeBindings.Add(new(shapeSdf, shapeSdfOrigin, layer.ArenaClip, layer.ArenaOrigin));
+            }
+            RecordWorldPrimitiveRun(WorldPrimitiveRunKind.ProjectedShapes, index, layers.Length, 0);
+            return;
+        }
         _worldProjectedShapes.Add(shape.WithHoleFillRadius(holeFillRadius));
         _worldProjectedShapeBindings.Add(new(shapeSdf, shapeSdfOrigin, arenaSdf, arenaSdfOrigin));
         RecordWorldPrimitiveRun(WorldPrimitiveRunKind.ProjectedShapes, index, 1, 0);

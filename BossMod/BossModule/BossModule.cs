@@ -400,23 +400,24 @@ public abstract class BossModule : IDisposable
         return resolved;
     }
 
-    // A restriction is meaningful only for a valid explicitly authored layer. Null/invalid IDs keep
-    // normal behavior. Grouped physical floors form one 2D/hint/AI visibility domain, allowing remote
-    // teleporter destinations to remain visible and rasterized on their shared map.
-    public bool MechanicAppliesToArenaProjectionLayer(Actor actor, int? mechanicLayer, bool restrictToLayer)
+    // True restricts to a valid explicitly authored layer. False keeps unrestricted legacy
+    // behavior; null explicitly applies the mechanic to all layers. Null/invalid IDs keep normal
+    // behavior. Grouped physical floors form one 2D/AI visibility domain, allowing remote teleporter
+    // destinations to remain visible and rasterized on their shared map.
+    public bool MechanicAppliesToArenaProjectionLayer(Actor actor, int? mechanicLayer, bool? restrictToLayer)
     {
-        if (!restrictToLayer || Bounds is not ArenaBoundsCustom custom || !custom.IsValidProjectionLayer(mechanicLayer))
+        if (restrictToLayer != true || Bounds is not ArenaBoundsCustom custom || !custom.IsValidProjectionLayer(mechanicLayer))
         {
             return true;
         }
         return custom.ProjectionLayersShare2DGroup(ResolveArenaProjectionLayer(actor), mechanicLayer);
     }
 
-    // Participant selection/counting remains tied to the exact physical floor. This prevents actors
-    // on another island in the same 2D group from becoming bait targets, stack members or tower soakers.
-    public bool ActorMatchesArenaProjectionLayer(Actor actor, int? mechanicLayer, bool restrictToLayer)
+    // With restriction enabled, participant selection/counting stays tied to the exact physical
+    // floor. False/null allow participants on any floor, including other islands in a shared group.
+    public bool ActorMatchesArenaProjectionLayer(Actor actor, int? mechanicLayer, bool? restrictToLayer)
     {
-        if (!restrictToLayer || Bounds is not ArenaBoundsCustom custom || !custom.IsValidProjectionLayer(mechanicLayer))
+        if (restrictToLayer != true || Bounds is not ArenaBoundsCustom custom || !custom.IsValidProjectionLayer(mechanicLayer))
         {
             return true;
         }

@@ -2,10 +2,10 @@
 
 // generic unavoidable raidwide, started and finished by a single cast
 [SkipLocalsInit]
-public class RaidwideCast(BossModule module, uint aid, string hint = "Raidwide", int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false) : CastHint(module, aid, hint)
+public class RaidwideCast(BossModule module, uint aid, string hint = "Raidwide", int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false) : CastHint(module, aid, hint)
 {
     public int? ArenaProjectionLayer = arenaProjectionLayer;
-    public bool RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
+    public bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
 
     public override void AddGlobalHints(GlobalHints hints)
     {
@@ -48,7 +48,7 @@ public class RaidwideCast(BossModule module, uint aid, string hint = "Raidwide",
     }
 }
 
-public class RaidwideCasts(BossModule module, uint[] aids, string hint = "Raidwide", int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false)
+public class RaidwideCasts(BossModule module, uint[] aids, string hint = "Raidwide", int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false)
     : RaidwideCast(module, default, hint, arenaProjectionLayer, restrictToArenaProjectionLayer)
 {
     private readonly uint[] AIDs = aids;
@@ -95,13 +95,13 @@ public class RaidwideCasts(BossModule module, uint[] aids, string hint = "Raidwi
 
 // generic unavoidable raidwide, initiated by a custom condition and applied by an instant cast after a delay
 [SkipLocalsInit]
-public class RaidwideInstant(BossModule module, uint aid, double delay = default, string hint = "Raidwide", int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false) : CastCounter(module, aid)
+public class RaidwideInstant(BossModule module, uint aid, double delay = default, string hint = "Raidwide", int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false) : CastCounter(module, aid)
 {
     public readonly double Delay = delay;
     public readonly string Hint = hint;
     public DateTime Activation; // default if inactive, otherwise expected cast time
     public int? ArenaProjectionLayer = arenaProjectionLayer;
-    public bool RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
+    public bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
 
     public override void AddGlobalHints(GlobalHints hints)
     {
@@ -148,7 +148,7 @@ public class RaidwideInstant(BossModule module, uint aid, double delay = default
 
 // generic unavoidable instant raidwide initiated by a cast (usually visual-only)
 [SkipLocalsInit]
-public class RaidwideCastDelay(BossModule module, uint actionVisual, uint actionAOE, double delay, string hint = "Raidwide", int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false)
+public class RaidwideCastDelay(BossModule module, uint actionVisual, uint actionAOE, double delay, string hint = "Raidwide", int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false)
     : RaidwideInstant(module, actionAOE, delay, hint, arenaProjectionLayer, restrictToArenaProjectionLayer)
 {
     public uint ActionVisual = actionVisual;
@@ -163,7 +163,7 @@ public class RaidwideCastDelay(BossModule module, uint actionVisual, uint action
 }
 
 [SkipLocalsInit]
-public class RaidwideCastsDelay(BossModule module, uint[] aidsVisual, uint[] aidsAOE, double delay, string hint = "Raidwide", int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false)
+public class RaidwideCastsDelay(BossModule module, uint[] aidsVisual, uint[] aidsAOE, double delay, string hint = "Raidwide", int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false)
     : RaidwideCastDelay(module, default, default, delay, hint, arenaProjectionLayer, restrictToArenaProjectionLayer)
 {
     private readonly uint[] AIDsVisual = aidsVisual;
@@ -199,7 +199,7 @@ public class RaidwideCastsDelay(BossModule module, uint[] aidsVisual, uint[] aid
 
 // generic unavoidable instant raidwide cast initiated by NPC yell
 [SkipLocalsInit]
-public class RaidwideAfterNPCYell(BossModule module, uint aid, uint npcYellID, double delay, string hint = "Raidwide", int? arenaProjectionLayer = null, bool restrictToArenaProjectionLayer = false)
+public class RaidwideAfterNPCYell(BossModule module, uint aid, uint npcYellID, double delay, string hint = "Raidwide", int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false)
     : RaidwideInstant(module, aid, delay, hint, arenaProjectionLayer, restrictToArenaProjectionLayer)
 {
     public uint NPCYellID = npcYellID;

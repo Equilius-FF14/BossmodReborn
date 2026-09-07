@@ -201,11 +201,11 @@ public sealed class RotationModuleManager : IDisposable
     {
         var fullMask = new BitMask(~0ul);
         var allowedMask = fullMask;
-        if (!filter.HasFlag(StrategyPartyFiltering.IncludeSelf))
+        if ((filter & StrategyPartyFiltering.IncludeSelf) == 0)
         {
             allowedMask.Clear(PlayerSlot);
         }
-        if (filter.HasFlag(StrategyPartyFiltering.ExcludeNoPredictedDamage))
+        if ((filter & StrategyPartyFiltering.ExcludeNoPredictedDamage) != 0)
         {
             var predictedDamage = default(BitMask);
             var predicteddamage = Hints.PredictedDamage;
@@ -233,10 +233,10 @@ public sealed class RotationModuleManager : IDisposable
 
             var excluded = player.Role switch
             {
-                Role.Tank => filter.HasFlag(StrategyPartyFiltering.ExcludeTanks),
-                Role.Healer => filter.HasFlag(StrategyPartyFiltering.ExcludeHealers),
-                Role.Melee => filter.HasFlag(StrategyPartyFiltering.ExcludeMelee),
-                Role.Ranged => filter.HasFlag(StrategyPartyFiltering.ExcludeRanged),
+                Role.Tank => (filter & StrategyPartyFiltering.ExcludeTanks) != 0,
+                Role.Healer => (filter & StrategyPartyFiltering.ExcludeHealers) != 0,
+                Role.Melee => (filter & StrategyPartyFiltering.ExcludeMelee) != 0,
+                Role.Ranged => (filter & StrategyPartyFiltering.ExcludeRanged) != 0,
                 _ => false,
             };
             if (excluded || best != null && player.HPMP.CurHP >= bestHP)

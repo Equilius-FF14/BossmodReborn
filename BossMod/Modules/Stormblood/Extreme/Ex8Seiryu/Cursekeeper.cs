@@ -2,7 +2,7 @@ namespace BossMod.Stormblood.Extreme.Ex8Seiryu;
 
 sealed class Cursekeeper(BossModule module) : Components.GenericBaitAway(module, centerAtTarget: true, tankbuster: true, damageType: AIHints.PredictedDamageType.Tankbuster)
 {
-    private static readonly AOEShapeCircle circle = new(4f);
+    private readonly AOEShapeCircle circle = new(4f);
     private ulong prevTarget;
 
     public override void OnCastStarted(Actor caster, ActorCastInfo spell)
