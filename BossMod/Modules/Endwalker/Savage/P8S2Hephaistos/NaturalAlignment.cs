@@ -52,7 +52,7 @@ sealed class NaturalAlignment(BossModule module) : Components.GenericStackSpread
         base.Update();
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (CurMechanicProgress >= 2 || CurMechanicSource == null)
             return;

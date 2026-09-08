@@ -56,7 +56,7 @@ sealed class Pinax(BossModule module) : BossComponent(module)
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         var order = _order switch
         {
@@ -97,8 +97,15 @@ sealed class Pinax(BossModule module) : BossComponent(module)
         if (_acid != null)
         {
             Arena.ZoneCircleOutline(pc.Position, _acidAOERadius, Colors.Danger);
-            foreach (var player in Raid.WithoutSlot(false, true, true).Exclude(pc))
-                Arena.Actor(player, player.Position.InCircle(pc.Position, _acidAOERadius) ? Colors.PlayerInteresting : Colors.PlayerGeneric);
+            foreach (var player in Raid.WithoutSlot(false, true, true))
+            {
+                if (player == pc)
+                {
+                    continue;
+                }
+                var isindanger = player.Position.InCircle(pc.Position, _acidAOERadius);
+                Arena.Actor(player, isindanger ? Colors.PlayerInteresting : Colors.PlayerGeneric, drawWorld: isindanger ? true : null);
+            }
         }
         if (_fire != null)
         {
@@ -106,7 +113,7 @@ sealed class Pinax(BossModule module) : BossComponent(module)
             {
                 if (player.Role == Role.Healer)
                 {
-                    Arena.Actor(player, Colors.Danger);
+                    Arena.Actor(player, Colors.Danger, drawWorld: true);
                     Arena.ZoneCircleOutline(player.Position, _fireAOERadius, Colors.Danger);
                 }
                 else

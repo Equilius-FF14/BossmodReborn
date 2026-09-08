@@ -25,7 +25,7 @@ sealed class ElementalBelone : BossComponent
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         hints.Add($"Safe square: {_safeElement}");
     }

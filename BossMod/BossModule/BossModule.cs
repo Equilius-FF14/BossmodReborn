@@ -273,7 +273,7 @@ public abstract class BossModule : IDisposable
 
             if (WindowConfig.ShowGlobalHints)
             {
-                DrawGlobalHints(CalculateGlobalHints());
+                DrawGlobalHints(CalculateGlobalHints(pc));
             }
 
             if (WindowConfig.ShowPlayerHints)
@@ -358,7 +358,7 @@ public abstract class BossModule : IDisposable
         }
         // draw enemies & player
         DrawEnemies(pcSlot, pc);
-        Arena.Actor(pc, Colors.PC, true);
+        Arena.Actor(pc, Colors.PC, true, drawWorld: WindowConfig.ShowActorTrianglesIn3DWorld);
     }
 
     public BossComponent.TextHints CalculateHintsForRaidMember(int slot, Actor actor)
@@ -400,10 +400,16 @@ public abstract class BossModule : IDisposable
         return resolved;
     }
 
+    // Targeted mechanics follow their target's current floor unless an explicit floor overrides it.
+    // A null restriction flag always wins and keeps all-layer mechanics independent of the target.
+    public int? ResolveTargetArenaProjectionLayer(Actor? target, int? mechanicLayer = null, bool? restrictToLayer = true)
+        => !restrictToLayer.HasValue ? null : mechanicLayer ?? (target != null ? ResolveArenaProjectionLayer(target) : null);
+
     // True restricts to a valid explicitly authored layer. False keeps unrestricted legacy
     // behavior; null explicitly applies the mechanic to all layers. Null/invalid IDs keep normal
     // behavior. Grouped physical floors form one 2D/AI visibility domain, allowing remote teleporter
     // destinations to remain visible and rasterized on their shared map.
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool MechanicAppliesToArenaProjectionLayer(Actor actor, int? mechanicLayer, bool? restrictToLayer)
     {
         if (restrictToLayer != true || Bounds is not ArenaBoundsCustom custom || !custom.IsValidProjectionLayer(mechanicLayer))
@@ -415,6 +421,7 @@ public abstract class BossModule : IDisposable
 
     // With restriction enabled, participant selection/counting stays tied to the exact physical
     // floor. False/null allow participants on any floor, including other islands in a shared group.
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool ActorMatchesArenaProjectionLayer(Actor actor, int? mechanicLayer, bool? restrictToLayer)
     {
         if (restrictToLayer != true || Bounds is not ArenaBoundsCustom custom || !custom.IsValidProjectionLayer(mechanicLayer))
@@ -423,6 +430,10 @@ public abstract class BossModule : IDisposable
         }
         return ResolveArenaProjectionLayer(actor) == mechanicLayer;
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool ActorsMatchArenaProjectionLayer(Actor first, Actor second)
+        => ResolveArenaProjectionLayer(first) == ResolveArenaProjectionLayer(second);
 
     public BossComponent.MovementHints CalculateMovementHintsForRaidMember(int slot, Actor actor)
     {
@@ -436,13 +447,13 @@ public abstract class BossModule : IDisposable
         return hints;
     }
 
-    public BossComponent.GlobalHints CalculateGlobalHints()
+    public BossComponent.GlobalHints CalculateGlobalHints(Actor actor)
     {
         BossComponent.GlobalHints hints = [];
         var count = Components.Count;
         for (var i = 0; i < count; ++i)
         {
-            Components[i].AddGlobalHints(hints);
+            Components[i].AddGlobalHints(actor, hints);
         }
 
         return hints;
@@ -755,7 +766,7 @@ public abstract class BossModule : IDisposable
                 }
             }
 
-            Arena.Actor(player, color);
+            Arena.Actor(player, color, drawWorld: WindowConfig.ShowActorTrianglesIn3DWorld);
         }
     }
 

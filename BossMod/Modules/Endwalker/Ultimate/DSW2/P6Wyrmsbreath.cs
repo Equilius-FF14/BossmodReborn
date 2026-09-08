@@ -33,7 +33,7 @@ abstract class P6Wyrmsbreath(BossModule module, bool allowIntersect) : Component
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (Glows.Any())
             hints.Add(Glows.Raw == 3ul ? "Tankbuster: shared" : "Tankbuster: solo");

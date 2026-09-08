@@ -6,7 +6,7 @@ sealed class TrickReload(BossModule module) : BossComponent(module)
     public int SafeSlice;
     public int NumLoads;
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (SafeSlice > 0)
             hints.Add($"Order: {(FirstStack ? "stack" : "spread")} -> {SafeSlice} -> {(FirstStack ? "spread" : "stack")}");

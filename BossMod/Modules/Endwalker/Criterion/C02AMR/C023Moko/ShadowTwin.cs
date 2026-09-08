@@ -48,7 +48,7 @@ sealed class AccursedEdge : Components.GenericBaitAway
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (_curMechanic != Mechanic.None)
             hints.Add($"Untethered bait: {_curMechanic}");

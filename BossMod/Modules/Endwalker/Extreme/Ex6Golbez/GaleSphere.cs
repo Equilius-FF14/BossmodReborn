@@ -26,7 +26,7 @@ sealed class GaleSphere(BossModule module) : Components.GenericAOEs(module)
         return [];
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (_sides.Count > NumCasts)
             hints.Add($"Order: {string.Join(" -> ", _sides.Skip(NumCasts))}");

@@ -60,4 +60,4 @@ sealed class CoursingRiverForceOfNature(BossModule module) : Components.GenericK
     }
 }
 
-sealed class ForceOfNatureAOE(BossModule module) : Components.SimpleAOEs(module, (uint)AID.ForceOfNature, 5f);
+sealed class ForceOfNatureAOE(BossModule module) : Components.SimpleAOEs(module, (uint)AID.ForceOfNature, 5f, arenaProjectionLayer: 1);

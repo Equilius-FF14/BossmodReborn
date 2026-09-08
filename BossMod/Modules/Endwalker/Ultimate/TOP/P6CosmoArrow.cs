@@ -28,7 +28,7 @@ sealed class P6CosmoArrow(BossModule module) : Components.GenericAOEs(module)
         return CollectionsMarshal.AsSpan(aoes);
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (CurPattern != Pattern.Unknown)
             hints.Add($"Pattern: {(CurPattern == Pattern.InOut ? "in -> out" : "out -> in")}");

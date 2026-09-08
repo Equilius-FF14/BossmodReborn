@@ -76,7 +76,7 @@ sealed class VengefulBelone(BossModule module) : BossComponent(module)
         foreach ((var i, var player) in Raid.WithSlot(false, true, true))
         {
             var nearLethalOrb = orbs.Where(orb => IsOrbLethal(i, player, OrbTarget(orb.InstanceID))).InRadius(player.Position, _burstRadius).Any();
-            Arena.Actor(player, nearLethalOrb ? Colors.PlayerInteresting : Colors.PlayerGeneric);
+            Arena.Actor(player, nearLethalOrb ? Colors.PlayerInteresting : Colors.PlayerGeneric, drawWorld: nearLethalOrb ? true : null);
         }
     }
 

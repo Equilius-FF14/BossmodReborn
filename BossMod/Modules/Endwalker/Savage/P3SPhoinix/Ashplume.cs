@@ -57,7 +57,7 @@ sealed class Ashplume : BossComponent
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (CurState == State.Stack)
             hints.Add("Stack!");
@@ -72,9 +72,14 @@ sealed class Ashplume : BossComponent
 
         // draw all raid members, to simplify positioning
         var aoeRadius = CurState == State.Stack ? _stackRadius : _spreadRadius;
-        foreach (var player in Raid.WithoutSlot(false, true, true).Exclude(pc))
+        foreach (var player in Raid.WithoutSlot(false, true, true))
         {
-            Arena.Actor(player, player.Position.InCircle(pc.Position, aoeRadius) ? Colors.PlayerInteresting : Colors.PlayerGeneric);
+            if (player == pc)
+            {
+                continue;
+            }
+            var isinaoe = player.Position.InCircle(pc.Position, aoeRadius);
+            Arena.Actor(player, isinaoe ? Colors.PlayerInteresting : Colors.PlayerGeneric, drawWorld: isinaoe ? true : null);
         }
 
         // draw circle around pc

@@ -16,7 +16,7 @@ sealed class DaemoniacBonds(BossModule module) : Components.UniformStackSpread(m
             AddStacks(_stackTargets, _stackResolve);
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (_spreadResolve == default || _stackResolve == default)
             return;

@@ -6,7 +6,7 @@ sealed class AzdajasShadow(BossModule module) : BossComponent(module)
 
     public Mechanic CurMechanic;
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (CurMechanic != Mechanic.Unknown)
             hints.Add($"Next mechanic: {(CurMechanic == Mechanic.CircleStack ? "out -> stack" : "in -> spread")}");

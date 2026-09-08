@@ -94,7 +94,14 @@ sealed class Mechanics(BossModule module) : BossComponent(module)
     {
         var mt = WorldState.Actors.Find(Module.PrimaryActor.TargetID);
         foreach (var player in Raid.WithoutSlot(false, true, true).Exclude(pc))
-            Arena.Actor(player, _orbKiters.Contains(player.InstanceID) ? Colors.Danger : player == mt ? Colors.PlayerInteresting : Colors.PlayerGeneric);
+        {
+            if (player == pc)
+            {
+                continue;
+            }
+            var isKiter = _orbKiters.Contains(player.InstanceID);
+            Arena.Actor(player, isKiter ? Colors.Danger : player == mt ? Colors.PlayerInteresting : Colors.PlayerGeneric, drawWorld: isKiter || player == mt ? true : null);
+        }
         if (mt != null)
             Arena.ZoneCircleOutline(mt.Position, _aoeCleave.Radius, Colors.Danger);
 

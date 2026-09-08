@@ -79,7 +79,7 @@ sealed class ElementaryExpansion(BossModule module) : Components.GenericAOEs(mod
         }
     }
 #if DEBUG
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         hints.Add($"Expansion[{NumCasts}]");
     }

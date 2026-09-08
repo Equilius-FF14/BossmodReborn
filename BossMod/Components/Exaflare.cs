@@ -113,7 +113,7 @@ public class Exaflare(BossModule module, AOEShape shape, uint aid = default) : G
 }
 
 public class SimpleExaflare(BossModule module, AOEShape shape, uint aidFirst, uint aidRest, float distance, double timeToMove, int explosionsLeft, int maxShownExplosions, bool castEvent = false,
-bool locationBased = false, Angle rotation = default, float[]? arenaProjectionLayers = null, bool? restrictToArenaProjectionLayer = true) : Exaflare(module, shape)
+bool locationBased = false, Angle rotation = default, float[]? arenaProjectionLayers = null, bool? restrictToArenaProjectionLayer = true, int? arenaProjectionLayer = null) : Exaflare(module, shape)
 {
     private readonly uint AIDFirst = aidFirst;
     private readonly uint AIDRest = aidRest;
@@ -125,15 +125,17 @@ bool locationBased = false, Angle rotation = default, float[]? arenaProjectionLa
     private readonly bool LocationBased = locationBased; // if cast is location based
     private readonly Angle Rotation = rotation;
     public float[]? ArenaProjectionLayers = arenaProjectionLayers;
+    public int? ArenaProjectionLayer = arenaProjectionLayer; // explicit ID takes precedence over height-based selection
     public bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
     public int NumLinesFinished;
 
     public SimpleExaflare(BossModule module, float radius, uint aidFirst, uint aidRest, float distance, double timeToMove, int explosionsLeft, int maxShownExplosions, bool castEvent = false, bool locationBased = false,
-        float[]? arenaProjectionLayers = null, bool? restrictToArenaProjectionLayer = true)
-    : this(module, new AOEShapeCircle(radius), aidFirst, aidRest, distance, timeToMove, explosionsLeft, maxShownExplosions, castEvent, locationBased, default, arenaProjectionLayers, restrictToArenaProjectionLayer) { }
+        float[]? arenaProjectionLayers = null, bool? restrictToArenaProjectionLayer = true, int? arenaProjectionLayer = null)
+    : this(module, new AOEShapeCircle(radius), aidFirst, aidRest, distance, timeToMove, explosionsLeft, maxShownExplosions, castEvent, locationBased, default, arenaProjectionLayers, restrictToArenaProjectionLayer, arenaProjectionLayer) { }
 
     private int? ResolveArenaProjectionLayer(float y)
-        => ArenaProjectionLayers is { Length: > 0 } layers ? GenericAOEs.IndexOfClosestLayer(layers, y) : null;
+        => !RestrictToArenaProjectionLayer.HasValue ? null : ArenaProjectionLayer
+            ?? (ArenaProjectionLayers is { Length: > 0 } layers ? GenericAOEs.IndexOfClosestLayer(layers, y) : null);
 
     public override void OnCastStarted(Actor caster, ActorCastInfo spell)
     {

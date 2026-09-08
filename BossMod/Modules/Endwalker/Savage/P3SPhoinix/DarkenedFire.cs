@@ -31,12 +31,15 @@ sealed class DarkenedFire(BossModule module) : BossComponent(module)
     public override void DrawArenaForeground(int pcSlot, Actor pc)
     {
         // draw other potential targets, to simplify positioning
-        var healerOrTank = pc.Role is Role.Tank or Role.Healer;
-        foreach (var player in Raid.WithoutSlot(false, true, true).Where(player => CanBothBeTargets(player, pc)))
+        foreach (var player in Raid.WithoutSlot(false, true, true))
         {
+            if (!CanBothBeTargets(player, pc))
+            {
+                continue;
+            }
             var tooClose = player.Position.InCircle(pc.Position, _minRange);
             var inRange = player.Position.InCircle(pc.Position, _maxRange);
-            Arena.Actor(player, tooClose ? Colors.Danger : (inRange ? Colors.PlayerInteresting : Colors.PlayerGeneric));
+            Arena.Actor(player, tooClose ? Colors.Danger : (inRange ? Colors.PlayerInteresting : Colors.PlayerGeneric), drawWorld: tooClose || inRange ? true : null);
         }
 
         // draw circles around pc

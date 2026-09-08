@@ -90,7 +90,7 @@ sealed class InversiveChlamys(BossModule module) : BossComponent(module)
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         var forbidden = Raid.WithSlot(true, true, true).IncludedInMask(_tetherForbidden).FirstOrDefault().Item2;
         if (forbidden != null)
@@ -109,7 +109,7 @@ sealed class InversiveChlamys(BossModule module) : BossComponent(module)
         {
             var failing = failingPlayers[i];
             var inAOE = _tetherInAOE[i];
-            Arena.Actor(player, failing ? Colors.Danger : (inAOE ? Colors.PlayerInteresting : Colors.PlayerGeneric));
+            Arena.Actor(player, failing ? Colors.Danger : (inAOE ? Colors.PlayerInteresting : Colors.PlayerGeneric), drawWorld: failing || inAOE ? true : null);
 
             if (player.Tether.ID == (uint)TetherID.Chlamys)
             {

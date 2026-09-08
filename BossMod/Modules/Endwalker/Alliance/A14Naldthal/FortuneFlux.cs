@@ -10,7 +10,7 @@ sealed class FortuneFluxOrder(BossModule module) : BossComponent(module)
     private Mechanic _currentMechanic;
     private DateTime activation;
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         var orderBuilder = new StringBuilder();
         var count = Mechanics.Count;

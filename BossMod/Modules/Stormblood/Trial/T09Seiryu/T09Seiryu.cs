@@ -1,7 +1,7 @@
 ﻿namespace BossMod.Stormblood.Trial.T09Seiryu;
 
-sealed class HundredTonzeSwing(BossModule module) : Components.SimpleAOEs(module, (uint)AID.HundredTonzeSwing, 16f);
-sealed class CoursingRiver(BossModule module) : Components.SimpleKnockbacks(module, (uint)AID.CoursingRiverAOE, 25f, true, kind: Kind.DirForward)
+sealed class HundredTonzeSwing(BossModule module) : Components.SimpleAOEs(module, (uint)AID.HundredTonzeSwing, 16f, restrictToArenaProjectionLayer: null);
+sealed class CoursingRiver(BossModule module) : Components.SimpleKnockbacks(module, (uint)AID.CoursingRiverAOE, 25f, true, kind: Kind.DirForward, restrictToArenaProjectionLayer: null)
 {
     private readonly Handprint _aoe = module.FindComponent<Handprint>()!;
 
@@ -16,16 +16,16 @@ sealed class CoursingRiver(BossModule module) : Components.SimpleKnockbacks(modu
 }
 
 sealed class DragonsWake(BossModule module) : Components.RaidwideCast(module, (uint)AID.DragonsWake2);
-sealed class FifthElement(BossModule module) : Components.RaidwideCast(module, (uint)AID.FifthElement);
-sealed class FortuneBladeSigil(BossModule module) : Components.SimpleAOEs(module, (uint)AID.FortuneBladeSigil, new AOEShapeRect(100f, 2f));
+sealed class FifthElement(BossModule module) : Components.RaidwideCast(module, (uint)AID.FifthElement, restrictToArenaProjectionLayer: null);
+sealed class FortuneBladeSigil(BossModule module) : Components.SimpleAOEs(module, (uint)AID.FortuneBladeSigil, new AOEShapeRect(50.5f, 2f), restrictToArenaProjectionLayer: null);
 
 sealed class InfirmSoul(BossModule module) : Components.BaitAwayCast(module, (uint)AID.InfirmSoul, 4f, tankbuster: true, damageType: AIHints.PredictedDamageType.Tankbuster);
 
-sealed class SerpentDescending(BossModule module) : Components.SpreadFromIcon(module, (uint)IconID.Spreadmarker, (uint)AID.SerpentDescending, 5f, 6d);
-sealed class YamaKagura(BossModule module) : Components.SimpleAOEs(module, (uint)AID.YamaKagura, new AOEShapeRect(60f, 3f));
-sealed class Handprint(BossModule module) : Components.SimpleAOEs(module, (uint)AID.Handprint1, new AOEShapeCone(40f, 90f.Degrees()));
+sealed class SerpentDescending(BossModule module) : Components.SpreadFromIcon(module, (uint)IconID.Spreadmarker, (uint)AID.SerpentDescending, 5f, 6d, restrictToArenaProjectionLayer: null);
+sealed class YamaKagura(BossModule module) : Components.SimpleAOEs(module, (uint)AID.YamaKagura, new AOEShapeRect(62.7f, 3f), restrictToArenaProjectionLayer: null);
+sealed class Handprint(BossModule module) : Components.SimpleAOEs(module, (uint)AID.Handprint1, new AOEShapeCone(40f, 90f.Degrees()), restrictToArenaProjectionLayer: null);
 
-sealed class ForceOfNature1(BossModule module) : Components.SimpleKnockbacks(module, (uint)AID.ForceOfNature1, 10f)
+sealed class ForceOfNature1(BossModule module) : Components.SimpleKnockbacks(module, (uint)AID.ForceOfNature1, 10f, restrictToArenaProjectionLayer: null)
 {
     public override void AddAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints)
     {
@@ -35,8 +35,8 @@ sealed class ForceOfNature1(BossModule module) : Components.SimpleKnockbacks(mod
         }
     }
 }
-sealed class ForceOfNature2(BossModule module) : Components.SimpleAOEs(module, (uint)AID.ForceOfNature2, 5f);
-sealed class KanaboBait(BossModule module) : Components.BaitAwayTethers(module, new AOEShapeCone(45f, 30f.Degrees()), (uint)TetherID.BaitAway, (uint)AID.KanaboVisual2, (uint)OID.IwaNoShiki, 5.9d)
+sealed class ForceOfNature2(BossModule module) : Components.SimpleAOEs(module, (uint)AID.ForceOfNature2, 5f, arenaProjectionLayer: 1);
+sealed class KanaboBait(BossModule module) : Components.BaitAwayTethers(module, new AOEShapeCone(44f, 30f.Degrees()), (uint)TetherID.BaitAway, (uint)AID.KanaboVisual2, (uint)OID.IwaNoShiki, 5.9d, restrictToArenaProjectionLayer: null)
 {
     public override void AddAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints)
     {
@@ -48,8 +48,8 @@ sealed class KanaboBait(BossModule module) : Components.BaitAwayTethers(module, 
     }
 }
 
-sealed class KanaboAOE(BossModule module) : Components.SimpleAOEs(module, (uint)AID.Kanabo, new AOEShapeCone(45f, 30f.Degrees()));
-sealed class BlueBolt(BossModule module) : Components.LineStack(module, aidMarker: (uint)AID.BlueBoltMarker, (uint)AID.BlueBolt, 5.9d, 83f, 2.5f)
+sealed class KanaboAOE(BossModule module) : Components.SimpleAOEs(module, (uint)AID.Kanabo, new AOEShapeCone(44f, 30f.Degrees()), restrictToArenaProjectionLayer: null);
+sealed class BlueBolt(BossModule module) : Components.LineStack(module, aidMarker: (uint)AID.BlueBoltMarker, (uint)AID.BlueBolt, 5.9d, 83f, 2.5f, restrictToArenaProjectionLayer: null)
 {
     public override void Update()
     {
@@ -60,8 +60,8 @@ sealed class BlueBolt(BossModule module) : Components.LineStack(module, aidMarke
     }
 }
 
-sealed class ForbiddenArts(BossModule module) : Components.LineStack(module, aidMarker: (uint)AID.ForbiddenArtsMarker, (uint)AID.ForbiddenArtsSecond, 5.2f, 84.4f, 4); // this hits twice
-sealed class RedRush(BossModule module) : Components.BaitAwayTethers(module, new AOEShapeRect(82.6f, 2.5f), (uint)TetherID.BaitAway, (uint)AID.RedRush, (uint)OID.AkaNoShiki, 6d)
+sealed class ForbiddenArts(BossModule module) : Components.LineStack(module, aidMarker: (uint)AID.ForbiddenArtsMarker, (uint)AID.ForbiddenArtsSecond, 5.2f, 84.4f, 4, restrictToArenaProjectionLayer: null); // this hits twice
+sealed class RedRush(BossModule module) : Components.BaitAwayTethers(module, new AOEShapeRect(82.6f, 2.5f), (uint)TetherID.BaitAway, (uint)AID.RedRush, (uint)OID.AkaNoShiki, 6d, restrictToArenaProjectionLayer: null)
 {
     private readonly BlueBolt _stack = module.FindComponent<BlueBolt>()!;
 
@@ -103,17 +103,6 @@ sealed class RedRush(BossModule module) : Components.BaitAwayTethers(module, new
     }
 }
 
-sealed class ArenaChange(BossModule module) : BossComponent(module)
-{
-    public override void OnCastFinished(Actor caster, ActorCastInfo spell)
-    {
-        if (spell.Action.ID == (uint)AID.StrengthOfSpirit) // in phase 2 the arena no longer got a wall and we need to add back the player hitboxradius
-        {
-            Arena.Bounds = SeiryuTrial.GetPhase2Arena();
-        }
-    }
-}
-
 public abstract class SeiryuTrial : BossModule
 {
     public SeiryuTrial(WorldState ws, Actor primary) : this(ws, primary, BuildArena()) { }
@@ -129,11 +118,11 @@ public abstract class SeiryuTrial : BossModule
     public static ArenaBoundsCustom GetPhase2Arena()
     {
         var center = new WPos(100f, 100f);
-        Polygon[] phase2withwater = [new Polygon(center, 44.5f, 48)];
+        Polygon phase2withwater = new Polygon(center, 44.5f, 48);
         var phase2nowater = new Polygon(center, 20f, 48);
-        var polywithwater = new RelSimplifiedComplexPolygon(phase2withwater[0].Contour(center));
+        var polywithwater = new RelSimplifiedComplexPolygon(phase2withwater.Contour(center));
         var polynowater = new RelSimplifiedComplexPolygon(phase2nowater.Contour(center));
-        var arena = new ArenaBoundsCustom(phase2withwater, WorldProjectionLayers: [new(polywithwater, -0.75f, borderY: -0.75f), new(polynowater, 0.03f, borderY: 0.03f)]);
+        var arena = new ArenaBoundsCustom([phase2withwater], WorldProjectionLayers: [new(polywithwater, -0.8f, borderY: -0.8f), new(polynowater, 0f, borderY: 0f)]);
         return arena;
     }
 }

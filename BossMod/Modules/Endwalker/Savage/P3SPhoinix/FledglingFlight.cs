@@ -52,7 +52,10 @@ sealed class FledglingFlight(BossModule module) : BossComponent(module)
 
         // draw all players
         foreach ((var i, var player) in Raid.WithSlot(false, true, true))
-            Arena.Actor(player, _playerAOECount[i] != _playerDeathTollStacks[i] ? Colors.PlayerInteresting : Colors.PlayerGeneric);
+        {
+            var indanger = _playerAOECount[i] != _playerDeathTollStacks[i];
+            Arena.Actor(player, indanger ? Colors.PlayerInteresting : Colors.PlayerGeneric, drawWorld: indanger ? true : null);
+        }
 
         var eyePos = GetEyePlacementPosition(pcSlot, pc);
         if (eyePos != null)

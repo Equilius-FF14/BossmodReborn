@@ -188,7 +188,7 @@ sealed class WaterPuddles(BossModule module) : BossComponent(module)
         return filteredWater;
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         var orbs = GetPuddles(Module);
 

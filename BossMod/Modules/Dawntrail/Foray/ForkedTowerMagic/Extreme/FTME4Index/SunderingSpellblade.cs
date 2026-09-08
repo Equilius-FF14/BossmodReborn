@@ -128,7 +128,7 @@ sealed class SunderingSpellblade(BossModule module) : Components.GenericAOEs(mod
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         WPos pos1 = new(3.25f, -619f);
         WPos pos2 = new(7.794f, -623.5f);

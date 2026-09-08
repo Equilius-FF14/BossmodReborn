@@ -241,7 +241,7 @@ sealed class RushingRumbleRampage(BossModule module) : Components.GenericAOEs(mo
         hints.GoalZones.Add(AIHints.GoalSingleTarget(activebirds[0].Position, 12f, 5f)); // follow the charge
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (!showBait)
         {

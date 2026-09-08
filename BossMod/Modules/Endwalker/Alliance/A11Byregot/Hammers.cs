@@ -175,7 +175,7 @@ sealed class HammersSpire(BossModule module) : Components.SimpleAOEs(module, (ui
         _safespot = null;
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (_safespot != null)
         {

@@ -1,6 +1,6 @@
-namespace BossMod.Stormblood.Extreme.Ex8Seiryu;
+namespace BossMod.Stormblood.Trial.T09Seiryu;
 
-sealed class ArenaChanges(BossModule module) : BossComponent(module)
+sealed class ArenaChange(BossModule module) : BossComponent(module)
 {
     public override void AddAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints)
     {
@@ -9,9 +9,15 @@ sealed class ArenaChanges(BossModule module) : BossComponent(module)
             hints.AddForbiddenZone(new SDInvertedCircle(Arena.Center, 19f), DateTime.MaxValue);
         }
     }
-}
 
-sealed class GreatTyphoonCone(BossModule module) : Components.SimpleAOEs(module, (uint)AID.GreatTyphoonCone, new AOEShapeDonutSector(20f, 45f, 15f.Degrees()), arenaProjectionLayer: 0, restrictToArenaProjectionLayer: true);
+    public override void OnCastFinished(Actor caster, ActorCastInfo spell)
+    {
+        if (spell.Action.ID == (uint)AID.StrengthOfSpirit) // in phase 2 the arena no longer got a wall and we need to add back the player hitboxradius
+        {
+            Arena.Bounds = SeiryuTrial.GetPhase2Arena();
+        }
+    }
+}
 
 sealed class GreatTyphoonDonut(BossModule module) : Components.GenericAOEs(module)
 {

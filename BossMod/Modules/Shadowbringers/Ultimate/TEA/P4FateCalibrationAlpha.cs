@@ -6,7 +6,7 @@ sealed class P4FateCalibrationAlphaStillnessMotion(BossModule module) : Componen
     private Requirement _first;
     private Requirement _second;
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (_first != Requirement.None)
             hints.Add($"Movement: {_first} -> {(_second != Requirement.None ? _second.ToString() : "???")}");

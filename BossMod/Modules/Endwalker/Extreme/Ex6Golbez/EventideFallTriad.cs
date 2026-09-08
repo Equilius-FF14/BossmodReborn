@@ -7,7 +7,7 @@ sealed class EventideFallTriad(BossModule module) : BossComponent(module)
 
     private Mechanic _curMechanic;
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (_curMechanic != Mechanic.None)
             hints.Add($"Stack by: {_curMechanic}");

@@ -6,7 +6,7 @@ sealed class Quote(BossModule module) : BossComponent(module)
     public List<uint> PendingMechanics = [];
     public DateTime NextActivation;
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         var count = PendingMechanics.Count;
         if (count > 0)

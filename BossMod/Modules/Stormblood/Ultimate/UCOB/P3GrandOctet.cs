@@ -25,7 +25,7 @@ sealed class P3GrandOctet(BossModule module) : Components.GenericAOEs(module)
         base.AddHints(slot, actor, hints);
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (_diveOrder != 0)
             hints.Add($"Move {(_diveOrder < 0 ? "CW" : "CCW")}");

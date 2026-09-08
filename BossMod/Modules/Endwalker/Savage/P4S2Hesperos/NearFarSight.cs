@@ -62,12 +62,13 @@ sealed class NearFarSight : BossComponent
         {
             if (_targets[i])
             {
-                Arena.Actor(player, Colors.Danger);
+                Arena.Actor(player, Colors.Danger, drawWorld: true);
                 Arena.ZoneCircleOutline(player.Position, _aoeRadius, Colors.Danger);
             }
             else
             {
-                Arena.Actor(player, _inAOE[i] ? Colors.PlayerInteresting : Colors.PlayerGeneric);
+                var isinAOE = _inAOE[i];
+                Arena.Actor(player, isinAOE ? Colors.PlayerInteresting : Colors.PlayerGeneric, drawWorld: isinAOE ? true : null);
             }
         }
     }

@@ -78,6 +78,36 @@ sealed class Camera
     // Once cleared, stop queueing presents entirely so an unused overlay cannot participate in window-resize churn.
     private bool _worldOverlayHadContent;
 
+    private float _screenRiskOpacity;
+    private float _screenRiskPhase;
+    private Vector4 _screenRiskColor;
+
+    // Called once per live UI frame, independently of radar/replay window drawing.
+    public void UpdateScreenRiskBorder(bool enabled, bool haveRisks, uint color, float intensity)
+    {
+        if (!enabled || intensity <= 0f)
+        {
+            _screenRiskOpacity = 0f;
+            _screenRiskPhase = 0f;
+            _screenRiskColor = default;
+            return;
+        }
+
+        var dt = Math.Clamp(ImGui.GetIO().DeltaTime, 0f, 0.1f);
+        var target = haveRisks ? 1f : 0f;
+        var fadeTime = haveRisks ? 0.12f : 0.22f;
+        _screenRiskOpacity += (target - _screenRiskOpacity) * (1f - MathF.Exp(-dt / fadeTime));
+        if (!haveRisks && _screenRiskOpacity < 0.001f)
+        {
+            _screenRiskOpacity = 0f;
+        }
+        // A smooth 1.6-second pulse; keep the phase bounded during long encounters.
+        const float phaseconst = Angle.DoublePI / 1.6f;
+        _screenRiskPhase = _screenRiskOpacity > 0f ? (_screenRiskPhase + dt * phaseconst) % Angle.DoublePI : 0f;
+        _screenRiskColor = new Color(color).ToFloat4();
+        _screenRiskColor.W *= _screenRiskOpacity * Math.Clamp(intensity, 0f, 10f);
+    }
+
     public unsafe void Update()
     {
         var controlCamera = CameraManager.Instance()->GetActiveCamera();
@@ -103,6 +133,12 @@ sealed class Camera
         var viewport = ImGuiHelpers.MainViewport;
         if (_worldPrimitiveRuns.Count == 0)
         {
+            if (_screenRiskColor.W > 0f)
+            {
+                Dx11ArenaRenderer.QueueWorldOverlayPresent(ImGui.GetBackgroundDrawList(), viewport.Size, _screenRiskColor, _screenRiskPhase);
+                _worldOverlayHadContent = true;
+                return;
+            }
             // Preserve the old stale-content clearing behavior, but only once after the last frame
             // that actually submitted world primitives. If the overlay was never used (for example,
             // 3D projection is disabled), this path now allocates/presents nothing at all.
@@ -200,7 +236,7 @@ sealed class Camera
             {
                 CollectionsMarshal.SetCount(_worldTransforms, 1);
             }
-            Dx11ArenaRenderer.QueueWorldOverlayPresent(ImGui.GetBackgroundDrawList(), viewport.Size);
+            Dx11ArenaRenderer.QueueWorldOverlayPresent(ImGui.GetBackgroundDrawList(), viewport.Size, _screenRiskColor, _screenRiskPhase);
         }
     }
 
@@ -244,7 +280,6 @@ sealed class Camera
         {
             // All-layer mechanics keep one 2D copy, but get a terrain-projected copy on each
             // physical floor, with that floor's receiver height and independent world-only clip.
-
             var len = layers.Length;
             for (var i = 0; i < len; ++i)
             {

@@ -29,7 +29,7 @@ sealed class HydrofallHydrobullet(BossModule module) : Components.UniformStackSp
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         var firstMech = Math.Max(ActiveMechanic, 0);
         if (Mechanics.Count > firstMech)

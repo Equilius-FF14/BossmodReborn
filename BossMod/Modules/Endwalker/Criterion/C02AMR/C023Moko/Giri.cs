@@ -22,7 +22,7 @@ sealed class TripleKasumiGiri(BossModule module) : Components.GenericAOEs(module
         return CollectionsMarshal.AsSpan(_aoes)[..max];
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (_hints.Count > 0)
             hints.Add($"Safespots: {string.Join(" > ", _hints)}");
@@ -382,7 +382,7 @@ sealed class IaiGiriResolve(BossModule module) : Components.GenericAOEs(module)
 
 sealed class FleetingIaiGiriBait(BossModule module) : IaiGiriBait(module, 3f, 60f)
 {
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (Instances.Count == 1 && Instances[0].Hints.Count == 1)
             hints.Add($"Safespot: {Instances[0].Hints[0]}");
@@ -391,7 +391,7 @@ sealed class FleetingIaiGiriBait(BossModule module) : IaiGiriBait(module, 3f, 60
 
 sealed class DoubleIaiGiriBait(BossModule module) : IaiGiriBait(module, 1f, 23f)
 {
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         var count = Instances.Count;
         if (count == 0)

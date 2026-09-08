@@ -26,7 +26,7 @@ sealed class VenomSquallSurge(BossModule module) : BossComponent(module)
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         hints.Add(_reverse ? "Order: stack -> mid -> spread" : "Order: spread -> mid -> stack");
     }

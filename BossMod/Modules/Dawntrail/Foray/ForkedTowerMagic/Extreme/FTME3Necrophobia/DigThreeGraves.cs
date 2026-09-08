@@ -168,7 +168,7 @@ sealed class DigThreeGraves(BossModule module) : Components.GenericAOEs(module)
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         hints.Add(string.Join(" -> ", _elements));
     }

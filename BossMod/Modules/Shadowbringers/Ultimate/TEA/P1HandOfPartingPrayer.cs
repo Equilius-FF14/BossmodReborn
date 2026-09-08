@@ -5,7 +5,7 @@ sealed class P1HandOfPartingPrayer(TEA module) : BossComponent(module)
 {
     public bool Resolved;
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         var hint = (module.LiquidHand2?.ModelState.ModelState ?? default) switch
         {

@@ -322,7 +322,7 @@ sealed class QuadrilogyOfImplements(BossModule module) : Components.GenericAOEs(
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         hints.Add(string.Join(" -> ", _mechs));
     }
@@ -372,7 +372,7 @@ sealed class SealedImplements(BossModule module) : Components.GenericAOEs(module
         }
     }
 #if DEBUG
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         hints.Add($"SealedNumCast[{NumCasts}] SealedVisual[{VisualCasts}]");
     }

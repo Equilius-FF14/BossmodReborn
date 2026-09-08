@@ -78,7 +78,7 @@ class Entrapment : Components.CastCounter
         UpdatePotentiallyUnsafe();
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         hints.Add($"Matching patterns: {(_possiblePatterns.Any() ? string.Join(", ", _possiblePatterns.SetBits()) : "none")}");
     }

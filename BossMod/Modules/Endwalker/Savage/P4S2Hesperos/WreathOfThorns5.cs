@@ -28,7 +28,7 @@ sealed class WreathOfThorns5(BossModule module) : BossComponent(module)
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         hints.Add($"Order: {string.Join(" -> ", _playersOrder.Skip(_castsDone).Select(id => WorldState.Actors.Find(id)?.Name ?? "???"))}");
     }
@@ -48,8 +48,15 @@ sealed class WreathOfThorns5(BossModule module) : BossComponent(module)
         if (_playersOrder.Count < 8)
         {
             Arena.ZoneCircleOutline(pc.Position, _impulseAOERadius, Colors.Danger);
-            foreach (var player in Raid.WithoutSlot(false, true, true).Exclude(pc))
-                Arena.Actor(player, player.Position.InCircle(pc.Position, _impulseAOERadius) ? Colors.PlayerInteresting : Colors.PlayerGeneric);
+            foreach (var player in Raid.WithoutSlot(false, true, true))
+            {
+                if (player == pc)
+                {
+                    continue;
+                }
+                var isindanger = player.Position.InCircle(pc.Position, _impulseAOERadius);
+                Arena.Actor(player, isindanger ? Colors.PlayerInteresting : Colors.PlayerGeneric, drawWorld: isindanger ? true : null);
+            }
         }
     }
 

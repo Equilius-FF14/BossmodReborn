@@ -34,7 +34,7 @@ sealed class P3Gaols(BossModule module) : Components.GenericAOEs(module)
         return aoes;
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (CurState == State.TargetSelection && _targets.Any())
         {

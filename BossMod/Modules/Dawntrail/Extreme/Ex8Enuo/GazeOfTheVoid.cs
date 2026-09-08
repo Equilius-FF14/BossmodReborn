@@ -17,7 +17,7 @@ sealed class GazeOfTheVoidSoaks(BossModule module) : BossComponent(module)
         var count = orbs.Count;
         return count == 0 ? [] : orbs;
     }
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (GetSmallOrbs(Module).Count != 0 || GetBigOrbs(Module).Count != 0)
             hints.Add("Soak the orbs in pairs!");

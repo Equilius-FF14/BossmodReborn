@@ -92,7 +92,7 @@ sealed class Shackles(BossModule module) : BossComponent(module)
         {
             var blueTetheredTo = _blueTetherMatrix[i];
             var redTetheredTo = _redTetherMatrix[i];
-            Arena.Actor(actor, TetherColor(blueTetheredTo.Any(), redTetheredTo.Any()));
+            Arena.Actor(actor, TetherColor(blueTetheredTo.Any(), redTetheredTo.Any()), drawWorld: blueTetheredTo.Any() || redTetheredTo.Any() ? true : null);
 
             // draw tethers
             foreach ((var j, var target) in Raid.WithSlot(true).Exclude(i).IncludedInMask(blueTetheredTo | redTetheredTo))
@@ -100,9 +100,9 @@ sealed class Shackles(BossModule module) : BossComponent(module)
 
             // draw explosion circles that hit me
             if (_blueExplosionMatrix[pcSlot, i])
-                Arena.ZoneCircleOutline(actor.Position, _blueExplosionRadius, Colors.Danger);
+                Arena.ZoneCircleOutline(actor.Position, _blueExplosionRadius);
             if (_redExplosionMatrix[pcSlot, i])
-                Arena.ZoneCircleOutline(actor.Position, _redExplosionRadius, Colors.Danger);
+                Arena.ZoneCircleOutline(actor.Position, _redExplosionRadius);
 
             drawBlueAroundMe |= _blueExplosionMatrix[i, pcSlot];
             drawRedAroundMe |= _redExplosionMatrix[i, pcSlot];
@@ -110,9 +110,9 @@ sealed class Shackles(BossModule module) : BossComponent(module)
 
         // draw explosion circles if I hit anyone
         if (drawBlueAroundMe)
-            Arena.ZoneCircleOutline(pc.Position, _blueExplosionRadius, Colors.Danger);
+            Arena.ZoneCircleOutline(pc.Position, _blueExplosionRadius);
         if (drawRedAroundMe)
-            Arena.ZoneCircleOutline(pc.Position, _redExplosionRadius, Colors.Danger);
+            Arena.ZoneCircleOutline(pc.Position, _redExplosionRadius);
 
         // draw assigned spot, if any
         if (_preferredPositions[pcSlot] != new WPos())

@@ -19,7 +19,7 @@ sealed class OminousBubbling(BossModule module) : Components.CastCounter(module,
         {
             if (player.Role == Role.Healer)
             {
-                Arena.Actor(player, Colors.Danger);
+                Arena.Actor(player, Colors.Danger, drawWorld: true);
                 Arena.ZoneCircleOutline(player.Position, _radius, Colors.Danger);
             }
             else

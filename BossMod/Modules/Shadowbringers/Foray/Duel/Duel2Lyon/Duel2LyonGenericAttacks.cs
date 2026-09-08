@@ -80,9 +80,8 @@ sealed class RavenousGale(BossModule module) : Components.GenericAOEs(module)
             casting = false;
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
-        base.AddGlobalHints(hints);
         if (casting)
             hints.Add("Move a little to avoid voidzone spawning under you");
     }

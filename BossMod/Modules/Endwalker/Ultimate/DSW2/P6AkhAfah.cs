@@ -2,7 +2,7 @@
 
 sealed class P6HPCheck(DSW2 module) : BossComponent(module)
 {
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (module._NidhoggP6 is Actor nidhogg && module._HraesvelgrP6 is Actor hraesvelgr)
         {

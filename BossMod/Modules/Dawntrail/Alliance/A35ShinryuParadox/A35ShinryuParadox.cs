@@ -215,29 +215,7 @@ sealed class VortexStayMove(BossModule module) : Components.StayMove(module)
 sealed class UpDownCounter(BossModule module) : Components.CastCounterMulti(module, [(uint)AID.CosmicBreath, (uint)AID.CosmicTail]);
 
 sealed class DarkNova(BossModule module) : Components.BaitAwayIconMulti(module, 6f, (uint)IconID.Tankbuster, [(uint)AID.DarkNova, (uint)AID.DarkNovaP2],
-    centerAtTarget: true, restrictToArenaProjectionLayer: true, damageType: AIHints.PredictedDamageType.Tankbuster)
-{
-    private readonly float[] layers = [-900f, -879f];
-
-    public override void Update()
-    {
-        var count = CurrentBaits.Count;
-        if (count != 0)
-        {
-            if (Arena.Bounds is ArenaBoundsRect) // only one layer left in P2
-            {
-                return;
-            }
-            var baits = CollectionsMarshal.AsSpan(CurrentBaits);
-            for (var i = 0; i < count; ++i)
-            {
-                ref var b = ref baits[i];
-                var t = b.Target;
-                b.ArenaProjectionLayer = IndexOfClosestLayer(layers.AsSpan(), t.PosRot.Y);
-            }
-        }
-    }
-}
+    centerAtTarget: true, restrictToArenaProjectionLayer: true, damageType: AIHints.PredictedDamageType.Tankbuster);
 
 /*
  * Spawns eight towers at the north. Tower will appear red (if empty) or blue (if taken).

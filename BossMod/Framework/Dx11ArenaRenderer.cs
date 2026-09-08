@@ -444,6 +444,13 @@ public static unsafe partial class Dx11ArenaRenderer
         public Vector4 Params; // x = elapsed seconds; remaining lanes reserved for future tuning
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    private struct WorldOverlayConstants
+    {
+        public Vector4 RiskColor; // straight-alpha color, with fade/intensity included in alpha
+        public Vector4 RiskParams; // xy = framebuffer size, z = pulse phase, w reserved
+    }
+
     private struct WorldProjectedSdfBinding
     {
         public ID3D11ShaderResourceView* View;
@@ -826,6 +833,8 @@ public static unsafe partial class Dx11ArenaRenderer
         // composited swapchain. A separate marker packet resolves that texture once per frame.
         public bool WorldOverlayTarget;
         public bool IsWorldOverlayPresent;
+        public Vector4 ScreenRiskColor;
+        public float ScreenRiskPhase;
         // Deferred clipping-edge replay is correctness-sensitive: it must land after and obscure
         // the arena border. Give these packets a fresh dynamic-buffer backing allocation instead of sharing the same-frame NO_OVERWRITE ring with the border packet
         public bool IsDeferredOverlay;
@@ -915,6 +924,7 @@ public static unsafe partial class Dx11ArenaRenderer
     private static ID3D11InputLayout* _worldProjectedShapeInputLayout;
     private static ID3D11VertexShader* _worldOverlayVertexShader;
     private static ID3D11PixelShader* _worldOverlayPixelShader;
+    private static ID3D11Buffer* _worldOverlayConstantBuffer;
     private static ID3D11Buffer* _worldProjectedSdfConstantBuffer;
     private static ID3D11Buffer* _worldLineConstantBuffer;
     private static ID3D11Buffer* _worldLineTransformBuffer;
@@ -1221,6 +1231,7 @@ public static unsafe partial class Dx11ArenaRenderer
             Release(ref _worldCurveInputLayout);
             Release(ref _worldProjectedArrowInputLayout);
             Release(ref _worldProjectedShapeInputLayout);
+            Release(ref _worldOverlayConstantBuffer);
             Release(ref _worldProjectedSdfConstantBuffer);
             Release(ref _worldLineConstantBuffer);
             Release(ref _worldLineTransformBuffer);
@@ -3816,6 +3827,7 @@ public static unsafe partial class Dx11ArenaRenderer
         if (!CreateDynamicConstantBuffer((uint)sizeof(OutlineSdfConstants), "outline SDF constants", out _outlineSdfConstantBuffer) ||
             !CreateDynamicConstantBuffer((uint)sizeof(OutlineSdfConstants), "custom SDF constants", out _customSdfConstantBuffer) ||
             !CreateDynamicConstantBuffer((uint)sizeof(ZoneWaveConstants), "zone-wave constants", out _zoneWaveConstantBuffer) ||
+            !CreateDynamicConstantBuffer((uint)sizeof(WorldOverlayConstants), "world-overlay constants", out _worldOverlayConstantBuffer) ||
             !CreateDynamicConstantBuffer((uint)sizeof(WorldProjectedSdfConstants), "world-projected SDF constants", out _worldProjectedSdfConstantBuffer) ||
             !CreateDynamicConstantBuffer((uint)sizeof(WorldLineConstants), "world-line constants", out _worldLineConstantBuffer) ||
             !CreateDynamicConstantBuffer((uint)(MaxWorldLineTransforms * sizeof(WorldLineTransform)), "world-line transforms", out _worldLineTransformBuffer))
@@ -4512,7 +4524,7 @@ public static unsafe partial class Dx11ArenaRenderer
     // Queued after all Camera/world callbacks, including on frames with no world primitives. The
     // marker clears stale content and resolves the accumulated premultiplied render target into the
     // straight-alpha texture consumed by FFXIV's native background overlay node.
-    public static void QueueWorldOverlayPresent(ImDrawListPtr drawList, Vector2 viewportSize)
+    public static void QueueWorldOverlayPresent(ImDrawListPtr drawList, Vector2 viewportSize, Vector4 screenRiskColor = default, float screenRiskPhase = 0f)
     {
         if (!_isInitialized)
         {
@@ -4525,6 +4537,8 @@ public static unsafe partial class Dx11ArenaRenderer
         var scaleY = scale.Y > 0f ? scale.Y : 1f;
         var packet = RentBatchPacket();
         packet.IsWorldOverlayPresent = true;
+        packet.ScreenRiskColor = screenRiskColor;
+        packet.ScreenRiskPhase = screenRiskPhase;
         packet.FramebufferWidth = Math.Max(1, (int)MathF.Round(viewportSize.X * scaleX));
         packet.FramebufferHeight = Math.Max(1, (int)MathF.Round(viewportSize.Y * scaleY));
 
@@ -5662,7 +5676,7 @@ public static unsafe partial class Dx11ArenaRenderer
             }
             if (packet.IsWorldOverlayPresent)
             {
-                PresentWorldOverlay(packet.FramebufferWidth, packet.FramebufferHeight, packet.SubmitFrame);
+                PresentWorldOverlay(packet.FramebufferWidth, packet.FramebufferHeight, packet.SubmitFrame, packet.ScreenRiskColor, packet.ScreenRiskPhase);
                 return;
             }
             if (packet.Segments == null || packet.SegmentCount == 0)
@@ -5689,7 +5703,9 @@ public static unsafe partial class Dx11ArenaRenderer
             // primitives visible as an ordinary background draw for this frame. They remain free of
             // the particle-corrupted alpha mask even in this degraded path.
             if (packet.WorldOverlayTarget && !EnsureWorldOverlayResources(packet.FramebufferWidth, packet.FramebufferHeight, packet.SubmitFrame))
+            {
                 packet.WorldOverlayTarget = false;
+            }
 
             var uploadBytes = packet.UploadBytes;
             if (uploadBytes != 0 && !EnsureUploadVertexBuffer(uploadBytes))
@@ -8109,13 +8125,27 @@ public static unsafe partial class Dx11ArenaRenderer
         return true;
     }
 
-    private static void PresentWorldOverlay(int width, int height, int submitFrame)
+    private static void PresentWorldOverlay(int width, int height, int submitFrame, Vector4 screenRiskColor, float screenRiskPhase)
     {
         _worldOverlayLastSucceeded = false;
         if (!EnsureWorldOverlayResources(width, height, submitFrame))
         {
             return;
         }
+
+        // Snapshot per-packet state, including a zero alpha when disabled. The same resolve pass
+        // also draws a screen warning on frames with no projected world primitives.
+        D3D11_MAPPED_SUBRESOURCE mapped = default;
+        if (_worldOverlayConstantBuffer == null || _context->Map((ID3D11Resource*)_worldOverlayConstantBuffer, 0u, (D3D11_MAP)4, 0u, &mapped) < 0)
+        {
+            return;
+        }
+        *(WorldOverlayConstants*)mapped.pData = new WorldOverlayConstants
+        {
+            RiskColor = screenRiskColor,
+            RiskParams = new Vector4(width, height, screenRiskPhase, 0f),
+        };
+        _context->Unmap((ID3D11Resource*)_worldOverlayConstantBuffer, 0u);
 
         if (_worldOverlayBaseFrame != submitFrame)
         {
@@ -8132,6 +8162,7 @@ public static unsafe partial class Dx11ArenaRenderer
         ID3D11VertexShader* oldVertexShader = null;
         ID3D11PixelShader* oldPixelShader = null;
         ID3D11ShaderResourceView* oldInputView = null;
+        ID3D11Buffer* oldPixelConstants = null;
         var oldBlendFactor = stackalloc float[4];
         uint oldSampleMask = 0;
         uint oldStencilRef = 0;
@@ -8142,6 +8173,7 @@ public static unsafe partial class Dx11ArenaRenderer
         _context->VSGetShader(&oldVertexShader, null, null);
         _context->PSGetShader(&oldPixelShader, null, null);
         _context->PSGetShaderResources(0u, 1u, &oldInputView);
+        _context->PSGetConstantBuffers(0u, 1u, &oldPixelConstants);
 
         try
         {
@@ -8154,6 +8186,8 @@ public static unsafe partial class Dx11ArenaRenderer
             _context->RSSetScissorRects(1u, &scissor);
             _context->VSSetShader(_worldOverlayVertexShader, null, 0u);
             _context->PSSetShader(_worldOverlayPixelShader, null, 0u);
+            var constants = _worldOverlayConstantBuffer;
+            _context->PSSetConstantBuffers(0u, 1u, &constants);
             var baseView = _worldOverlayBaseView;
             _context->PSSetShaderResources(0u, 1u, &baseView);
             _context->Draw(3u, 0u);
@@ -8175,6 +8209,12 @@ public static unsafe partial class Dx11ArenaRenderer
             _context->VSSetShader(oldVertexShader, null, 0u);
             _context->PSSetShader(oldPixelShader, null, 0u);
             _context->PSSetShaderResources(0u, 1u, &oldInputView);
+            _context->PSSetConstantBuffers(0u, 1u, &oldPixelConstants);
+
+            if (oldPixelConstants != null)
+            {
+                oldPixelConstants->Release();
+            }
 
             if (oldInputView != null)
             {
@@ -8642,6 +8682,8 @@ public static unsafe partial class Dx11ArenaRenderer
         packet.SubmitFrame = -1;
         packet.WorldOverlayTarget = false;
         packet.IsWorldOverlayPresent = false;
+        packet.ScreenRiskColor = default;
+        packet.ScreenRiskPhase = 0f;
         packet.IsDeferredOverlay = false;
         BatchPacketPool.Push(packet);
     }

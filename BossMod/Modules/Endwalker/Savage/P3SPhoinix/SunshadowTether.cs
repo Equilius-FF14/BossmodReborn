@@ -69,7 +69,10 @@ sealed class SunshadowTether(BossModule module) : BossComponent(module)
 
         // draw all players
         foreach ((var i, var player) in Raid.WithSlot(false, true, true))
-            Arena.Actor(player, _playersInAOE[i] ? Colors.PlayerInteresting : Colors.PlayerGeneric);
+        {
+            var isinaoe = _playersInAOE[i];
+            Arena.Actor(player, isinaoe ? Colors.PlayerInteresting : Colors.PlayerGeneric, drawWorld: isinaoe ? true : null);
+        }
 
         // draw my tether
         var myBird = Module.Enemies((uint)OID.Sunshadow).FirstOrDefault(bird => BirdTarget(bird) == pc.InstanceID);

@@ -37,7 +37,7 @@ public class BossComponent(BossModule module)
     public virtual void Update() { } // called every frame - it is a good place to update any cached values
     public virtual void AddHints(int slot, Actor actor, TextHints hints) { } // gather any relevant pieces of advice for specified raid member
     public virtual void AddMovementHints(int slot, Actor actor, MovementHints movementHints) { } // gather movement hints for specified raid member
-    public virtual void AddGlobalHints(GlobalHints hints) { } // gather any relevant pieces of advice for whole raid
+    public virtual void AddGlobalHints(Actor actor, GlobalHints hints) { } // gather any relevant pieces of advice for whole raid
     public virtual void AddAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints) { } // gather AI hints for specified raid member
     public virtual PlayerPriority CalcPriority(int pcSlot, Actor pc, int playerSlot, Actor player, ref uint customColor) => PlayerPriority.Irrelevant; // determine how particular party member should be drawn; if custom color is left untouched, standard color is selected
     public virtual void DrawArenaBackground(int pcSlot, Actor pc) { } // called at the beginning of arena draw, good place to draw aoe zones

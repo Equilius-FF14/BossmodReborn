@@ -6,7 +6,7 @@ sealed class DeadMansOverdraught(BossModule module) : Components.GenericStackSpr
     private bool? partnerStack;
     public uint Counter;
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (partnerStack is bool stack)
         {

@@ -14,7 +14,7 @@ sealed class P2PartySynergy(BossModule module) : CommonAssignments(module)
         return (config.P2PartySynergyAssignments, config.P2PartySynergyGlobalPriority);
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (ActiveGlitch != Glitch.Unknown)
             hints.Add($"Glitch: {ActiveGlitch}");
@@ -254,7 +254,7 @@ class P2PartySynergyEfficientBladework : Components.GenericAOEs
         return [];
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (_swaps.Length > 0)
             hints.Add($"Swaps: {_swaps}");

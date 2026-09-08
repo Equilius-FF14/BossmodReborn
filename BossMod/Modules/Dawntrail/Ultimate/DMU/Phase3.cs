@@ -239,7 +239,7 @@ sealed class WaterCrystal(BossModule module) : Components.GenericBaitProximity(m
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         hints.Add($"Element: {crystals?.nextElement}");
     }
@@ -341,7 +341,7 @@ sealed class FireCrystal(BossModule module) : Components.GenericBaitProximity(mo
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         hints.Add($"Element: {crystals?.nextElement}");
     }

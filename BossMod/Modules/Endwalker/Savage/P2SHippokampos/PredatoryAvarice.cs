@@ -74,19 +74,19 @@ sealed class PredatoryAvarice(BossModule module) : BossComponent(module)
             {
                 // tides are always drawn
                 Arena.ZoneCircleOutline(actor.Position, _tidesRadius, Colors.Danger);
-                Arena.Actor(actor, Colors.Danger);
+                Arena.Actor(actor, Colors.Danger, drawWorld: true);
             }
             else if (_playersWithDepths[i] && !pcHasTides)
             {
                 // depths are drawn only if pc has no tides - otherwise it is to be considered a generic player
                 Arena.ZoneCircleOutline(actor.Position, _tidesRadius, Colors.Safe);
-                Arena.Actor(actor, Colors.Danger);
+                Arena.Actor(actor, Colors.Danger, drawWorld: true);
             }
             else if (pcHasTides || pcHasDepths)
             {
                 // other players are only drawn if pc has some debuff
                 var playerInteresting = pcHasTides ? _playersInTides[i] : _playersInDepths[i];
-                Arena.Actor(actor.Position, actor.Rotation, playerInteresting ? Colors.PlayerInteresting : Colors.PlayerGeneric);
+                Arena.Actor(actor, playerInteresting ? Colors.PlayerInteresting : Colors.PlayerGeneric, drawWorld: playerInteresting ? true : null);
             }
         }
     }

@@ -114,7 +114,10 @@ sealed class Knockback : BossComponent
         {
             // there will be AOE around me, draw all players to help with positioning - note that we use position adjusted for knockback
             foreach (var player in Raid.WithoutSlot(false, true, true))
-                Arena.Actor(player, player.Position.InCircle(targetPos, aoeRange) ? Colors.PlayerInteresting : Colors.PlayerGeneric);
+            {
+                var inaoe = player.Position.InCircle(targetPos, aoeRange);
+                Arena.Actor(player, inaoe ? Colors.PlayerInteresting : Colors.PlayerGeneric, drawWorld: inaoe ? true : null);
+            }
         }
         else
         {
@@ -125,7 +128,7 @@ sealed class Knockback : BossComponent
 
         // draw vulnerable target
         if (_knockbackTarget != pc && _knockbackTarget != target)
-            Arena.Actor(_knockbackTarget, Colors.Vulnerable);
+            Arena.Actor(_knockbackTarget, Colors.Vulnerable, drawWorld: true);
     }
 
     public override void OnEventCast(Actor caster, ActorCastEvent spell)

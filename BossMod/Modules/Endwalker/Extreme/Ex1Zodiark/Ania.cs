@@ -38,12 +38,19 @@ sealed class Ania(BossModule module) : BossComponent(module)
         Arena.ZoneCircleOutline(_target.Position, _aoeRadius, Colors.Danger);
         if (pc == _target)
         {
-            foreach (var a in Raid.WithoutSlot(false, true, true).Exclude(pc))
-                Arena.Actor(a, a.Position.InCircle(_target.Position, _aoeRadius) ? Colors.PlayerInteresting : Colors.PlayerGeneric);
+            foreach (var a in Raid.WithoutSlot(false, true, true))
+            {
+                if (a == pc)
+                {
+                    continue;
+                }
+                var isinaoe = a.Position.InCircle(_target.Position, _aoeRadius);
+                Arena.Actor(a, isinaoe ? Colors.PlayerInteresting : Colors.PlayerGeneric, drawWorld: isinaoe ? true : null);
+            }
         }
         else
         {
-            Arena.Actor(_target, Colors.Danger);
+            Arena.Actor(_target, Colors.Danger, drawWorld: true);
         }
     }
 

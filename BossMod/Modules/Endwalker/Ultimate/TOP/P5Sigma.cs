@@ -26,7 +26,7 @@ sealed class P5Sigma(BossModule module) : BossComponent(module)
             hints.Add($"Order: {ps.Order}", false);
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (ActiveGlitch != Glitch.Unknown)
             hints.Add($"Glitch: {ActiveGlitch}");

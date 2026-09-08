@@ -47,7 +47,7 @@ sealed class AetherExplosion(BossModule module) : BossComponent(module)
     public override void DrawArenaForeground(int pcSlot, Actor pc)
     {
         if (_memberWithSOT != pc)
-            Arena.Actor(_memberWithSOT, Colors.Other2);
+            Arena.Actor(_memberWithSOT, Colors.Other2, drawWorld: true);
     }
 
     public override void OnStatusGain(Actor actor, ref ActorStatus status)

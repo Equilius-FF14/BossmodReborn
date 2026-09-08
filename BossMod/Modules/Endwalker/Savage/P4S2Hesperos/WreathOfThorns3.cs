@@ -88,7 +88,10 @@ sealed class WreathOfThorns3(BossModule module) : BossComponent(module)
     public override void DrawArenaForeground(int pcSlot, Actor pc)
     {
         foreach ((var i, var player) in Raid.WithSlot(false, true, true))
-            Arena.Actor(player, _playersInAOE[i] ? Colors.PlayerInteresting : Colors.PlayerGeneric);
+        {
+            var isinaoe = _playersInAOE[i];
+            Arena.Actor(player, isinaoe ? Colors.PlayerInteresting : Colors.PlayerGeneric, drawWorld: isinaoe ? true : null);
+        }
 
         if (CurState != State.Done)
         {
@@ -99,12 +102,12 @@ sealed class WreathOfThorns3(BossModule module) : BossComponent(module)
         if (NumCones != NumJumps)
         {
             foreach ((_, var player) in Raid.WithSlot(false, true, true).IncludedInMask(_coneTargets))
-                Arena.Actor(player, Colors.Danger);
-            Arena.Actor(_jumpTarget, Colors.Vulnerable);
+                Arena.Actor(player, Colors.Danger, drawWorld: true);
+            Arena.Actor(_jumpTarget, Colors.Vulnerable, drawWorld: true);
         }
         else if (_jumpTarget != null)
         {
-            Arena.Actor(_jumpTarget, Colors.Danger);
+            Arena.Actor(_jumpTarget, Colors.Danger, drawWorld: true);
             Arena.ZoneCircleOutline(_jumpTarget.Position, _jumpAOERadius, Colors.Danger);
         }
     }

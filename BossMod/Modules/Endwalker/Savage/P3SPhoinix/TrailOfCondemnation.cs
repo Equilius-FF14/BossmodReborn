@@ -42,10 +42,14 @@ sealed class TrailOfCondemnation(BossModule module) : BossComponent(module)
     public override void DrawArenaForeground(int pcSlot, Actor pc)
     {
         // draw all raid members, to simplify positioning
-        foreach (var player in Raid.WithoutSlot(false, true, true).Exclude(pc))
+        foreach (var player in Raid.WithoutSlot(false, true, true))
         {
+            if (player == pc)
+            {
+                continue;
+            }
             var inRange = player.Position.InCircle(pc.Position, _aoeRadius);
-            Arena.Actor(player, inRange ? Colors.PlayerInteresting : Colors.PlayerGeneric);
+            Arena.Actor(player, inRange ? Colors.PlayerInteresting : Colors.PlayerGeneric, drawWorld: inRange ? true : null);
         }
 
         // draw circle around pc

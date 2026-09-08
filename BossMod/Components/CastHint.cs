@@ -10,7 +10,7 @@ public class CastHint(BossModule module, uint aid, string hint, bool showCastTim
 
     public bool Active => Casters.Count > 0;
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (Active && Hint.Length > 0)
         {

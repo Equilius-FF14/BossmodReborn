@@ -57,7 +57,7 @@ sealed class Bombs(BossModule module) : Components.Adds(module, (uint)OID.Summon
 {
     private readonly FTMN4IndexConfig _config = Service.Config.Get<FTMN4IndexConfig>();
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (ActiveActors.Count != 0)
         {

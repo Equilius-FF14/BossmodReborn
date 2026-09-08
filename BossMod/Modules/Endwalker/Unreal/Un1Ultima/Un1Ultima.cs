@@ -3,7 +3,7 @@
 // TODO: consider how phase changes could be detected and create different states for them?..
 sealed class Phases(BossModule module) : BossComponent(module)
 {
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         var hint = ((float)Module.PrimaryActor.HPMP.CurHP / Module.PrimaryActor.HPMP.MaxHP) switch
         {

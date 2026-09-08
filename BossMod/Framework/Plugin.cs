@@ -321,6 +321,7 @@ public sealed class Plugin : IAsyncDalamudPlugin
         _amex.FinishActionGather();
 
         var uiHidden = Service.GameGui.GameUiHidden || Service.Condition[ConditionFlag.OccupiedInCutSceneEvent] || Service.Condition[ConditionFlag.WatchingCutscene78] || Service.Condition[ConditionFlag.WatchingCutscene];
+        UpdateScreenRiskBorder(uiHidden);
         if (!uiHidden)
         {
             Service.WindowSystem?.Draw();
@@ -330,6 +331,30 @@ public sealed class Plugin : IAsyncDalamudPlugin
 
         Camera.Instance?.DrawWorldPrimitives();
         _prevUpdateTime = DateTime.Now - tsStart;
+    }
+
+    private void UpdateScreenRiskBorder(bool uiHidden)
+    {
+        var config = BossModuleManager.Config;
+        var module = _bossmod.ActiveModule;
+        var pc = _ws.Party[PartyState.PlayerSlot];
+        var enabled = config.ShowScreenRiskBorder && !uiHidden && module != null && pc != null && !pc.IsDead;
+        var haveRisks = false;
+        if (enabled && config.ScreenRiskBorderIntensity > 0f)
+        {
+            var hints = module!.CalculateHintsForRaidMember(PartyState.PlayerSlot, pc!);
+            var count = hints.Count;
+            for (var i = 0; i < count; ++i)
+            {
+                if (hints[i].Item2)
+                {
+                    haveRisks = true;
+                    break;
+                }
+            }
+        }
+
+        Camera.Instance?.UpdateScreenRiskBorder(enabled, haveRisks, Colors.Enemy, config.ScreenRiskBorderIntensity);
     }
 
     private unsafe bool QuestUnlocked(uint link)

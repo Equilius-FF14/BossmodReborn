@@ -135,15 +135,17 @@ public abstract class GenericGaze(BossModule module, uint aid = default) : CastC
 }
 
 // gaze that happens on cast end
-public class CastGaze(BossModule module, uint aid, bool inverted = false, float range = 10000f, int maxCasts = int.MaxValue, float[]? arenaProjectionLayers = null, bool? restrictToArenaProjectionLayer = true) : GenericGaze(module, aid)
+public class CastGaze(BossModule module, uint aid, bool inverted = false, float range = 10000f, int maxCasts = int.MaxValue, float[]? arenaProjectionLayers = null, bool? restrictToArenaProjectionLayer = true, int? arenaProjectionLayer = null) : GenericGaze(module, aid)
 {
     public readonly List<Eye> Eyes = [];
     public int MaxCasts = maxCasts; // used for staggered gazes, when showing all active would be pointless
     public float[]? ArenaProjectionLayers = arenaProjectionLayers;
+    public int? ArenaProjectionLayer = arenaProjectionLayer; // explicit ID takes precedence over height-based selection
     public bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
 
     protected int? ResolveArenaProjectionLayer(float y)
-        => ArenaProjectionLayers is { Length: > 0 } layers ? GenericAOEs.IndexOfClosestLayer(layers, y) : null;
+        => !RestrictToArenaProjectionLayer.HasValue ? null : ArenaProjectionLayer
+            ?? (ArenaProjectionLayers is { Length: > 0 } layers ? GenericAOEs.IndexOfClosestLayer(layers, y) : null);
 
     public override ReadOnlySpan<Eye> ActiveEyes(int slot, Actor actor)
     {
@@ -185,8 +187,8 @@ public class CastGaze(BossModule module, uint aid, bool inverted = false, float 
     }
 }
 
-public class CastGazes(BossModule module, uint[] aids, bool inverted = false, float range = 10000f, int maxCasts = int.MaxValue, int expectedNumCasters = 99, float[]? arenaProjectionLayers = null, bool? restrictToArenaProjectionLayer = true)
-    : CastGaze(module, default, maxCasts: maxCasts, arenaProjectionLayers: arenaProjectionLayers, restrictToArenaProjectionLayer: restrictToArenaProjectionLayer)
+public class CastGazes(BossModule module, uint[] aids, bool inverted = false, float range = 10000f, int maxCasts = int.MaxValue, int expectedNumCasters = 99, float[]? arenaProjectionLayers = null, bool? restrictToArenaProjectionLayer = true, int? arenaProjectionLayer = null)
+    : CastGaze(module, default, maxCasts: maxCasts, arenaProjectionLayers: arenaProjectionLayers, restrictToArenaProjectionLayer: restrictToArenaProjectionLayer, arenaProjectionLayer: arenaProjectionLayer)
 {
     protected readonly uint[] AIDs = aids;
     protected readonly int ExpectedNumCasters = expectedNumCasters;

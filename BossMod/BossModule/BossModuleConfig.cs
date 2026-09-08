@@ -32,6 +32,9 @@ public sealed class BossModuleConfig : ConfigNode
     [PropertyDisplay("Enable projecting radar into the 3D world")]
     public bool ProjectRadarInto3DWorld = false;
 
+    [PropertyDisplay("Show actor triangles in the 3D world", tooltip: "Show ordinary actor triangles. Mechanic markers, including knockback destinations, remain visible when this is disabled.")]
+    public bool ShowActorTrianglesIn3DWorld = true;
+
     [PropertyDisplay("Include drawing arena outline into the 3D world", tooltip: "If projecting the radar into the 3D world is enabled, the outline can also be drawn")]
     public bool EnableArenaOutlineIn3DWorld = true;
 
@@ -85,6 +88,13 @@ public sealed class BossModuleConfig : ConfigNode
 
     [PropertyDisplay("Change arena border color if player is at risk", tooltip: "Changes the white border to red when you are standing somewhere you are likely to be hit by a mechanic")]
     public bool ShowBorderRisk = true;
+
+    [PropertyDisplay("Pulse screen edges when player is at risk", tooltip: "A glow pulses in the risky arena border color (Enemy color) while a player warning is active. Works independently of the radar and 3D projection settings.")]
+    public bool ShowScreenRiskBorder = false;
+
+    [PropertyDisplay("Screen danger pulse intensity")]
+    [PropertySlider(0f, 10f, Speed = 0.1f)]
+    public float ScreenRiskBorderIntensity = 2.5f;
 
     [PropertyDisplay("Show cardinal direction names on radar")]
     public bool ShowCardinals = false;

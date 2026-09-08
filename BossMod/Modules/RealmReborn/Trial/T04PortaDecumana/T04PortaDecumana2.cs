@@ -59,7 +59,7 @@ sealed class LaserFocus(BossModule module) : Components.StackWithCastTargets(mod
 [SkipLocalsInit]
 sealed class AethericBoom(BossModule module) : Components.SimpleKnockbacks(module, (uint)AID.AethericBoom, 30f, stopAtWall: true)
 {
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (Casters.Count > 0)
             hints.Add("Prepare to soak the orbs!");
@@ -96,7 +96,7 @@ sealed class Aetheroplasm(BossModule module) : BossComponent(module)
         return filteredorbs;
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (GetOrbs(Module).Count != 0)
             hints.Add("Soak the orbs!");

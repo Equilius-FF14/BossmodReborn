@@ -81,7 +81,7 @@ sealed class WreathOfThorns4(BossModule module) : BossComponent(module)
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (_darkOrder != null && _activeTethers > 0)
         {
@@ -102,11 +102,15 @@ sealed class WreathOfThorns4(BossModule module) : BossComponent(module)
     public override void DrawArenaForeground(int pcSlot, Actor pc)
     {
         // draw other players
-        foreach ((var slot, var player) in Raid.WithSlot(false, true, true).Exclude(pc))
+        foreach ((var slot, var player) in Raid.WithSlot(false, true, true))
         {
+            if (player == pc)
+            {
+                continue;
+            }
             var icon = _playerIcons[slot];
             var nextBreaking = _doneTowers < 4 ? icon == (uint)IconID.AkanthaiWater : (icon == (uint)IconID.AkanthaiDark && NextAOE()?.Tether.Target == player.InstanceID);
-            Arena.Actor(player, nextBreaking ? Colors.Danger : Colors.PlayerGeneric);
+            Arena.Actor(player, nextBreaking ? Colors.Danger : Colors.PlayerGeneric, drawWorld: nextBreaking ? true : null);
         }
 
         // tether

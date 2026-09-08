@@ -102,7 +102,7 @@ abstract class LightAndDarkBase(BossModule module) : Components.GenericAOEs(modu
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (hpDifference != default)
         {

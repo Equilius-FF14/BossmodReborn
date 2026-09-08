@@ -65,6 +65,7 @@ public sealed class MiniArena(WPos center, ArenaBounds bounds)
     private float _frameBillboardYOffset;
     private bool _frameShowWorldTextIconBillboards;
     private bool _frameShowOutlinesAndShadows;
+    private bool _frameProjectActorTriangles;
     private bool _frameProjectIntoWorld;
     private bool _frameClipWorldZonesToArena;
     private Camera? _frameWorldCamera;
@@ -197,6 +198,7 @@ public sealed class MiniArena(WPos center, ArenaBounds bounds)
         _frameWorldTextFontSize = Config.TextBillboardFontSize;
         _frameWorldIconFontSize = Config.IconBillboardFontSize;
         _frameBillboardYOffset = Config.BillboardHeightOffset;
+        _frameProjectActorTriangles = Config.ShowActorTrianglesIn3DWorld;
         _frameShowWorldTextIconBillboards = Config.EnableTextIconBillboards;
         _frameWorldCamera = Config.ProjectRadarInto3DWorld ? Camera.Instance : null;
         _frameProjectIntoWorld = _frameWorldCamera != null;
@@ -464,15 +466,14 @@ public sealed class MiniArena(WPos center, ArenaBounds bounds)
     private Camera.WorldProjectionLayer[] AllWorldProjectionLayers(ArenaBoundsCustom bounds, ArenaProjectionLayer[] layers)
     {
         var result = _allWorldProjectionLayers;
-        var len = layers.Length;
-        if (result == null || result.Length != len)
+        if (result == null || result.Length != layers.Length)
         {
-            result = _allWorldProjectionLayers = new Camera.WorldProjectionLayer[len];
+            result = _allWorldProjectionLayers = new Camera.WorldProjectionLayer[layers.Length];
             _allWorldProjectionLayersInitialized = false;
         }
         if (!_allWorldProjectionLayersInitialized)
         {
-            for (var i = 0; i < len; ++i)
+            for (var i = 0; i < layers.Length; ++i)
             {
                 ref readonly var layer = ref layers[i];
                 result[i] = new(ResolveWorldProjectionY(layer.Y), ResolveWorldProjectionHeight(layer), ResolveWorldProjectionHoleFillRadius(layer),
@@ -1463,8 +1464,7 @@ public sealed class MiniArena(WPos center, ArenaBounds bounds)
     {
         if (_frameShowWorldTextIconBillboards && _frameWorldCamera?.ProjectedShapeLayers is { Length: > 0 } layers)
         {
-            var len = layers.Length;
-            for (var i = 0; i < len; ++i)
+            for (var i = 0; i < layers.Length; ++i)
             {
                 TextWorldBillboard(new Vector3(center.X, layers[i].Y + _frameBillboardYOffset, center.Z), text, color, outlineColor, outlineWidth);
             }
@@ -1498,8 +1498,7 @@ public sealed class MiniArena(WPos center, ArenaBounds bounds)
         {
             if (_frameWorldCamera?.ProjectedShapeLayers is { Length: > 0 } layers)
             {
-                var len = layers.Length;
-                for (var i = 0; i < len; ++i)
+                for (var i = 0; i < layers.Length; ++i)
                 {
                     _frameWorldCamera.DrawWorldIconBillboard(new Vector3(center.X, layers[i].Y + _frameBillboardYOffset, center.Z), text, color, _frameWorldIconFontSize);
                 }
@@ -1645,7 +1644,7 @@ public sealed class MiniArena(WPos center, ArenaBounds bounds)
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Actor(WPos position, Angle rotation, uint color)
+    public void Actor(WPos position, Angle rotation, uint color, bool drawWorld = true)
     {
         var shape = _frameArenaProjectionShape;
         if (shape != null && !_frameSuppress2DZoneRendering && shape.Parts.Count > 0)
@@ -1653,9 +1652,9 @@ public sealed class MiniArena(WPos center, ArenaBounds bounds)
             Actor(position, rotation, color, shape, true, false);
         }
         // World markers keep the global logical bounds and their existing clamping exceptions.
-        if (shape == null || _frameProjectIntoWorld)
+        if (shape == null || drawWorld && _frameProjectIntoWorld)
         {
-            Actor(position, rotation, color, null, shape == null, true);
+            Actor(position, rotation, color, null, shape == null, drawWorld);
         }
     }
 
@@ -1676,34 +1675,38 @@ public sealed class MiniArena(WPos center, ArenaBounds bounds)
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Actor(Actor? actor, uint color = default, bool allowDeadAndUntargetable = false)
+    public void Actor(Actor? actor, uint color = default, bool allowDeadAndUntargetable = false, bool? drawWorld = null)
     {
         if (actor != null && !actor.IsDestroyed && (allowDeadAndUntargetable || actor.IsTargetable && !actor.IsDead))
         {
             // Unlike generic mechanic footprints, actors already carry a world Y. In a vertical arena, project their marker onto the authored floor nearest the actor itself
             using (WorldProjectionLayerForActor(actor))
             {
-                Actor(actor.Position, actor.Rotation, color == default ? Colors.Enemy : color);
+                // Resolve before the inside/outside test so filled markers and clamped outlines
+                // share the setting, including direct player redraws from encounter components.
+                // Mechanics can explicitly request a marker with drawWorld: true.
+                var showWorld = drawWorld ?? _frameProjectActorTriangles;
+                Actor(actor.Position, actor.Rotation, color == default ? Colors.Enemy : color, showWorld);
             }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Actors(IEnumerable<Actor> actors, uint color = default, bool allowDeadAndUntargetable = false)
+    public void Actors(IEnumerable<Actor> actors, uint color = default, bool allowDeadAndUntargetable = false, bool? drawWorld = null)
     {
         foreach (var a in actors)
         {
-            Actor(a, color == default ? Colors.Enemy : color, allowDeadAndUntargetable);
+            Actor(a, color == default ? Colors.Enemy : color, allowDeadAndUntargetable, drawWorld);
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Actors(List<Actor> actors, uint color = default, bool allowDeadAndUntargetable = false)
+    public void Actors(List<Actor> actors, uint color = default, bool allowDeadAndUntargetable = false, bool? drawWorld = null)
     {
         var count = actors.Count;
         for (var i = 0; i < count; ++i)
         {
-            Actor(actors[i], color == default ? Colors.Enemy : color, allowDeadAndUntargetable);
+            Actor(actors[i], color == default ? Colors.Enemy : color, allowDeadAndUntargetable, drawWorld);
         }
     }
 

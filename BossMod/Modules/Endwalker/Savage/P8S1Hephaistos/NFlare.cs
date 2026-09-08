@@ -49,7 +49,7 @@ sealed class TetraOctaFlareConceptual(BossModule module) : TetraOctaFlareCommon(
 {
     private Concept _concept;
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (_concept != Concept.None)
             hints.Add(_concept == Concept.Tetra ? "Prepare to stack in pairs" : "Prepare to spread");

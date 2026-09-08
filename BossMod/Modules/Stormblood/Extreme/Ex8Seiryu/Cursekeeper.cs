@@ -12,7 +12,7 @@ sealed class Cursekeeper(BossModule module) : Components.GenericBaitAway(module,
             prevTarget = spell.TargetID;
             if (WorldState.Actors.Find(prevTarget) is Actor t)
             {
-                CurrentBaits.Add(new(Module.PrimaryActor, t, circle, Module.CastFinishAt(spell, 3.1d)));
+                CurrentBaits.Add(new(Module.PrimaryActor, t, circle, Module.CastFinishAt(spell, 3.1d), restrictToArenaProjectionLayer: null));
             }
         }
     }
@@ -52,7 +52,7 @@ sealed class Cursekeeper(BossModule module) : Components.GenericBaitAway(module,
     }
 }
 
-sealed class KarmicCurse(BossModule module) : Components.RaidwideInstant(module, (uint)AID.KarmicCurse, 4d)
+sealed class KarmicCurse(BossModule module) : Components.RaidwideInstant(module, (uint)AID.KarmicCurse, 4d, restrictToArenaProjectionLayer: null)
 {
     public override void OnEventCast(Actor caster, ActorCastEvent spell)
     {

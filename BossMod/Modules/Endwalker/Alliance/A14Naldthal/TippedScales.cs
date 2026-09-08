@@ -43,7 +43,7 @@ sealed class TippedScales(BossModule module) : Components.GenericAOEs(module, (u
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         var count = weightsByActor.Count;
         if (count == 0)
@@ -55,15 +55,15 @@ sealed class TippedScales(BossModule module) : Components.GenericAOEs(module, (u
         var actors = CollectionsMarshal.AsSpan(weightsByActor);
         for (var i = 0; i < count; ++i)
         {
-            ref var actor = ref actors[i];
+            ref var a = ref actors[i];
             {
-                if (actor.Item1.Position.InRect(Arena.Center, eastBoundary, 50f))
+                if (a.Item1.Position.InRect(Arena.Center, eastBoundary, 50f))
                 {
-                    eastWeight += actor.weight;
+                    eastWeight += a.weight;
                 }
                 else
                 {
-                    westWeight += actor.weight;
+                    westWeight += a.weight;
                 }
             }
         }

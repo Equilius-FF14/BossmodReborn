@@ -86,7 +86,7 @@ sealed class Intemperance(BossModule module) : BossComponent(module)
                 movementHints.Add(from, to, color);
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         hints.Add($"Order: {_curState}, pattern: {_pattern}.");
     }

@@ -25,7 +25,7 @@ sealed class RubyGlow3(BossModule module) : RubyGlowCommon(module, (uint)AID.Rub
         return aoes;
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (_aoeQuadrants[2].Any())
         {

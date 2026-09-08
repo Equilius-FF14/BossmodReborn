@@ -121,7 +121,7 @@ sealed class FlipToABSide(BossModule module) : Components.GenericBaitStack(modul
     private bool active;
     private DateTime activation;
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (Source != null && CurrentBaits.Count == 0)
         {

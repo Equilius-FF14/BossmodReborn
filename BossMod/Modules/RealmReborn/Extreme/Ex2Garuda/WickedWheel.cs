@@ -5,7 +5,7 @@ sealed class WickedWheel(BossModule module) : Components.CastCounter(module, (ui
     private DateTime _expectedNext = module.WorldState.FutureTime(25d);
     private const float _radius = 8.7f;
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (_expectedNext != default)
             hints.Add($"Wicked wheel in ~{Math.Max((_expectedNext - WorldState.CurrentTime).TotalSeconds, 0)}s");

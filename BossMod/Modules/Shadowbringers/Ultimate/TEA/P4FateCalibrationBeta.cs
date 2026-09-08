@@ -168,7 +168,7 @@ sealed class P4FateCalibrationBetaOpticalSight(BossModule module) : Components.U
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (_mechanic != Mechanic.Unknown)
             hints.Add($"{_mechanic} after jumps");

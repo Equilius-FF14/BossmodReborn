@@ -2,7 +2,7 @@
 
 sealed class P1HandOfPain(TEA module) : Components.CastCounter(module, (uint)AID.HandOfPain)
 {
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (module.LiquidHand2 is Actor hand)
         {

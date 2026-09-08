@@ -74,8 +74,7 @@ sealed class ForsakenShapes(BossModule module) : BossComponent(module)
     private static readonly PartyRolesConfig partyConfig = Service.Config.Get<PartyRolesConfig>();
     private static readonly DMUConfig dmuConfig = Service.Config.Get<DMUConfig>();
     public int currentTowerSet = 1; // We start on odd tower set
-    public bool towerSetLocked = false;
-    public DateTime? lastTowerSetChange = null;
+    private int pathOfLightCasts;
 
     public enum Shape { None, Spread, Cone, Stack }
     public Shape[] shapes = new Shape[8];
@@ -107,19 +106,22 @@ sealed class ForsakenShapes(BossModule module) : BossComponent(module)
 
     public override void OnEventCast(Actor caster, ActorCastEvent spell)
     {
-        if (spell.Action.ID == (uint)AID.ThePathOfLight)
+        if (spell.Action.ID != (uint)AID.ThePathOfLight)
         {
-            if (!towerSetLocked)
-            {
-                lastTowerSetChange = WorldState.CurrentTime;
-                towerSetLocked = true;
-                ++currentTowerSet;
-            }
+            return;
+        }
 
-            if (currentTowerSet is 4 or 8)
-            {
-                pairsSwapped = false;
-            }
+        if (++pathOfLightCasts < 2)
+        {
+            return;
+        }
+
+        pathOfLightCasts = 0;
+        ++currentTowerSet;
+
+        if (currentTowerSet is 4 or 8)
+        {
+            pairsSwapped = false;
         }
     }
 
@@ -149,11 +151,6 @@ sealed class ForsakenShapes(BossModule module) : BossComponent(module)
         seSoakers = default;
         supportHelpers = default;
         dpsHelpers = default;
-
-        if (WorldState.CurrentTime - lastTowerSetChange > TimeSpan.FromSeconds(1.0) && towerSetLocked)
-        {
-            towerSetLocked = false;
-        }
 
         var slots = partyConfig.SlotsPerAssignment(Raid);
         if (slots.Length == 0)

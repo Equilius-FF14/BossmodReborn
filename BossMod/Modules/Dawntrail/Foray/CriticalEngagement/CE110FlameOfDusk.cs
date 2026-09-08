@@ -205,7 +205,7 @@ sealed class MoltKB(BossModule module) : Components.GenericKnockback(module)
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (_kb.Length != 0)
         {

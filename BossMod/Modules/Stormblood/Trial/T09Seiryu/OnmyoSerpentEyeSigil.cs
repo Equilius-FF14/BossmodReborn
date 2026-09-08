@@ -18,7 +18,7 @@ sealed class OnmyoSerpentEyeSigil(BossModule module) : Components.GenericAOEs(mo
         };
         if (shape != null)
         {
-            _aoe = [new(shape, actor.Position.Quantized(), default, WorldState.FutureTime(5.6d))];
+            _aoe = [new(shape, actor.Position.Quantized(), default, WorldState.FutureTime(5.6d), restrictToArenaProjectionLayer: null)];
         }
     }
 

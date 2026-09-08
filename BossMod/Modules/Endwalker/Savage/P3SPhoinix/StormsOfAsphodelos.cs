@@ -124,7 +124,7 @@ sealed class StormsOfAsphodelos(BossModule module) : BossComponent(module)
                 Arena.AddLine(Module.PrimaryActor.Position, player.Position, player.Role == Role.Tank ? Colors.Safe : Colors.Danger);
             var active = tethered || _bossTargets[i] || _twisterTargets.Contains(player);
             var failing = (_hitByMultipleAOEs | _closeToTetherTarget)[i];
-            Arena.Actor(player, active ? Colors.Danger : (failing ? Colors.PlayerInteresting : Colors.PlayerGeneric));
+            Arena.Actor(player, active ? Colors.Danger : (failing ? Colors.PlayerInteresting : Colors.PlayerGeneric), drawWorld: active || failing ? true : null);
         }
     }
 

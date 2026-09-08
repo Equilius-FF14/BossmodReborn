@@ -20,7 +20,7 @@ sealed class BombarianSpecial(BossModule module) : Components.UniformStackSpread
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (CurMechanic != Mechanic.None)
             hints.Add(CurMechanic.ToString());

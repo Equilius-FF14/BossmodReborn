@@ -115,7 +115,7 @@ sealed class P2SanctityOfTheWard2Towers1(BossModule module) : Components.CastTow
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (Active)
         {

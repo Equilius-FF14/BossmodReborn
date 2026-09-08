@@ -77,7 +77,7 @@ sealed class DirectorsBelone(BossModule module) : BossComponent(module)
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         var forbidden = Raid.WithSlot(true, true, true).IncludedInMask(_debuffForbidden).FirstOrDefault().Item2;
         if (forbidden != null)
@@ -94,7 +94,8 @@ sealed class DirectorsBelone(BossModule module) : BossComponent(module)
         var failingPlayers = _debuffForbidden & _debuffTargets;
         foreach ((var i, var player) in Raid.WithSlot(false, true, true))
         {
-            Arena.Actor(player, failingPlayers[i] ? Colors.Danger : Colors.PlayerGeneric);
+            var isfailing = failingPlayers[i];
+            Arena.Actor(player, isfailing ? Colors.Danger : Colors.PlayerGeneric, drawWorld: isfailing ? true : null);
         }
     }
 

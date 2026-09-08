@@ -18,7 +18,11 @@ sealed class OnmyoSerpentEyeSigil(BossModule module) : Components.GenericAOEs(mo
 
     public override void OnActorModelStateChange(Actor actor, byte modelState, byte animState1, byte animState2)
     {
-        void AddAOE(AOEShape shape, bool first = true) => _aoes.Add(new(shape, actor.Position.Quantized(), default, WorldState.FutureTime(first ? 5.6d : 8.7d), restrictToArenaProjectionLayer: null));
+        void AddAOE(AOEShape shape, bool first = true)
+        {
+            var pos = actor.Position.Quantized();
+            _aoes.Add(new(shape, actor.Position.Quantized(), default, WorldState.FutureTime(first ? 5.6d : 8.7d), shapeDistance: shape.Distance(pos, default), restrictToArenaProjectionLayer: null));
+        }
         switch (modelState)
         {
             case 5:

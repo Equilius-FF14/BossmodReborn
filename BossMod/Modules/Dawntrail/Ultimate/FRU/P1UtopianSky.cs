@@ -60,7 +60,7 @@ sealed class P1UtopianSkySpreadStack(BossModule module) : Components.UniformStac
         }
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (CurMechanic != Mechanic.None)
             hints.Add($"Next: {CurMechanic}");

@@ -120,7 +120,7 @@ sealed class P3DiveFromGrace(BossModule module) : Components.CastTowers(module, 
             movementHints.Add(actor.Position, s, Colors.Safe);
     }
 
-    public override void AddGlobalHints(GlobalHints hints)
+    public override void AddGlobalHints(Actor actor, GlobalHints hints)
     {
         if (_haveDirections)
             hints.Add($"Arrows for: {(_ordersWithArrows.Any() ? string.Join(", ", _ordersWithArrows.SetBits()) : "none")}");

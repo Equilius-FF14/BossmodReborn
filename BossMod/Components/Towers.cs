@@ -381,9 +381,10 @@ public class GenericTowers(BossModule module, uint aid = default, bool prioritiz
     }
 }
 
-[SkipLocalsInit]
-public class CastTowers(BossModule module, uint aid, float radius, int minSoakers = 1, int maxSoakers = 1, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.Raidwide) : GenericTowers(module, aid, damageType: damageType)
+public class CastTowers(BossModule module, uint aid, float radius, int minSoakers = 1, int maxSoakers = 1, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.Raidwide, int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false) : GenericTowers(module, aid, damageType: damageType)
 {
+    public int? ArenaProjectionLayer = arenaProjectionLayer;
+    public bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
     public readonly float Radius = radius;
     public readonly int MinSoakers = minSoakers;
     public readonly int MaxSoakers = maxSoakers;
@@ -392,7 +393,7 @@ public class CastTowers(BossModule module, uint aid, float radius, int minSoaker
     {
         if (spell.Action.ID == WatchedAction)
         {
-            Towers.Add(new(spell.LocXZ, Radius, MinSoakers, MaxSoakers, activation: Module.CastFinishAt(spell), actorID: caster.InstanceID));
+            Towers.Add(new(spell.LocXZ, Radius, MinSoakers, MaxSoakers, activation: Module.CastFinishAt(spell), actorID: caster.InstanceID, arenaProjectionLayer: ArenaProjectionLayer, restrictToArenaProjectionLayer: RestrictToArenaProjectionLayer));
         }
     }
 
@@ -808,9 +809,10 @@ public class GenericTowersOpenWorld(BossModule module, uint aid = default, bool 
     }
 }
 
-[SkipLocalsInit]
-public class CastTowersOpenWorld(BossModule module, uint aid, float radius, int minSoakers = 1, int maxSoakers = 1, bool prioritizeInsufficient = false, bool prioritizeEmpty = false, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.Raidwide) : GenericTowersOpenWorld(module, aid, prioritizeInsufficient, prioritizeEmpty, damageType)
+public class CastTowersOpenWorld(BossModule module, uint aid, float radius, int minSoakers = 1, int maxSoakers = 1, bool prioritizeInsufficient = false, bool prioritizeEmpty = false, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.Raidwide, int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false) : GenericTowersOpenWorld(module, aid, prioritizeInsufficient, prioritizeEmpty, damageType)
 {
+    public int? ArenaProjectionLayer = arenaProjectionLayer;
+    public bool? RestrictToArenaProjectionLayer = restrictToArenaProjectionLayer;
     public readonly float Radius = radius;
     public readonly int MinSoakers = minSoakers;
     public readonly int MaxSoakers = maxSoakers;
@@ -819,7 +821,7 @@ public class CastTowersOpenWorld(BossModule module, uint aid, float radius, int 
     {
         if (spell.Action.ID == WatchedAction)
         {
-            Towers.Add(new(spell.LocXZ, Radius, MinSoakers, MaxSoakers, activation: Module.CastFinishAt(spell), actorID: caster.InstanceID));
+            Towers.Add(new(spell.LocXZ, Radius, MinSoakers, MaxSoakers, activation: Module.CastFinishAt(spell), actorID: caster.InstanceID, arenaProjectionLayer: ArenaProjectionLayer, restrictToArenaProjectionLayer: RestrictToArenaProjectionLayer));
         }
     }
 
