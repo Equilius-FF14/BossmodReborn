@@ -826,9 +826,14 @@ public static class InternalClipper
             seg1.Y + Math.Round(q * dy, MidpointRounding.ToEven)); // use MidpointRounding.ToEven in order to explicitly match the nearbyint behaviour on the C++ side
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static PointInPolygonResult PointInPolygon(Point64 pt, Path64 polygon)
     {
-        var points = CollectionsMarshal.AsSpan(polygon);
+        return PointInPolygon(pt, CollectionsMarshal.AsSpan(polygon));
+    }
+
+    internal static PointInPolygonResult PointInPolygon(Point64 pt, ReadOnlySpan<Point64> points)
+    {
         int len = points.Length, start = 0;
         if (len < 3)
         {
