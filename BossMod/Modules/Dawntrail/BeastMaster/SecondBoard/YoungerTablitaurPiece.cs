@@ -98,9 +98,10 @@ sealed class TonzeStomp10 : Components.SimpleAOEGroups {
     }
 }
 
+// TODO change shape to arc cap
 sealed class EndlessSwing(BossModule module) : Components.GenericAOEs(module) {
     private readonly List<AOEInstance> aoes = [];
-    private readonly AOEShapeCircle shape = new (6.0f);
+    private readonly AOEShapeCircle shape = new (8.0f);
     private Actor? spellSource;
     private readonly EndlessSwipes? endlessSwipes = module.FindComponent<EndlessSwipes>();
 
@@ -191,6 +192,8 @@ sealed class EndlessSwipes(BossModule module) : Components.GenericRotatingAOE(mo
 
     // If the caster of swipes dies, then we have to clear any left over aoes otherwise they will not get removed - it can be either boss
     public override void Update() {
+        base.Update();
+
         if (Sequences.Count == 0) {
             return;
         }
@@ -200,13 +203,13 @@ sealed class EndlessSwipes(BossModule module) : Components.GenericRotatingAOE(mo
             Sequences.Clear();
             isCasterDead = true;
         }
-
-        base.Update();
     }
 }
 
 sealed class TonzeSlash100(BossModule module) : Components.BaitAwayIcon(module, new AOEShapeRect(65.0f, 4.0f), (uint)IconID.TankBuster, (uint)AID.TonzeSlash100,
-    9.1D);
+    9.1D, tankbuster: true, damageType: AIHints.PredictedDamageType.Tankbuster) {
+    public override Actor? BaitSource(Actor target) => Module.Enemies((uint)OID.ElderTablitaurPiece).First();
+}
 
 [SkipLocalsInit]
 sealed class YoungerTablitaurPieceStates : StateMachineBuilder {
