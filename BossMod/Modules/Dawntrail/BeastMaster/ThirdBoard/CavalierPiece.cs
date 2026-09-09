@@ -34,7 +34,9 @@ public enum TetherID : uint {
 sealed class Hint(BossModule module) : BossComponent(module) {
     public override void AddGlobalHints(Actor actor, GlobalHints hints) {
         hints.Add("This fight is easy if you kill every pack wave together and before the 4th pack spawn otherwise it starts getting complicated.\n" +
-                  "If you start getting the 4th pack spawn and you're not close to clearing then I would recommend leveling up your beasts and farming gear.\n" +
+                  "If you start getting the 4th pack spawn and you're not close to clearing then I would recommend the following: \n" +
+                  "1. Using the correct beast master pets\n" +
+                  "2. Leveling up your beasts and farming gear.\n" +
                   "Otherwise, after the 4th pack spawn you will need to stagger them by only killing 4 mobs at a time and waiting for the doubling cast to happen." +
                   " Killing 5 or more mobs will cause the map to get filled with aoes.");
     }
@@ -51,7 +53,7 @@ sealed class CrushingBlade(BossModule module) : Components.GenericKnockback(modu
     private Actor? source = null;
 
     public override void OnEventIcon(Actor actor, uint iconID, ulong targetID) {
-        if (iconID == (uint)IconID.TankBusterKnockBack && Raid.FindSlot(actor.InstanceID) is var slot && slot >= 0) {
+        if (iconID == (uint)IconID.TankBusterKnockBack && Raid.FindSlot(targetID) is var slot && slot >= 0) {
             affectedPlayers[slot] = true;
         }
     }
