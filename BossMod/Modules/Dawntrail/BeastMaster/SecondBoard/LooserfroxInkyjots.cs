@@ -1,0 +1,23 @@
+﻿namespace BossMod.Modules.Dawntrail.BeastMaster.SecondBoard.LooserfroxInkyjots;
+
+public enum OID : uint
+{
+    LoosefroxInkyjots = 0x4C65,
+    Helper = 0x233C,
+}
+
+[SkipLocalsInit]
+sealed class LoosefroxInkyjotsStates : StateMachineBuilder
+{
+    public LoosefroxInkyjotsStates(BossModule module) : base(module)
+    {
+        TrivialPhase();
+    }
+}
+
+[ModuleInfo(BossModuleInfo.Maturity.Dummy, PrimaryActorOID = (uint)OID.LoosefroxInkyjots, Contributors = "Equilius",
+    Category = BossModuleInfo.Category.BeastMaster, GroupType = BossModuleInfo.GroupType.CFC,
+    GroupID = 1089u, NameID = 14561u, SortOrder = 5)]
+[SkipLocalsInit]
+public sealed class LoosefroxInkyjots(WorldState ws, Actor primary) : BossModule(ws, primary, new(520f, -420f), new ArenaBoundsCircle(22f));
+

@@ -58,6 +58,7 @@ public static class BossModuleInfo
         HallOfTheNovice,
         Quantum,
         Advanced,
+        BeastMaster,
 
         Count
     }
