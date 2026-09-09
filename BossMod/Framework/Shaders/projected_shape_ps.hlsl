@@ -1,7 +1,5 @@
 #include "zone_wave.hlsli"
 
-// Projection fix r21: character silhouettes terminate support rays instead of stretching holes.
-
 cbuffer WorldRenderConstants : register(b4)
 {
     row_major float4x4 ViewProj;
@@ -1382,6 +1380,12 @@ float4 main(PS_INPUT input) : SV_Target
     }
     else if (filledWithOutline)
     {
+        if (!outlineReferenceValid)
+            clip(-1.0f);
+        const float maxStableActorProjectionXZSq = 16.0f; // 4 yalms squared, matching outline-only projection
+        float2 actorReceiverShiftXZ = world.xz - outlineReferenceXZ;
+        clip(maxStableActorProjectionXZSq - dot(actorReceiverShiftXZ, actorReceiverShiftXZ));
+
         // Composite the edge colour inside this one projected primitive. This avoids a second scene
         // depth reconstruction and classification pass for actor marker outlines.
         coverage = max(fillCoverage, outlineCoverage);
