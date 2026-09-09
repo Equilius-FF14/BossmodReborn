@@ -21,12 +21,9 @@ public enum AID : uint
     StormWaveNext = 47388, // 4B5B->location, no cast, range 50 width 5 rect
 }
 
-[SkipLocalsInit]
 sealed class WaveWhistle(BossModule module) : Components.SimpleAOEs(module, (uint)AID.WaveWhistle, new AOEShapeRect(25f, 25f));
-[SkipLocalsInit]
 sealed class WaterIV(BossModule module) : Components.RaidwideCast(module, (uint)AID.WaterIV);
 
-[SkipLocalsInit]
 sealed class BloodyPuddle : Components.SimpleAOEs
 {
     public BloodyPuddle(BossModule module) : base(module, (uint)AID.BloodyPuddle, 8f)
@@ -35,7 +32,6 @@ sealed class BloodyPuddle : Components.SimpleAOEs
     }
 }
 
-[SkipLocalsInit]
 sealed class StormWave(BossModule module) : Components.GenericAOEs(module)
 {
     private readonly List<AOEInstance> _cardinal = [with(9)];
@@ -169,7 +165,6 @@ sealed class StormWave(BossModule module) : Components.GenericAOEs(module)
     }
 }
 
-[SkipLocalsInit]
 sealed class WavedAwayStates : StateMachineBuilder
 {
     public WavedAwayStates(BossModule module) : base(module)
@@ -183,7 +178,6 @@ sealed class WavedAwayStates : StateMachineBuilder
 
 [ModuleInfo(BossModuleInfo.Maturity.Contributed, PrimaryActorOID = (uint)OID.ArchKelpie, Contributors = "Equilius", GroupType = BossModuleInfo.GroupType.ForayFATE,
     GroupID = 1093u, NameID = 2077u, SortOrder = 6)]
-[SkipLocalsInit]
 public sealed class WavedAway : OpenWorldFate
 {
     public WavedAway(WorldState ws, Actor primary) : base(ws, primary)

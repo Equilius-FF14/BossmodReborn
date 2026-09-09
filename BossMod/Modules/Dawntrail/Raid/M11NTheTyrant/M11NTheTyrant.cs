@@ -411,5 +411,4 @@ sealed class GreatWallOfFire(BossModule module) : Components.IconSharedTankbuste
 
 [ModuleInfo(BossModuleInfo.Maturity.Contributed, PrimaryActorOID = (uint)OID.Boss, Contributors = "VeraNala, wen, Topas", GroupType = BossModuleInfo.GroupType.CFC,
     GroupID = 1072u, NameID = 14305u)]
-[SkipLocalsInit]
 public sealed class M11NTheTyrant(WorldState ws, Actor primary) : BossModule(ws, primary, new(100f, 100f), new ArenaBoundsSquare(20f));

@@ -220,7 +220,6 @@ sealed class ParticipantInfo : CommonEnumInfo
         sb.AppendLine($"    Helper = 0x233C,");
         sb.AppendLine("}");
         sb.AppendLine();
-        sb.AppendLine("[SkipLocalsInit]");
         sb.AppendLine($"sealed class {name}States : StateMachineBuilder");
         sb.AppendLine("{");
         sb.AppendLine($"    public {name}States(BossModule module) : base(module)");
@@ -250,7 +249,6 @@ sealed class ParticipantInfo : CommonEnumInfo
         sb.AppendLine($"[ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.{name}, Contributors = \"\",");
         sb.AppendLine("Category = BossModuleInfo.Category.Placeholder, GroupType = BossModuleInfo.GroupType.CFC,");
         sb.AppendLine($"GroupID = {(data.Zones.Count != 0 ? data.Zones[0].cfcId : default)}u, NameID = {(data.Names.Count != 0 ? data.Names[0].id : default)}u, SortOrder = 1)]");
-        sb.AppendLine("[SkipLocalsInit]");
         sb.AppendLine($"public sealed class {name}(WorldState ws, Actor primary) : BossModule(ws, primary, new(100f, 100f), new ArenaBoundsCircle(20f));");
         return sb;
     }

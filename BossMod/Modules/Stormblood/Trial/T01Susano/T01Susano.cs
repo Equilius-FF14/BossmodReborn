@@ -134,7 +134,6 @@ sealed class StormSplitter(BossModule module) : Components.IconSharedTankbuster(
 
 sealed class SheerForce(BossModule module) : Components.RaidwideInstant(module, (uint)AID.SheerForce);
 
-[SkipLocalsInit]
 sealed class SusanoStates : StateMachineBuilder
 {
     public SusanoStates(BossModule module) : base(module)
@@ -181,7 +180,6 @@ sealed class SusanoStates : StateMachineBuilder
     NameID = 6221u,
     SortOrder = 1,
     PlanLevel = 0)]
-[SkipLocalsInit]
 public class Susano(WorldState ws, Actor primary)
     : BossModule(ws, primary, new(0, 0), new ArenaBoundsCircle(20f))
 {

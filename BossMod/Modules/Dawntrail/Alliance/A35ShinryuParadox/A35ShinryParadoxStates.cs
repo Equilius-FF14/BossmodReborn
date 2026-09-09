@@ -1,6 +1,5 @@
 namespace BossMod.Dawntrail.Alliance.A35ShinryuParadox;
 
-[SkipLocalsInit]
 sealed class A35ShinryuParadoxStates : StateMachineBuilder
 {
     readonly A35ShinryuParadox _module;

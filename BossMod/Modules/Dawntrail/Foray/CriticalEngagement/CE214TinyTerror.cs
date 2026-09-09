@@ -695,7 +695,6 @@ sealed class SphereGrowable(BossModule module) : BossComponent(module)
     }
 }
 
-[SkipLocalsInit]
 sealed class CE214TinyTerrorStates : StateMachineBuilder
 {
     public CE214TinyTerrorStates(BossModule module) : base(module)
@@ -712,7 +711,6 @@ sealed class CE214TinyTerrorStates : StateMachineBuilder
 }
 
 [ModuleInfo(BossModuleInfo.Maturity.Contributed, PrimaryActorOID = (uint)OID.TinyMage, Contributors = "Equilius", GroupType = BossModuleInfo.GroupType.CriticalEngagement, GroupID = 1093u, NameID = 60u)]
-[SkipLocalsInit]
 public sealed class CE214TinyTerror(WorldState ws, Actor primary) : BossModule(ws, primary, new(152f, 716f), new ArenaBoundsCircle(20f))
 {
     protected override void DrawEnemies(int pcSlot, Actor pc)

@@ -1,6 +1,5 @@
 ﻿namespace BossMod.Dawntrail.Foray.ForkedTowerMagic.Extreme.FTME4Index;
 
-[SkipLocalsInit]
 sealed class ElementaryEvocation(BossModule module) : Components.GenericAOEs(module)
 {
     private readonly OmniElementPanels _panels = module.FindComponent<OmniElementPanels>()!;

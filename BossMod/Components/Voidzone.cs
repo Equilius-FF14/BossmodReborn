@@ -5,7 +5,6 @@ namespace BossMod.Components;
 // for moving 'voidzones', the hints can mark the area in front of each source as dangerous
 // TODO: typically sources are either eventobj's with eventstate != 7 or normal actors that are non dead; other conditions are much rarer
 
-[SkipLocalsInit]
 public class Voidzone(BossModule module, float radius, Func<BossModule, IEnumerable<Actor>> sources, float moveHintLength = default,
     int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false) : GenericAOEs(module, default, "GTFO from voidzone!")
 {
@@ -68,7 +67,6 @@ public class Voidzone(BossModule module, float radius, Func<BossModule, IEnumera
 // note that if voidzone is predicted by cast start rather than cast event, we have to account for possibility of cast finishing without event (e.g. if actor dies before cast finish)
 // TODO: this has problems when target moves - castevent and spawn position could be quite different
 // TODO: this has problems if voidzone never actually spawns after castevent, eg because of phase changes
-[SkipLocalsInit]
 public class VoidzoneAtCastTarget(BossModule module, float radius, uint aid, Func<BossModule, IEnumerable<Actor>> sources, double castEventToSpawn = default,
     int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false) : GenericAOEs(module, aid, "GTFO from voidzone!")
 {
@@ -163,7 +161,6 @@ public class VoidzoneAtCastTarget(BossModule module, float radius, uint aid, Fun
     }
 }
 
-[SkipLocalsInit]
 public class VoidzoneAtCastTargetGroup(BossModule module, float radius, uint[] aids, Func<BossModule, IEnumerable<Actor>> sources, double castEventToSpawn,
     int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false) : VoidzoneAtCastTarget(module, radius, default, sources, castEventToSpawn, arenaProjectionLayer, restrictToArenaProjectionLayer)
 {
@@ -215,7 +212,6 @@ public class VoidzoneAtCastTargetGroup(BossModule module, float radius, uint[] a
 // these are normal voidzones that could be 'inverted' (e.g. when you need to enter a voidzone at specific time to avoid some mechanic)
 // TODO: i'm not sure whether these should be considered actual voidzones (if so, should i merge them with base component? what about cast prediction?) or some completely other type of mechanic (maybe drawing differently)
 // TODO: might want to have per-player invertability
-[SkipLocalsInit]
 public class PersistentInvertibleVoidzone(BossModule module, float radius, Func<BossModule, IEnumerable<Actor>> sources, uint aid = default,
     int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false) : CastCounter(module, aid)
 {
@@ -291,7 +287,6 @@ public class PersistentInvertibleVoidzone(BossModule module, float radius, Func<
 }
 
 // invertible voidzone that is inverted when specific spell is being cast; resolved when cast ends
-[SkipLocalsInit]
 public class PersistentInvertibleVoidzoneByCast(BossModule module, float radius, Func<BossModule, IEnumerable<Actor>> sources, uint aid,
     int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false) : PersistentInvertibleVoidzone(module, radius, sources, aid, arenaProjectionLayer, restrictToArenaProjectionLayer)
 {

@@ -6,7 +6,6 @@ public enum OID : uint
     Helper = 0x233C,
 }
 
-[SkipLocalsInit]
 sealed class LoosefroxInkyjotsStates : StateMachineBuilder
 {
     public LoosefroxInkyjotsStates(BossModule module) : base(module)
@@ -18,6 +17,5 @@ sealed class LoosefroxInkyjotsStates : StateMachineBuilder
 [ModuleInfo(BossModuleInfo.Maturity.Dummy, PrimaryActorOID = (uint)OID.LoosefroxInkyjots, Contributors = "Equilius",
     Category = BossModuleInfo.Category.BeastMaster, GroupType = BossModuleInfo.GroupType.CFC,
     GroupID = 1089u, NameID = 14561u, SortOrder = 5)]
-[SkipLocalsInit]
 public sealed class LoosefroxInkyjots(WorldState ws, Actor primary) : BossModule(ws, primary, new(520f, -420f), new ArenaBoundsCircle(22f));
 

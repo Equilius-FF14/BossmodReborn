@@ -3,7 +3,6 @@
 namespace BossMod;
 
 // utility for invoking parametrized constructors in generic context
-[SkipLocalsInit]
 public static class New<T>
 {
     private static readonly Type TypeOfT = typeof(T);

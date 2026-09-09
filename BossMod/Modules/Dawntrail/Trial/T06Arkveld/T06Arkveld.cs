@@ -88,5 +88,4 @@ sealed class CrackedCrystalSmall(BossModule module) : Components.SimpleAOEs(modu
 sealed class CrackedCrystalLarge(BossModule module) : Components.SimpleAOEs(module, (uint)AID.WyvernsRadiance11, 12f);
 
 [ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.GuardianArkveld, Contributors = "JoeSparkx", GroupType = BossModuleInfo.GroupType.CFC, GroupID = 1043u, NameID = 14237u)]
-[SkipLocalsInit]
 public sealed class GuardianArkveld(WorldState ws, Actor primary) : BossModule(ws, primary, new(100f, 100f), new ArenaBoundsCircle(20f));

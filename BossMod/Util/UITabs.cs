@@ -3,7 +3,6 @@ using Dalamud.Interface.Utility.Raii;
 
 namespace BossMod;
 
-[SkipLocalsInit]
 public sealed class UITabs(string id)
 {
     private readonly List<(string Name, Action Tab)> _tabs = [];

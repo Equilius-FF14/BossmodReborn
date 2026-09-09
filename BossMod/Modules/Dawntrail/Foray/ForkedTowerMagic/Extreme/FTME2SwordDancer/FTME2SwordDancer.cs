@@ -1,21 +1,13 @@
 ﻿namespace BossMod.Dawntrail.Foray.ForkedTowerMagic.Extreme.FTME2SwordDancer;
 
-[SkipLocalsInit]
 sealed class SwordStorm(BossModule module) : Components.RaidwideCast(module, (uint)AID.SwordStorm);
-[SkipLocalsInit]
 sealed class Rush(BossModule module) : Components.SimpleChargeAOEGroups(module, [(uint)AID.Rush1, (uint)AID.Rush2, (uint)AID.Rush3, (uint)AID.Rush4], 3.5f, 2, 2);
-[SkipLocalsInit]
 sealed class RushLong(BossModule module) : Components.SimpleAOEs(module, (uint)AID.RushLong, new AOEShapeRect(30f, 3f), 8);
-[SkipLocalsInit]
 sealed class TurnInner(BossModule module) : Components.SimpleAOEGroups(module, [(uint)AID.Turn1], new AOEShapeDonutSector(9f, 14f, 45f.Degrees()));
-[SkipLocalsInit]
 sealed class TurnOuter(BossModule module) : Components.SimpleAOEGroups(module, [(uint)AID.Turn2, (uint)AID.Turnabout2], new AOEShapeDonutSector(19f, 24f, 45f.Degrees()));
 sealed class TurnMiddle(BossModule module) : Components.SimpleAOEGroups(module, [(uint)AID.Turn3, (uint)AID.Turn4, (uint)AID.Turnabout1], new AOEShapeDonutSector(14f, 19f, 45f.Degrees()));
-[SkipLocalsInit]
 sealed class MartialMystique(BossModule module) : Components.SimpleAOEs(module, (uint)AID.MartialMystique, new AOEShapeRect(48f, 48f));
-[SkipLocalsInit]
 sealed class Pierce(BossModule module) : Components.SimpleAOEs(module, (uint)AID.Pierce, 5f);
-[SkipLocalsInit]
 sealed class SwordDance(BossModule module) : Components.GenericAOEs(module)
 {
     // do sword markers rotate like in normal mode or can it be different?
@@ -58,7 +50,6 @@ sealed class SwordDance(BossModule module) : Components.GenericAOEs(module)
 [ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.SwordDancer, Contributors = "gynorhino",
     Category = BossModuleInfo.Category.Foray, GroupType = BossModuleInfo.GroupType.TheForkedTowerMagicExtreme, GroupID = 1114u,
     NameID = 14820u, SortOrder = 2, PlanLevel = 100)]
-[SkipLocalsInit]
 public sealed class FTME2SwordDancer(WorldState ws, Actor primary) : BossModule(ws, primary, new(600f, 704f), new ArenaBoundsCircle(24f))
 {
     protected override bool CheckPull() => base.CheckPull() && Raid.Player()!.Position.InCircle(Arena.Center, 24f);

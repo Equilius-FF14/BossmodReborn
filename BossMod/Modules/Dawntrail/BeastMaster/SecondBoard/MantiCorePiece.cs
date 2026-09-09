@@ -122,7 +122,6 @@ sealed class WildCharge(BossModule module) : Components.GenericAOEs(module) {
     }
 }
 
-[SkipLocalsInit]
 sealed class ManticorePieceStates : StateMachineBuilder {
     public ManticorePieceStates(BossModule module) : base(module) {
         TrivialPhase()
@@ -142,5 +141,4 @@ sealed class ManticorePieceStates : StateMachineBuilder {
     GroupID = 1089u,
     NameID = 14545u,
     SortOrder = 1)]
-[SkipLocalsInit]
 public sealed class ManticorePiece(WorldState ws, Actor primary) : BossModule(ws, primary, new(120f, -420f), new ArenaBoundsCircle(20f));

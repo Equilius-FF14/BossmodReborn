@@ -4,7 +4,6 @@ using System.Text.Json.Serialization;
 
 namespace BossMod;
 
-[SkipLocalsInit]
 public static class Serialization
 {
     public class JsonTypeConverter : JsonConverter<Type>

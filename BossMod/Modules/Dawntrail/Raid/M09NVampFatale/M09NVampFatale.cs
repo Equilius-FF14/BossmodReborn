@@ -76,5 +76,4 @@ sealed class CoffinMaker(BossModule module) : Components.Voidzone(module, 3f, Ge
 }
 
 [ModuleInfo(BossModuleInfo.Maturity.Contributed, PrimaryActorOID = (uint)OID.VampFatale, Contributors = "HerStolenLight", GroupType = BossModuleInfo.GroupType.CFC, GroupID = 1068u, NameID = 14300u)]
-[SkipLocalsInit]
 public sealed class M09NVampFatale(WorldState ws, Actor primary) : BossModule(ws, primary, new(100f, 100f), new ArenaBoundsSquare(20f));

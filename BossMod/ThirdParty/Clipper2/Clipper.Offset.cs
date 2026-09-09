@@ -26,7 +26,6 @@ public enum EndType
     Round
 }
 
-[SkipLocalsInit]
 public sealed class ClipperOffset
 {
     private sealed class Group

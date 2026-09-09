@@ -1,6 +1,5 @@
 ﻿namespace BossMod.Dawntrail.Foray.ForkedTowerMagic.Normal.FTMN2SwordDancer;
 
-[SkipLocalsInit]
 sealed class FTMN2SwordDancerStates : StateMachineBuilder
 {
     public FTMN2SwordDancerStates(BossModule module) : base(module)

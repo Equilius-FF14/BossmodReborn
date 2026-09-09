@@ -99,7 +99,6 @@ sealed class LongDeadPirate(BossModule module) : Components.SimpleAOEs(module, (
     public override void OnCastStarted(Actor caster, ActorCastInfo spell) { }
 }
 
-[SkipLocalsInit]
 sealed class CE206DarkArtistryStates : StateMachineBuilder
 {
     public CE206DarkArtistryStates(BossModule module) : base(module)
@@ -114,7 +113,6 @@ sealed class CE206DarkArtistryStates : StateMachineBuilder
 }
 
 [ModuleInfo(BossModuleInfo.Maturity.Verified, PrimaryActorOID = (uint)OID.PhantomNecromancer, Contributors = "Equilius", GroupType = BossModuleInfo.GroupType.CriticalEngagement, GroupID = 1093u, NameID = 57u)]
-[SkipLocalsInit]
 public sealed class CE206DarkArtistry(WorldState ws, Actor primary) : BossModule(ws, primary, new(224f, -860f), new ArenaBoundsSquare(20f))
 {
     protected override bool CheckPull() => base.CheckPull() && Raid.Player()!.Position.InSquare(Arena.Center, 20f);

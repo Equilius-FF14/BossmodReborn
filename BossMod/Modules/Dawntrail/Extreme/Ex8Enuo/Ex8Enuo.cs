@@ -119,7 +119,6 @@ sealed class ArenaChanges(BossModule module) : BossComponent(module)
 }
 
 [ModuleInfo(BossModuleInfo.Maturity.Contributed, PrimaryActorOID = (uint)OID.Enuo, Contributors = "HerStolenLight", GroupType = BossModuleInfo.GroupType.CFC, GroupID = 1116u, NameID = 14749u, PlanLevel = 0)]
-[SkipLocalsInit]
 public sealed class Ex8Enuo(WorldState ws, Actor primary) : BossModule(ws, primary, new(100f, 100f), new ArenaBoundsCircle(20f))
 {
     private Actor? _castingadd;

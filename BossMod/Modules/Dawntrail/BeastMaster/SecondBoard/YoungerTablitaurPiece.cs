@@ -211,7 +211,6 @@ sealed class TonzeSlash100(BossModule module) : Components.BaitAwayIcon(module, 
     public override Actor? BaitSource(Actor target) => Module.Enemies((uint)OID.ElderTablitaurPiece).First();
 }
 
-[SkipLocalsInit]
 sealed class YoungerTablitaurPieceStates : StateMachineBuilder {
     public YoungerTablitaurPieceStates(BossModule module) : base(module) {
         TrivialPhase()
@@ -232,7 +231,6 @@ sealed class YoungerTablitaurPieceStates : StateMachineBuilder {
     Category = BossModuleInfo.Category.BeastMaster,
     GroupType = BossModuleInfo.GroupType.CFC,
     GroupID = 1089u, NameID = 14556u, SortOrder = 4)]
-[SkipLocalsInit]
 public sealed class YoungerTablitaurPiece : BossModule {
     public static readonly uint[] Bosses = [(uint)OID.YoungerTablitaurPiece, (uint)OID.ElderTablitaurPiece];
 

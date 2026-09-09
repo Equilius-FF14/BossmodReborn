@@ -44,7 +44,6 @@ sealed class ThunderboltPuddle : Components.SimpleAOEGroups
     }
 }
 
-[SkipLocalsInit]
 sealed class ThunderregnumStates : StateMachineBuilder
 {
     public ThunderregnumStates(BossModule module) : base(module)
@@ -59,5 +58,4 @@ sealed class ThunderregnumStates : StateMachineBuilder
 
 [ModuleInfo(BossModuleInfo.Maturity.Contributed, PrimaryActorOID = (uint)OID.Cresceregina, Contributors = "Equilius", GroupType = BossModuleInfo.GroupType.ForayFATE,
     GroupID = 1093u, NameID = 2084u, SortOrder = 13)]
-[SkipLocalsInit]
 public sealed class Thunderregnum(WorldState ws, Actor primary) : OpenWorldFate(ws, primary);

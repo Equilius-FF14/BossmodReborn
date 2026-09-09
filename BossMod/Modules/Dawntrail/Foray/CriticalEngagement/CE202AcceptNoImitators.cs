@@ -359,7 +359,6 @@ sealed class ShapeshiftingSupercell : Components.GenericRotatingAOE
     }
 }
 
-[SkipLocalsInit]
 sealed class CE202AcceptNoImitatorsStates : StateMachineBuilder
 {
     public CE202AcceptNoImitatorsStates(BossModule module) : base(module)
@@ -381,7 +380,6 @@ sealed class CE202AcceptNoImitatorsStates : StateMachineBuilder
 }
 
 [ModuleInfo(BossModuleInfo.Maturity.Verified, PrimaryActorOID = (uint)OID.Metamorph, Contributors = "Equilius", GroupType = BossModuleInfo.GroupType.CriticalEngagement, GroupID = 1093u, NameID = 63u)]
-[SkipLocalsInit]
 public sealed class CE202AcceptNoImitators(WorldState ws, Actor primary) : BossModule(ws, primary, new(500f, -310f), new ArenaBoundsCircle(25f))
 {
     protected override bool CheckPull() => base.CheckPull() && Raid.Player()!.Position.InCircle(Arena.Center, 25f);

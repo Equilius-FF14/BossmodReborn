@@ -64,7 +64,6 @@ sealed class Whirlwind(BossModule module) : Components.GenericAOEs(module) {
     }
 }
 
-[SkipLocalsInit]
 sealed class WyvernPieceStates : StateMachineBuilder {
     public WyvernPieceStates(BossModule module) : base(module) {
         TrivialPhase()
@@ -87,5 +86,4 @@ sealed class WyvernPieceStates : StateMachineBuilder {
     GroupID = 1089u,
     NameID = 14549u,
     SortOrder = 2)]
-[SkipLocalsInit]
 public sealed class WyvernPiece(WorldState ws, Actor primary) : BossModule(ws, primary, new(520f, 0f), new ArenaBoundsRect(20f, 14.8f));

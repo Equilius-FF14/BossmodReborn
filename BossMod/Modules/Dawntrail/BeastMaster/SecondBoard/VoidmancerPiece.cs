@@ -81,7 +81,6 @@ sealed class Mindjack(BossModule module) : Components.StatusDrivenForcedMarch(mo
     }
 }
 
-[SkipLocalsInit]
 sealed class VoidmancerPieceStates : StateMachineBuilder {
     public VoidmancerPieceStates(BossModule module) : base(module) {
         TrivialPhase()
@@ -101,7 +100,6 @@ sealed class VoidmancerPieceStates : StateMachineBuilder {
     GroupID = 1089u,
     NameID = 14552u,
     SortOrder = 3)]
-[SkipLocalsInit]
 public sealed class VoidmancerPiece(WorldState ws, Actor primary) : BossModule(ws, primary, new(120f, 0f), new ArenaBoundsRect(20f, 20f)) {
 
     public override bool ShouldPrioritizeAllEnemies => true;

@@ -10,7 +10,6 @@ public enum PolygonShapeRelation : byte
     Intersecting
 }
 
-[SkipLocalsInit]
 internal sealed unsafe class PolygonBoundaryIndex2D : IDisposable
 {
     // Only used to collapse trig-generated cardinal directions (e.g. cos(pi/2) != exactly 0 in float)

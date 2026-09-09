@@ -4,7 +4,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Control;
 
 namespace BossMod;
 
-[SkipLocalsInit]
 sealed class Camera
 {
     public static Camera? Instance;

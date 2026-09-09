@@ -1,6 +1,5 @@
 ﻿namespace BossMod.Dawntrail.Foray.ForkedTowerMagic.Normal.FTMN4Index;
 
-[SkipLocalsInit]
 sealed class FTMN4IndexStates : StateMachineBuilder
 {
     public FTMN4IndexStates(BossModule module) : base(module)

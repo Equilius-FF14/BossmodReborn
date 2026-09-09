@@ -309,7 +309,6 @@ sealed class Debug(BossModule module) : BossComponent(module)
     }
 }
 
-[SkipLocalsInit]
 sealed class CE215WebofTerrorStates : StateMachineBuilder
 {
     public CE215WebofTerrorStates(BossModule module) : base(module)
@@ -326,7 +325,6 @@ sealed class CE215WebofTerrorStates : StateMachineBuilder
 }
 
 [ModuleInfo(BossModuleInfo.Maturity.Contributed, PrimaryActorOID = (uint)OID.CrescentArachne, Contributors = "gynorhino", GroupType = BossModuleInfo.GroupType.CriticalEngagement, GroupID = 1093u, NameID = 55u)]
-[SkipLocalsInit]
 public sealed class CE215WebofTerror(WorldState ws, Actor primary) : BossModule(ws, primary, new(170f, -136f), new ArenaBoundsCircle(20f))
 {
     protected override bool CheckPull() => base.CheckPull() && Raid.Player()!.Position.InCircle(Arena.Center, 25f);

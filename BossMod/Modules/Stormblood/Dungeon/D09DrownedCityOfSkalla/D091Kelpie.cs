@@ -155,7 +155,6 @@ sealed class WaterPuddles(BossModule module) : BossComponent(module)
 // Show the tether object
 class BloodyBurstTether(BossModule module) : Components.BaitAwayTethers(module, new AOEShapeCircle(6f), (uint)TetherID.HydrosphereTether, (uint)AID.BubbleBurst, enemyOID: (uint)OID.Hydrosphere);
 
-[SkipLocalsInit]
 sealed class D091KelpieStates : StateMachineBuilder
 {
     public D091KelpieStates(BossModule module) : base(module)
@@ -187,6 +186,5 @@ sealed class D091KelpieStates : StateMachineBuilder
     NameID = 6907u,
     SortOrder = 1,
     PlanLevel = 0)]
-[SkipLocalsInit]
 
 public sealed class D091Kelpie(WorldState ws, Actor primary) : BossModule(ws, primary, new(-220f, 4f), new ArenaBoundsSquare(14.5f));

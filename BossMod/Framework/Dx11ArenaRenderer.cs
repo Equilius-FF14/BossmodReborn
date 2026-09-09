@@ -10,7 +10,6 @@ using TerraFX.Interop.Windows;
 
 namespace BossMod;
 
-[SkipLocalsInit]
 public static unsafe partial class Dx11ArenaRenderer
 {
     [StructLayout(LayoutKind.Sequential)]
