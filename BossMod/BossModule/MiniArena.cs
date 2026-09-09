@@ -124,10 +124,8 @@ public sealed class MiniArena(WPos center, ArenaBounds bounds)
     private static MiniArena? _worldPathOwner;
 
     // Actor markers normally sit directly under a known actor.
-    // ActorProjected deliberately opts back into the bounds' WorldProjectionHeight because its
-    // destination marker is usually not underneath an actor. A zero bounds/layer height overrides
+    // a destination marker is usually not underneath an actor. A zero bounds/layer height overrides
     // the shallow marker band as well so reference-plane projection remains arena-wide.
-    private const float WorldActorMarkerProjectionHeight = 0.10f;
     private const float WorldProjectionLayerSwitchHysteresis = 0.75f;
     private const float WorldOutlineUnit = 0.08f;
     // 3D arena-rim Dimensions
@@ -1541,7 +1539,7 @@ public sealed class MiniArena(WPos center, ArenaBounds bounds)
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void ActorInsideBounds(WPos position, Angle rotation, uint color)
-        => ActorInsideBounds(position, rotation, color, _frameWorldProjectionHeight > 0f ? WorldActorMarkerProjectionHeight : 0f);
+        => ActorInsideBounds(position, rotation, color, _frameWorldProjectionHeight);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ActorInsideBounds(WPos position, Angle rotation, uint color, float worldProjectionHeight, bool draw2D = true, bool drawWorld = true)
@@ -1663,7 +1661,7 @@ public sealed class MiniArena(WPos center, ArenaBounds bounds)
         var offset = position - _center;
         if (shape?.Contains(offset) ?? InBounds(position))
         {
-            ActorInsideBounds(position, rotation, color, _frameWorldProjectionHeight > 0f ? WorldActorMarkerProjectionHeight : 0f, draw2D, drawWorld);
+            ActorInsideBounds(position, rotation, color, _frameWorldProjectionHeight, draw2D, drawWorld);
         }
         else
         {

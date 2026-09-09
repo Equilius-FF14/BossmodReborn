@@ -920,27 +920,6 @@ protected ZCallback64? _zCallback;
             _isSortedMinimaList = true;
         }
 
-        var count = _minimaList.Count;
-        _scanlineList.EnsureCapacity(count);
-        var hasPreviousY = false;
-        var previousY = 0L;
-        var count1 = count - 1;
-        for (var i = count1; i >= 0; --i)
-        {
-            var y = _minimaList[i].vertex.pt.Y;
-            if (hasPreviousY && y == previousY)
-            {
-                continue;
-            }
-            _scanlineList.Add(y);
-            previousY = y;
-            hasPreviousY = true;
-        }
-        if (_scanlineList.Count > ScanlineHeapThreshold)
-        {
-            ActivateScanlineHeap();
-        }
-
         _currentBotY = 0L;
         _currentLocMin = 0;
         _actives = null;
@@ -1016,6 +995,18 @@ protected ZCallback64? _zCallback;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool PopScanline(out long y)
     {
+        if (_currentLocMin < _minimaList.Count)
+        {
+            y = _minimaList[_currentLocMin].vertex.pt.Y;
+            var count = _scanlineList.Count;
+            if (count == 0 || y > _scanlineList[_scanlineIsHeap ? 0 : count - 1])
+            {
+                // InsertLocalMinimaIntoAEL consumes every minimum at this Y.
+                return true;
+            }
+            // Equal heights must pop the queued edge top too, so the sweep
+            // processes the shared height only once.
+        }
         if (_scanlineIsHeap)
         {
             return PopScanlineHeap(out y);
@@ -4095,8 +4086,7 @@ protected ZCallback64? _zCallback;
         }
 
         // Cleanup can append split contours; keep the loop bound live.
-        var count = _outrecList.Count;
-        for (var i = 0; i < count; ++i)
+        for (var i = 0; i < _outrecList.Count; ++i)
         {
             var outrec = _outrecList[i];
             if (outrec.pts == null)
@@ -4131,8 +4121,12 @@ protected ZCallback64? _zCallback;
             return true;
         }
         CleanCollinear(outrec);
+        if (outrec.pts == null)
+        {
+            return false;
+        }
         var path = outrec.path ??= [with(outrec.outPtCount)];
-        if (outrec.pts == null || !BuildPathAndBounds(outrec.pts, ReverseSolution, path, out var bounds))
+        if (!BuildPathAndBounds(outrec.pts, ReverseSolution, path, out var bounds))
         {
             return false;
         }
@@ -4218,18 +4212,15 @@ protected ZCallback64? _zCallback;
     {
         polytree.Clear();
         solutionOpen.Clear();
-        var count = _outrecList.Count;
+
         if (_hasOpenPaths)
         {
-            solutionOpen.EnsureCapacity(count);
+            solutionOpen.EnsureCapacity(_outrecList.Count);
         }
 
         var i = 0;
-        // _outrecList.Count is not static here because
-        // CheckBounds below can indirectly add additional
-        // OutRec (via FixOutRecPts & CleanCollinear)
 
-        while (i < count)
+        while (i < _outrecList.Count)
         {
             var outrec = _outrecList[i++];
             if (outrec.pts == null)
