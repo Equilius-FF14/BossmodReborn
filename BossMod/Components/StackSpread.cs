@@ -669,7 +669,6 @@ public abstract class GenericStackSpread(BossModule module, bool raidwideOnResol
 }
 
 // stack/spread with same properties for all stacks and all spreads (most common variant)
-[SkipLocalsInit]
 public abstract class UniformStackSpread(BossModule module, float stackRadius, float spreadRadius, int minStackSize = 2, int maxStackSize = int.MaxValue, bool raidwideOnResolve = true, bool includeDeadTargets = false)
     : GenericStackSpread(module, raidwideOnResolve, includeDeadTargets)
 {
@@ -697,7 +696,6 @@ public abstract class UniformStackSpread(BossModule module, float stackRadius, f
 }
 
 // spread/stack mechanic that selects targets by casts
-[SkipLocalsInit]
 public class CastStackSpread(BossModule module, uint stackAID, uint spreadAID, float stackRadius, float spreadRadius, int minStackSize = 2, int maxStackSize = int.MaxValue, bool alwaysShowSpreads = false, int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = true)
     : UniformStackSpread(module, stackRadius, spreadRadius, minStackSize, maxStackSize, alwaysShowSpreads)
 {

@@ -1,6 +1,5 @@
 namespace BossMod.Components;
 
-[SkipLocalsInit]
 public class GenericTowers(BossModule module, uint aid = default, bool prioritizeInsufficient = false, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.Raidwide) : CastCounter(module, aid)
 {
     public struct Tower
@@ -417,7 +416,6 @@ public class CastTowers(BossModule module, uint aid, float radius, int minSoaker
 }
 
 // for tower mechanics in open world since likely not everyone is in your party
-[SkipLocalsInit]
 public class GenericTowersOpenWorld(BossModule module, uint aid = default, bool prioritizeInsufficient = false, bool prioritizeEmpty = false, AIHints.PredictedDamageType damageType = AIHints.PredictedDamageType.Raidwide) : CastCounter(module, aid)
 {
     public class Tower(WPos position, AOEShape shape, int minSoakers = 1, int maxSoakers = 1, HashSet<Actor>? allowedSoakers = null, DateTime activation = default, Angle rotation = default,

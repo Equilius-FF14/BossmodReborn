@@ -1,6 +1,5 @@
 ﻿namespace BossMod.Dawntrail.Foray.ForkedTowerMagic.Extreme.FTME1TwoHeadedAevis;
 
-[SkipLocalsInit]
 sealed class Buffet(BossModule module) : BossComponent(module)
 {
     private readonly Actor?[] AssignedBoss = new Actor?[PartyState.MaxPartySize];

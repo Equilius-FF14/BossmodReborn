@@ -29,7 +29,6 @@ public enum SID : uint
     MotionTracker = 5191, // none->41EF/41F0/41F1/player, extra=0x0
 }
 
-[SkipLocalsInit]
 
 sealed class PetrifyingBeam(BossModule module) : Components.SimpleAOEGroups(module, [(uint)AID.PetrifyingBeam, (uint)AID.PetrifyingBeam2], new AOEShapeCone(70f, 50f.Degrees()), maxCasts: 2);
 
@@ -120,5 +119,4 @@ sealed class D131EyeOfTheScorpionStates : StateMachineBuilder
 }
 
 [ModuleInfo(BossModuleInfo.Maturity.Verified, PrimaryActorOID = (uint)OID.EyeOfTheScorpion, Contributors = "HerStolenLight", GroupType = BossModuleInfo.GroupType.CFC, GroupID = 1011u, NameID = 14716u, SortOrder = 1)]
-[SkipLocalsInit]
 public sealed class D131EyeOfTheScorpion(WorldState ws, Actor primary) : BossModule(ws, primary, new(-615f, 575f), new ArenaBoundsSquare(20f));

@@ -226,7 +226,6 @@ sealed class Steelsbreath(BossModule module) : Components.GenericKnockback(modul
 }
 
 [ModuleInfo(BossModuleInfo.Maturity.Contributed, PrimaryActorOID = (uint)OID.SwordDancer, Contributors = "gynorhino", GroupType = BossModuleInfo.GroupType.TheForkedTowerMagicNormal, GroupID = 1093u, NameID = 14820u)]
-[SkipLocalsInit]
 public sealed class FTMN2SwordDancer(WorldState ws, Actor primary) : BossModule(ws, primary, new WPos(600f, 704f).Quantized(), new ArenaBoundsCircle(24f))
 {
     protected override bool CheckPull() => base.CheckPull() && Raid.Player()!.Position.InCircle(Arena.Center, 24f);

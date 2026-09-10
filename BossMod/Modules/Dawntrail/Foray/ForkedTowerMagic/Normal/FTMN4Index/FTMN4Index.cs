@@ -601,7 +601,6 @@ sealed class Predict(BossModule module) : Components.GenericAOEs(module)
 }
 
 [ModuleInfo(BossModuleInfo.Maturity.Verified, PrimaryActorOID = (uint)OID.Index, Contributors = "gynorhino", GroupType = BossModuleInfo.GroupType.TheForkedTowerMagicNormal, GroupID = 1093u, NameID = 14717u)]
-[SkipLocalsInit]
 public sealed class FTMN4Index : BossModule
 {
     public FTMN4Index(WorldState ws, Actor primary) : this(ws, primary, BuildInitialArena()) { }

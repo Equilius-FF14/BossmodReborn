@@ -3,7 +3,6 @@ using Dalamud.Interface.Utility;
 
 namespace BossMod;
 
-[SkipLocalsInit]
 public static class UICombo
 {
     public static string EnumString(Enum value) => GeneratedEnumMetadata.DisplayName(value);

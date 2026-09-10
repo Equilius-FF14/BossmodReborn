@@ -18,7 +18,6 @@ using System.Runtime.Intrinsics.X86;
 namespace Clipper2Lib;
 // PRE-COMPILER CONDITIONAL ...
 // USINGZ: For user defined Z-coordinates. See Clipper.SetZ
-[SkipLocalsInit]
 public static class Clipper
 {
     private const double DoublePI = Math.Tau;

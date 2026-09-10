@@ -1,12 +1,8 @@
 ﻿namespace BossMod.Dawntrail.Foray.ForkedTowerMagic.Extreme.FTME1TwoHeadedAevis;
 
-[SkipLocalsInit]
 sealed class FreezingFugue(BossModule module) : Components.SimpleAOEGroups(module, [(uint)AID.FreezingFugue1, (uint)AID.FreezingFugue2, (uint)AID.FreezingFugue3], 20f);
-[SkipLocalsInit]
 sealed class PoisonBreath(BossModule module) : Components.SimpleAOEs(module, (uint)AID.PoisonBreath, 18f);
-[SkipLocalsInit]
 sealed class FulgurousFugue(BossModule module) : Components.SimpleAOEGroups(module, [(uint)AID.FulgurousFugue1, (uint)AID.FulgurousFugue2, (uint)AID.FulgurousFugue3], new AOEShapeDonut(20f, 60f));
-[SkipLocalsInit]
 sealed class FreezingFulgurousFugue(BossModule module) : Components.GenericAOEs(module)
 {
     public readonly List<AOEInstance> Casters = [];
@@ -78,9 +74,7 @@ sealed class FreezingFulgurousFugue(BossModule module) : Components.GenericAOEs(
         }
     }
 }
-[SkipLocalsInit]
 sealed class ThunderfrostTempest(BossModule module) : Components.RaidwideCast(module, (uint)AID.ThunderfrostTempest);
-[SkipLocalsInit]
 sealed class Archaeofury(BossModule module) : Components.SpreadFromIcon(module, (uint)IconID.Tankbuster, default, 6f, 5f)
 {
     public override void OnEventCast(Actor caster, ActorCastEvent spell)
@@ -108,11 +102,8 @@ sealed class Archaeofury(BossModule module) : Components.SpreadFromIcon(module, 
         }
     }
 }
-[SkipLocalsInit]
 sealed class TwoTerrorsWide(BossModule module) : Components.SimpleAOEs(module, (uint)AID.TwoTerrors1, new AOEShapeRect(40f, 10f));
-[SkipLocalsInit]
 sealed class TwoTerrorsThin(BossModule module) : Components.SimpleAOEs(module, (uint)AID.TwoTerrors2, new AOEShapeRect(40f, 5f));
-[SkipLocalsInit]
 sealed class ArcaneRevelation(BossModule module) : Components.GenericAOEs(module)
 {
     // arcane revelation, dangerous squares based on which boss is glowing during cast
@@ -203,7 +194,6 @@ sealed class ArcaneRevelation(BossModule module) : Components.GenericAOEs(module
 
 [ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.TwoHeadedAevis, Contributors = "gynorhino", Category = BossModuleInfo.Category.Foray,
     GroupType = BossModuleInfo.GroupType.TheForkedTowerMagicExtreme, GroupID = 1114u, NameID = 14490u, SortOrder = 1, PlanLevel = 100)]
-[SkipLocalsInit]
 public sealed class FTME1TwoHeadedAevis(WorldState ws, Actor primary) : BossModule(ws, primary, new(-900f, 700f), new ArenaBoundsSquare(20f))
 {
     private Actor? _greenHead;

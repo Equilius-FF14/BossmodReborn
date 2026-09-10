@@ -39,5 +39,4 @@ class KindleFlameStackIcon(BossModule module) : Components.StackTogether(module,
 }
 
 [ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.PariOfPlenty, Contributors = "Equilius", Category = BossModuleInfo.Category.VariantCriterion, GroupType = BossModuleInfo.GroupType.CFC, GroupID = 1079u, NameID = 14274u)]
-[SkipLocalsInit]
 public sealed class C013PariOfPlenty(WorldState ws, Actor primary) : BossModule(ws, primary, new(-760f, -805f), new ArenaBoundsSquare(20f));

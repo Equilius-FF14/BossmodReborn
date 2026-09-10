@@ -1,6 +1,5 @@
 ﻿namespace BossMod.Dawntrail.Foray.ForkedTowerMagic.Extreme.FTME4Index;
 
-[SkipLocalsInit]
 sealed class SunderingSpellblade(BossModule module) : Components.GenericAOEs(module)
 {
     // can start on left or right side?

@@ -587,5 +587,4 @@ sealed class SilentEight(BossModule module) : Components.GenericBaitAway(module)
 
 [ModuleInfo(BossModuleInfo.Maturity.Contributed, PrimaryActorOID = (uint)OID.LoneSwordmaster, Contributors = "", Category = BossModuleInfo.Category.VariantCriterion,
 GroupType = BossModuleInfo.GroupType.CFC, GroupID = 1084u, NameID = 14323u, SortOrder = 3)]
-[SkipLocalsInit]
 public sealed class Ad013LoneSwordmaster(WorldState ws, Actor primary) : BossModule(ws, primary, new(170f, -815f), new ArenaBoundsSquare(20f));

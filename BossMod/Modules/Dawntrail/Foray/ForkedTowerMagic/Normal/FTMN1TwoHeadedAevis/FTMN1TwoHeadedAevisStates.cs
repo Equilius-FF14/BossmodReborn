@@ -1,6 +1,5 @@
 ﻿namespace BossMod.Dawntrail.Foray.ForkedTowerMagic.Normal.FTMN1TwoHeadedAevis;
 
-[SkipLocalsInit]
 sealed class FTMN1TwoHeadedAevisStates : StateMachineBuilder
 {
     public FTMN1TwoHeadedAevisStates(BossModule module) : base(module)

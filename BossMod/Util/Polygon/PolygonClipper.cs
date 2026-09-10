@@ -12,7 +12,6 @@ public enum OperandType
 }
 
 // utility for simplifying and performing boolean operations on complex polygons
-[SkipLocalsInit]
 public sealed class PolygonClipper
 {
     public const float Scale = 1024f * 1024f; // note: we need at least 10 bits for integer part (-1024 to 1024 range); using 11 bits leaves 20 bits for fractional part; power-of-two scale should reduce rounding issues

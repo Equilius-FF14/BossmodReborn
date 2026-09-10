@@ -31,7 +31,6 @@ sealed class AgeOfEndlessFrost(BossModule module) : Components.SimpleAOEs(module
 sealed class TheStormWithin(BossModule module) : Components.SimpleAOEs(module, (uint)AID.TheStormWithin, 10f);
 sealed class TheStormWithout(BossModule module) : Components.SimpleAOEs(module, (uint)AID.TheStormWithout, new AOEShapeDonut(10f, 40f));
 
-[SkipLocalsInit]
 sealed class TerritorialDisputeStates : StateMachineBuilder
 {
     public TerritorialDisputeStates(BossModule module) : base(module)
@@ -54,5 +53,4 @@ sealed class TerritorialDisputeStates : StateMachineBuilder
     NameID = 2080u,
     SortOrder = 9,
     PlanLevel = 0)]
-[SkipLocalsInit]
 public sealed class TerritorialDispute(WorldState ws, Actor primary) : OpenWorldFate(ws, primary);

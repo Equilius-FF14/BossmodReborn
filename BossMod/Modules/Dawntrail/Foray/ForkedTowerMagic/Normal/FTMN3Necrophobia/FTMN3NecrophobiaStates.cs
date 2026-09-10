@@ -1,6 +1,5 @@
 ﻿namespace BossMod.Dawntrail.Foray.ForkedTowerMagic.Normal.FTMN3Necrophobia;
 
-[SkipLocalsInit]
 sealed class FTMN3NecrophobiaStates : StateMachineBuilder
 {
     public FTMN3NecrophobiaStates(BossModule module) : base(module)

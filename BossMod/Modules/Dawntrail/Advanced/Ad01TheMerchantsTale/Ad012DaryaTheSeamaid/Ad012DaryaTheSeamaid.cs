@@ -424,5 +424,4 @@ sealed class SunkenTreasure(BossModule module) : Components.GenericAOEs(module)
 
 [ModuleInfo(BossModuleInfo.Maturity.Contributed, PrimaryActorOID = (uint)OID.DaryaTheSeaMaid, Contributors = "", Category = BossModuleInfo.Category.VariantCriterion,
 GroupType = BossModuleInfo.GroupType.CFC, GroupID = 1084u, NameID = 14291u, SortOrder = 2)]
-[SkipLocalsInit]
 public sealed class Ad012DaryaTheSeamaid(WorldState ws, Actor primary) : BossModule(ws, primary, new(375f, 530f), new ArenaBoundsSquare(20f));

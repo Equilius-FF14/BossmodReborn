@@ -287,7 +287,6 @@ sealed class WaterTowers(BossModule module) : Components.GenericTowers(module)
 sealed class FlameRune(BossModule module) : Components.StackWithIcon(module, (uint)IconID.FireStackIcon, (uint)AID.FlameHammer, 5f, 3d, 8, 8);
 
 
-[SkipLocalsInit]
 sealed class TitaniaStates : StateMachineBuilder
 {
     public TitaniaStates(BossModule module) : base(module)
@@ -337,5 +336,4 @@ sealed class TitaniaStates : StateMachineBuilder
     SortOrder = 1,
     PlanLevel = 0)]
 
-[SkipLocalsInit]
 public sealed class Titania(WorldState ws, Actor primary) : BossModule(ws, primary, new(100f, 100f), new ArenaBoundsSquare(20f));

@@ -1,7 +1,6 @@
 ﻿namespace BossMod;
 
 // 2d vector that represents world-space direction on XZ plane
-[SkipLocalsInit]
 public readonly struct WDir(float x, float z)
 {
     public readonly float X = x;
@@ -80,7 +79,6 @@ public readonly struct WDir(float x, float z)
 }
 
 // 2d vector that represents world-space position on XZ plane
-[SkipLocalsInit]
 public readonly struct WPos(float x, float z)
 {
     public readonly float X = x;

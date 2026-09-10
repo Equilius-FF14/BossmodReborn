@@ -1,6 +1,5 @@
 ﻿namespace BossMod.Dawntrail.Foray.ForkedTowerMagic.Extreme.FTME4Index;
 
-[SkipLocalsInit]
 sealed class ElementaryChemistry(BossModule module) : BossComponent(module)
 {
     // players get ElementaryDeficiency status with extra 1-3

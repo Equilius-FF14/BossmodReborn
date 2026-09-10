@@ -11,7 +11,6 @@ using System.Buffers;
 
 namespace Clipper2Lib;
 
-[SkipLocalsInit]
 public static class Minkowski
 {
     private const int StackScratchThreshold = 128;

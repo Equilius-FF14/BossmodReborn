@@ -88,5 +88,4 @@ class CrossCurrent(BossModule module) : Components.GenericAOEs(module, (uint)AID
 class AquaBall(BossModule module) : Components.SimpleAOEs(module, (uint)AID.AquaBall1, 5f);
 
 [ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.DaryaTheSeaMaid, Contributors = "Equilius", Category = BossModuleInfo.Category.VariantCriterion, GroupType = BossModuleInfo.GroupType.CFC, GroupID = 1079u, NameID = 14291u)]
-[SkipLocalsInit]
 public sealed class C011DaryaTheSeaMaid(WorldState ws, Actor primary) : BossModule(ws, primary, new(375f, 530f), new ArenaBoundsSquare(20));

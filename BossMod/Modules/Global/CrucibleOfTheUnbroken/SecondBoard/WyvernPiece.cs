@@ -1,6 +1,7 @@
-﻿namespace BossMod.Dawntrail.BeastMaster.SecondBoard.WyvernPiece;
+﻿namespace BossMod.Global.CrucibleOfTheUnbroken.SecondBoard.WyvernPiece;
 
-public enum OID : uint {
+public enum OID : uint
+{
     WyvernPiece = 0x4C58,
     Helper = 0x233C,
     WindSprite = 0x4C5B, // R1.600, x0 (spawn during fight)
@@ -9,7 +10,8 @@ public enum OID : uint {
     LiquidHellPuddle = 0x1EA66D, // R0.500, x0 (spawn during fight), EventObj type
 }
 
-public enum AID : uint {
+public enum AID : uint
+{
     AutoAttack = 49680, // WyvernPiece->player, no cast, single-target
     Teleport = 48173, // WyvernPiece->location, no cast, single-target
     TheStormsGrip = 48166, // WyvernPiece->self, 4.0s cast, range 60 circle
@@ -33,40 +35,49 @@ sealed class StormTrail(BossModule module) : Components.SimpleAOEs(module, (uint
 sealed class LiquidHellPuddle(BossModule module) : Components.Voidzone(module, 5.0f,
     module => module.Enemies((uint)OID.LiquidHellPuddle).Where(z => z.EventState != 7));
 
-sealed class Whirlwind(BossModule module) : Components.GenericAOEs(module) {
+sealed class Whirlwind(BossModule module) : Components.GenericAOEs(module)
+{
     private AOEInstance[] aoes = [];
     private readonly List<Actor> puddles = [];
 
-    public override void OnActorCreated(Actor actor) {
-        if (actor.OID is (uint)OID.WhirlwindSmall or (uint)OID.WhirlwindBig) {
+    public override void OnActorCreated(Actor actor)
+    {
+        if (actor.OID is (uint)OID.WhirlwindSmall or (uint)OID.WhirlwindBig)
+        {
             puddles.Add(actor);
         }
     }
 
-    public override void OnActorDestroyed(Actor actor) {
-        if (actor.OID is (uint)OID.WhirlwindSmall or (uint)OID.WhirlwindBig) {
+    public override void OnActorDestroyed(Actor actor)
+    {
+        if (actor.OID is (uint)OID.WhirlwindSmall or (uint)OID.WhirlwindBig)
+        {
             puddles.Remove(actor);
         }
     }
 
-    public override ReadOnlySpan<AOEInstance> ActiveAOEs(int slot, Actor actor) {
+    public override ReadOnlySpan<AOEInstance> ActiveAOEs(int slot, Actor actor)
+    {
         return aoes;
     }
 
-    public override void Update() {
+    public override void Update()
+    {
         var count = puddles.Count;
         aoes = new AOEInstance[count];
-        for (var i = 0; i < count; i++) {
+        for (var i = 0; i < count; i++)
+        {
             var puddle = puddles[i];
             AOEShapeCapsule shape = puddle.OID == (uint)OID.WhirlwindSmall ? new AOEShapeCapsule(2.0f, 2.5f) : new AOEShapeCapsule(3.0f, 3.5f);
-            aoes[i] = new(shape, puddle.Position,  puddle.Rotation, color: Colors.Danger);
+            aoes[i] = new(shape, puddle.Position, puddle.Rotation, color: Colors.Danger);
         }
     }
 }
 
-[SkipLocalsInit]
-sealed class WyvernPieceStates : StateMachineBuilder {
-    public WyvernPieceStates(BossModule module) : base(module) {
+sealed class WyvernPieceStates : StateMachineBuilder
+{
+    public WyvernPieceStates(BossModule module) : base(module)
+    {
         TrivialPhase()
             //.ActivateOnEnter<TheStormsGrip>()
             .ActivateOnEnter<Buffet>()
@@ -82,10 +93,8 @@ sealed class WyvernPieceStates : StateMachineBuilder {
 [ModuleInfo(BossModuleInfo.Maturity.WIP,
     PrimaryActorOID = (uint)OID.WyvernPiece,
     Contributors = "Equilius",
-    Category = BossModuleInfo.Category.BeastMaster,
-    GroupType = BossModuleInfo.GroupType.CFC,
+    GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken,
     GroupID = 1089u,
     NameID = 14549u,
     SortOrder = 2)]
-[SkipLocalsInit]
 public sealed class WyvernPiece(WorldState ws, Actor primary) : BossModule(ws, primary, new(520f, 0f), new ArenaBoundsRect(20f, 14.8f));

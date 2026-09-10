@@ -35,7 +35,6 @@ public enum AID : uint
     WrathfulWire = 48928, // Helper->player, 5.0s cast, range 5 circle
 }
 
-[SkipLocalsInit]
 sealed class RubbishDisposal(BossModule module) : Components.RaidwideCast(module, (uint)AID.RubbishDisposal);
 
 sealed class VoidDark(BossModule module) : Components.SimpleAOEs(module, (uint)AID.VoidDark, new AOEShapeCone(30f, 90f.Degrees()));
@@ -94,5 +93,4 @@ sealed class D133MalphasStates : StateMachineBuilder
 }
 
 [ModuleInfo(BossModuleInfo.Maturity.Verified, PrimaryActorOID = (uint)OID.Malphas, Contributors = "HerStolenLight", GroupType = BossModuleInfo.GroupType.CFC, GroupID = 1011u, NameID = 14758u, SortOrder = 3)]
-[SkipLocalsInit]
 public sealed class D133Malphas(WorldState ws, Actor primary) : BossModule(ws, primary, new(760f, -803f), new ArenaBoundsCircle(20f));

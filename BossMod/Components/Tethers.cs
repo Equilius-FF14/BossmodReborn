@@ -501,7 +501,6 @@ public class InterceptTetherAOE(BossModule module, uint aid, uint tetherID, floa
 }
 
 // generic component for tethers that need to be intercepted eg. to prevent a boss from gaining buffs
-[SkipLocalsInit]
 public class InterceptTether(BossModule module, uint aid, uint tetherIDBad = 84u, uint tetherIDGood = 17u, uint[]? excludedAllies = null, int? arenaProjectionLayer = null, bool? restrictToArenaProjectionLayer = false) : CastCounter(module, aid)
 {
     public int? ArenaProjectionLayer = arenaProjectionLayer;

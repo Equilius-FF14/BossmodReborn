@@ -1,6 +1,5 @@
 namespace BossMod.Dawntrail.Extreme.Ex7Doomtrain;
 
-[SkipLocalsInit]
 sealed class DeadMansOverdraught(BossModule module) : Components.GenericStackSpread(module)
 {
     private bool? partnerStack;

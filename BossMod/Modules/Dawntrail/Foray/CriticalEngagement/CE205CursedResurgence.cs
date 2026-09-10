@@ -308,7 +308,6 @@ sealed class AetherialWard(BossModule module) : BossComponent(module)
     }
 }
 
-[SkipLocalsInit]
 sealed class CE205CursedResurgenceStates : StateMachineBuilder
 {
     public CE205CursedResurgenceStates(BossModule module) : base(module)
@@ -327,7 +326,6 @@ sealed class CE205CursedResurgenceStates : StateMachineBuilder
 }
 
 [ModuleInfo(BossModuleInfo.Maturity.Contributed, PrimaryActorOID = (uint)OID.ClaretDragon, Contributors = "gynorhino", GroupType = BossModuleInfo.GroupType.CriticalEngagement, GroupID = 1093u, NameID = 53u)]
-[SkipLocalsInit]
 public sealed class CE205CursedResurgence(WorldState ws, Actor primary) : BossModule(ws, primary, new(-688f, 150f), new ArenaBoundsSquare(20f))
 {
     private Actor? _aetherialWard;

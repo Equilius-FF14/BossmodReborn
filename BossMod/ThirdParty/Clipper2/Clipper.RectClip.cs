@@ -9,7 +9,6 @@
 
 namespace Clipper2Lib;
 
-[SkipLocalsInit]
 public sealed class OutPt2(Point64 pt)
 {
     public OutPt2? next;
@@ -20,7 +19,6 @@ public sealed class OutPt2(Point64 pt)
     public List<OutPt2?>? edge;
 }
 
-[SkipLocalsInit]
 public class RectClip64
 {
     protected enum Location
@@ -1247,7 +1245,6 @@ public class RectClip64
     }
 } // RectClip class
 
-[SkipLocalsInit]
 public sealed class RectClipLines64 : RectClip64
 {
     internal RectClipLines64(Rect64 rect) : base(rect) { }

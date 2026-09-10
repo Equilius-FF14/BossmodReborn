@@ -43,5 +43,4 @@ sealed class ScouringScorn(BossModule module) : Components.RaidwideCast(module, 
 
 [ModuleInfo(BossModuleInfo.Maturity.Contributed, PrimaryActorOID = (uint)OID.PariOfPlenty, Contributors = "HerStolenLight", Category = BossModuleInfo.Category.VariantCriterion,
 GroupType = BossModuleInfo.GroupType.CFC, GroupID = 1084u, NameID = 14274u, SortOrder = 1)]
-[SkipLocalsInit]
 public sealed class PariOfPlenty(WorldState ws, Actor primary) : BossModule(ws, primary, new(-760f, -805f), new ArenaBoundsSquare(20f));

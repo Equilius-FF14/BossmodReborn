@@ -30,7 +30,6 @@ internal enum VertexFlags
     LocalMin = 8
 }
 
-[SkipLocalsInit]
 internal sealed class Vertex(Point64 pt, VertexFlags flags, Vertex? prev)
 {
     public Point64 pt = pt;
@@ -39,7 +38,6 @@ internal sealed class Vertex(Point64 pt, VertexFlags flags, Vertex? prev)
     public VertexFlags flags = flags;
 }
 
-[SkipLocalsInit]
 internal readonly struct LocalMinima(Vertex vertex, PathType polytype, bool isOpen = false)
 {
     public readonly Vertex vertex = vertex;
@@ -64,7 +62,6 @@ internal readonly struct LocalMinima(Vertex vertex, PathType polytype, bool isOp
 // IntersectNode: a structure representing 2 intersecting edges.
 // Intersections must be sorted so they are processed from the largest
 // Y coordinates to the smallest while keeping edges adjacent.
-[SkipLocalsInit]
 internal readonly struct IntersectNode(Point64 pt, Active edge1, Active edge2)
 {
     public readonly Point64 pt = pt;
@@ -72,7 +69,6 @@ internal readonly struct IntersectNode(Point64 pt, Active edge1, Active edge2)
     public readonly Active edge2 = edge2;
 }
 
-[SkipLocalsInit]
 internal struct LocMinSorter : IComparer<LocalMinima>
 {
     public readonly int Compare(LocalMinima locMin1, LocalMinima locMin2)
@@ -82,7 +78,6 @@ internal struct LocMinSorter : IComparer<LocalMinima>
 }
 
 // OutPt: vertex data structure for clipping solutions
-[SkipLocalsInit]
 internal sealed class OutPt
 {
     public Point64 pt;
@@ -105,7 +100,6 @@ internal enum JoinWith { None, Left, Right }
 internal enum HorzPosition { Bottom, Middle, Top }
 
 // OutRec: path data structure for clipping solutions
-[SkipLocalsInit]
 internal sealed class OutRec
 {
     public int idx;
@@ -122,7 +116,6 @@ internal sealed class OutRec
     public OutRec? recursiveSplit;
 }
 
-[SkipLocalsInit]
 internal sealed class HorzSegment(OutPt op)
 {
     public OutPt? leftOp = op;
@@ -130,7 +123,6 @@ internal sealed class HorzSegment(OutPt op)
     public bool leftToRight = true;
 }
 
-[SkipLocalsInit]
 internal sealed class HorzJoin(OutPt ltor, OutPt rtol)
 {
     public OutPt? op1 = ltor;
@@ -141,7 +133,6 @@ internal sealed class HorzJoin(OutPt ltor, OutPt rtol)
 // Important: UP and DOWN here are premised on Y-axis positive down
 // displays, which is the orientation used in Clipper's development.
 ///////////////////////////////////////////////////////////////////
-[SkipLocalsInit]
 internal sealed class Active
 {
     public Point64 bot;
@@ -172,7 +163,6 @@ internal sealed class Active
     internal JoinWith joinWith;
 }
 
-[SkipLocalsInit]
 internal static class ClipperEngine
 {
     internal static void AddLocMin(Vertex vert, PathType polytype, bool isOpen,
@@ -337,7 +327,6 @@ internal static class ClipperEngine
     }
 }
 
-[SkipLocalsInit]
 public sealed class ReuseableDataContainer64
 {
     private static readonly IComparer<LocalMinima> LocMinComparer = new LocMinSorter();
@@ -387,7 +376,6 @@ public sealed class ReuseableDataContainer64
     }
 }
 
-[SkipLocalsInit]
 public class ClipperBase
 {
     private const int ScanlineHeapThreshold = 32;
@@ -4273,7 +4261,6 @@ protected ZCallback64? _zCallback;
     }
 }
 
-[SkipLocalsInit]
 public sealed class Clipper64 : ClipperBase
 {
     private readonly Paths64 _discardedOpenPaths = [];
@@ -4394,7 +4381,6 @@ public sealed class Clipper64 : ClipperBase
 
 }
 
-[SkipLocalsInit]
 public sealed class ClipperD : ClipperBase
 {
     private const string precision_range_error = "Error: Precision is out of range.";
@@ -4484,7 +4470,6 @@ public sealed class ClipperD : ClipperBase
         AddScaledPath(path, polytype, isOpen, _scaledPathBuffer);
     }
 
-    [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.NoInlining)]
     private void AddScaledPathStack(PathD path, PathType polytype, bool isOpen)
     {
@@ -4492,7 +4477,6 @@ public sealed class ClipperD : ClipperBase
         AddScaledPath(path, polytype, isOpen, scaled);
     }
 
-    [SkipLocalsInit]
     [MethodImpl(MethodImplOptions.NoInlining)]
     private void AddScaledPathsStack(scoped ReadOnlySpan<PathD> paths, int maximumPathCount, PathType polytype, bool isOpen)
     {
@@ -4682,7 +4666,6 @@ public sealed class ClipperD : ClipperBase
     }
 }
 
-[SkipLocalsInit]
 public abstract class PolyPathBase(PolyPathBase? parent = null) : IEnumerable
 {
     internal PolyPathBase? _parent = parent;
@@ -4807,7 +4790,6 @@ public abstract class PolyPathBase(PolyPathBase? parent = null) : IEnumerable
     }
 }
 
-[SkipLocalsInit]
 public class PolyPath64(PolyPathBase? parent = null) : PolyPathBase(parent)
 {
     public Path64? Polygon;// polytree root's polygon == null
@@ -4857,7 +4839,6 @@ public class PolyPath64(PolyPathBase? parent = null) : PolyPathBase(parent)
     }
 }
 
-[SkipLocalsInit]
 public class PolyPathD(PolyPathBase? parent = null) : PolyPathBase(parent)
 {
     internal double Scale;
@@ -4911,14 +4892,11 @@ public class PolyPathD(PolyPathBase? parent = null) : PolyPathBase(parent)
     }
 }
 
-[SkipLocalsInit]
 public sealed class PolyTree64 : PolyPath64 { }
 
-[SkipLocalsInit]
 public sealed class PolyTreeD : PolyPathD
 {
     public new double Scale => base.Scale;
 }
 
-[SkipLocalsInit]
 public sealed class ClipperLibException(string description) : Exception(description) { }

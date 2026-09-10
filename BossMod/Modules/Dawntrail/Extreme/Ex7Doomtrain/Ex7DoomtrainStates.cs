@@ -1,6 +1,5 @@
 namespace BossMod.Dawntrail.Extreme.Ex7Doomtrain;
 
-[SkipLocalsInit]
 sealed class Ex7DoomtrainStates : StateMachineBuilder
 {
     public Ex7DoomtrainStates(BossModule module) : base(module)

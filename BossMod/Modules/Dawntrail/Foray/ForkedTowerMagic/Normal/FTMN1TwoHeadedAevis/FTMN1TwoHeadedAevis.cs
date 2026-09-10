@@ -188,7 +188,6 @@ sealed class Archaeofury1(BossModule module) : Components.SpreadFromCastTargets(
 sealed class Archaeofury2(BossModule module) : Components.SpreadFromCastTargets(module, (uint)AID.Archaeofury2, 6f);
 
 [ModuleInfo(BossModuleInfo.Maturity.Verified, PrimaryActorOID = (uint)OID.GreenHead, Contributors = "Equilius + gynorhino", GroupType = BossModuleInfo.GroupType.TheForkedTowerMagicNormal, GroupID = 1093u, NameID = 14489u)]
-[SkipLocalsInit]
 public sealed class FTMN1TwoHeadedAevis(WorldState ws, Actor primary) : BossModule(ws, primary, new(-900f, 700f), new ArenaBoundsSquare(20f))
 {
     private Actor? _blueHead;

@@ -41,20 +41,13 @@ public enum IconID : uint
     BitingWindAOE = 506, // BitingWind->self
 }
 
-[SkipLocalsInit]
 sealed class WindBlade(BossModule module) : Components.SimpleAOEs(module, (uint)AID.WindBlade, new AOEShapeCone(60f, 90f.Degrees()));
-[SkipLocalsInit]
 sealed class CyclonicRing(BossModule module) : Components.SimpleAOEs(module, (uint)AID.CyclonicRing, new AOEShapeDonut(5f, 60f));
-[SkipLocalsInit]
 sealed class Splinter(BossModule module) : Components.SimpleAOEs(module, (uint)AID.Splinter, 13f);
-[SkipLocalsInit]
 sealed class Skydive(BossModule module) : Components.SimpleAOEs(module, (uint)AID.Skydive, 15f);
-[SkipLocalsInit]
 sealed class Hurricane(BossModule module) : Components.RaidwideCastDelay(module, (uint)AID.HurricaneVisual, (uint)AID.Hurricane, 0.9d);
-[SkipLocalsInit]
 sealed class Aerosnare(BossModule module) : Components.SimpleAOEs(module, (uint)AID.Aerosnare, new AOEShapeCone(60f, 30f.Degrees()), 3);
 
-[SkipLocalsInit]
 sealed class Buffet(BossModule module) : Components.GenericKnockback(module)
 {
     private readonly List<Knockback> knockbacks = [];
@@ -139,7 +132,6 @@ sealed class Buffet(BossModule module) : Components.GenericKnockback(module)
     }
 }
 
-[SkipLocalsInit]
 sealed class BitingWind : Components.GenericAOEs
 {
     public BitingWind(BossModule module) : base(module)
@@ -221,7 +213,6 @@ sealed class BitingWind : Components.GenericAOEs
     }
 }
 
-[SkipLocalsInit]
 sealed class TendronRipper(BossModule module) : Components.GenericAOEs(module)
 {
     public AOEInstance[] _aoes = [];
@@ -292,7 +283,6 @@ sealed class TendronRipper(BossModule module) : Components.GenericAOEs(module)
     }
 }
 
-[SkipLocalsInit]
 sealed class CE211LostontheWindStates : StateMachineBuilder
 {
     public CE211LostontheWindStates(BossModule module) : base(module)
@@ -311,7 +301,6 @@ sealed class CE211LostontheWindStates : StateMachineBuilder
 }
 
 [ModuleInfo(BossModuleInfo.Maturity.Contributed, PrimaryActorOID = (uint)OID.Abductor, Contributors = "Equilius", GroupType = BossModuleInfo.GroupType.CriticalEngagement, GroupID = 1093u, NameID = 61u)]
-[SkipLocalsInit]
 public sealed class CE211LostontheWind(WorldState ws, Actor primary) : BossModule(ws, primary, new WPos(-150f, -860f).Quantized(), new ArenaBoundsCircle(24f))
 {
     protected override bool CheckPull() => base.CheckPull() && Raid.Player()!.Position.InCircle(Arena.Center, 24f);

@@ -221,7 +221,6 @@ sealed class Acclaim(BossModule module) : Components.GenericAOEs(module)
     }
 }
 
-[SkipLocalsInit]
 sealed class CE213QuarriedAwayStates : StateMachineBuilder
 {
     public CE213QuarriedAwayStates(BossModule module) : base(module)
@@ -239,7 +238,6 @@ sealed class CE213QuarriedAwayStates : StateMachineBuilder
 }
 
 [ModuleInfo(BossModuleInfo.Maturity.Verified, PrimaryActorOID = (uint)OID.AlabasterBlade, Contributors = "Equilius", GroupType = BossModuleInfo.GroupType.CriticalEngagement, GroupID = 1093u, NameID = 51u)]
-[SkipLocalsInit]
 public sealed class CE213QuarriedAway : BossModule
 {
     public CE213QuarriedAway(WorldState ws, Actor primary) : this(ws, primary, BuildArena()) { }

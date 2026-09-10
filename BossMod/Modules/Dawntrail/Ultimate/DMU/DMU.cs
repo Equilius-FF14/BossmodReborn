@@ -4,7 +4,6 @@ sealed class LightOfJudgment(BossModule module) : Components.RaidwideCast(module
 
 [ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.Kefka, Contributors = "Equilius", Expansion = BossModuleInfo.Expansion.Dawntrail,
     Category = BossModuleInfo.Category.Ultimate, GroupType = BossModuleInfo.GroupType.CFC, GroupID = 1094u, NameID = 7131u, SortOrder = 1, PlanLevel = 100)]
-[SkipLocalsInit]
 public sealed class DMU : BossModule
 {
     public DMU(WorldState ws, Actor primary) : this(ws, primary, BuildArena()) { }
