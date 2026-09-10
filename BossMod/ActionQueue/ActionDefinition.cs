@@ -250,6 +250,10 @@ public sealed class ActionDefinitions
         RegisterItem(IDPotionUltra, 1.1f);
         RegisterItem(IDPotionPilgrim, 1.1f);
 
+        RegisterItem(IDClamCake, 2.1f);
+        RegisterItem(IDFruitcake, 2.1f);
+        RegisterItem(IDPopcorn, 2.1f);
+
         RegisterItem(IDMiscItemGreens, 1.1f);
 
         // special content actions - bozja, deep dungeons, etc
@@ -368,6 +372,7 @@ public sealed class ActionDefinitions
     // see ActionManager.CanUseActionOnTarget
     public ActionTargets SpellAllowedTargets(Lumina.Excel.Sheets.Action data)
     {
+        var res = ActionTargets.None;
         var res = ActionTargets.None;
         if (data.CanTargetSelf)
         {
@@ -556,6 +561,7 @@ public sealed class ActionDefinitions
     private void RegisterBozja(BozjaHolsterID id)
     {
         var normalAction = BozjaActionID.GetNormal(id);
+        var isItem = normalAction == BozjaActionID.GetHolster(id);
         var isItem = normalAction == BozjaActionID.GetHolster(id);
         RegisterSpell(normalAction, instantAnimLock: isItem ? 1.1f : 0.6f);
         if (!isItem)
