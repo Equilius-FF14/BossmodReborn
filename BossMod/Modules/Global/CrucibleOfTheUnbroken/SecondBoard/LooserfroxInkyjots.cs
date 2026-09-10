@@ -1,4 +1,4 @@
-﻿namespace BossMod.Modules.Dawntrail.BeastMaster.SecondBoard.LooserfroxInkyjots;
+﻿namespace BossMod.Global.CrucibleOfTheUnbroken.SecondBoard.LooserfroxInkyjots;
 
 public enum OID : uint
 {
@@ -15,7 +15,7 @@ sealed class LoosefroxInkyjotsStates : StateMachineBuilder
 }
 
 [ModuleInfo(BossModuleInfo.Maturity.Dummy, PrimaryActorOID = (uint)OID.LoosefroxInkyjots, Contributors = "Equilius",
-    Category = BossModuleInfo.Category.BeastMaster, GroupType = BossModuleInfo.GroupType.CFC,
+    GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken,
     GroupID = 1089u, NameID = 14561u, SortOrder = 5)]
 public sealed class LoosefroxInkyjots(WorldState ws, Actor primary) : BossModule(ws, primary, new(520f, -420f), new ArenaBoundsCircle(22f));
 

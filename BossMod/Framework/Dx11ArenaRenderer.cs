@@ -10,6 +10,7 @@ using TerraFX.Interop.Windows;
 
 namespace BossMod;
 
+[SkipLocalsInit]
 public static unsafe partial class Dx11ArenaRenderer
 {
     [StructLayout(LayoutKind.Sequential)]
@@ -365,6 +366,29 @@ public static unsafe partial class Dx11ArenaRenderer
             var min = Vector2.Min(aXZ, Vector2.Min(bXZ, cXZ));
             var max = Vector2.Max(aXZ, Vector2.Max(bXZ, cXZ));
             return new(center, projectionHeight, min, max, aRel, bRel, new Vector4(cRel.X, cRel.Y, 0f, 0f), default, color, WorldProjectedShapeKind.Triangle, outlineWidth, waveOriginXZ: aXZ);
+        }
+
+        // Dedicated actor marker primitive. PosRot is kept intact until this point so its real world Y
+        // becomes the terrain-projection origin; W supplies facing while X/Z supply the footprint center.
+        // This lets actor markers use a much smaller receiver/bounds height than generic arena-projected
+        // triangles without losing grounded actors on floors whose authored reference Y differs locally.
+        public static WorldProjectedShapeInstance ActorTriangle(Vector4 posRot, float scale, uint fillColor, uint outlineColor, float projectionHeight, float outlineWidth)
+        {
+            scale = Math.Max(0f, scale);
+            var (sin, cos) = MathF.SinCos(posRot.W);
+            var directionXZ = new Vector2(sin, cos);
+            var orthoR = new Vector2(-cos, sin);
+            var centerXZ = new Vector2(posRot.X, posRot.Z);
+            var aXZ = centerXZ + directionXZ * (scale * 0.7f);
+            var backXZ = centerXZ - directionXZ * (scale * 0.35f);
+            var sideXZ = orthoR * (scale * 0.433f);
+            var bXZ = backXZ + sideXZ;
+            var cXZ = backXZ - sideXZ;
+            var min = Vector2.Min(aXZ, Vector2.Min(bXZ, cXZ));
+            var max = Vector2.Max(aXZ, Vector2.Max(bXZ, cXZ));
+            var height = Math.Max(0f, projectionHeight);
+            return new(new Vector3(posRot.X, posRot.Y, posRot.Z), height, min, max, aXZ - centerXZ, bXZ - centerXZ,
+                new Vector4(cXZ.X - centerXZ.X, cXZ.Y - centerXZ.Y, 0f, 0f), new Vector4(height, 0f, 0f, 0f), fillColor, WorldProjectedShapeKind.Triangle, outlineWidth, outlineColor, fillWithOutline: true, suppressZoneWave: true);
         }
 
         // One projected triangle instance containing both fill and outline. This is primarily used by

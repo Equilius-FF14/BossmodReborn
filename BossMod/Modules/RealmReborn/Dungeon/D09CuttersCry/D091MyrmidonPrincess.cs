@@ -61,7 +61,7 @@ public sealed class D091MyrmidonPrincess : BossModule
             new(-34.67f, 184.99f), new(-34.30f, 185.57f), new(-33.12f, 184.63f), new(-33.03f, 182.80f), new(-32.69f, 182.18f),
             new(-32.18f, 181.78f), new(-31.99f, 180.41f), new(-31.72f, 179.75f), new(-31.16f, 179.32f), new(-30.63f, 178.97f),
             new(-29.74f, 178.02f), new(-29.24f, 177.93f)];
-        var arena = new ArenaBoundsCustom([new PolygonCustom(vertices)]) { WorldProjectionHeight = 10f };
+        var arena = new ArenaBoundsCustom([new PolygonCustom(vertices)]) { WorldProjectionHeight = 5f };
         return (arena.Center, arena);
     }
 

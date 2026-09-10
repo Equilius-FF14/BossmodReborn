@@ -1,11 +1,13 @@
-﻿namespace BossMod.Dawntrail.BeastMaster.SecondBoard.MantiCorePiece;
+﻿namespace BossMod.Global.CrucibleOfTheUnbroken.SecondBoard.MantiCorePiece;
 
-public enum OID : uint {
+public enum OID : uint
+{
     ManticorePiece = 0x4C53,
     Helper = 0x233C,
 }
 
-public enum AID : uint {
+public enum AID : uint
+{
     AutoAttack = 49680, // ManticorePiece->player, no cast, single-target
     Teleport = 48126, // ManticorePiece->location, no cast, single-target
     ArmAndHammerLeftGlow = 48124, // ManticorePiece->self, 5.0+0.6s cast, single-target
@@ -37,12 +39,14 @@ public enum AID : uint {
     ArmAndHammer2 = 48132, // Helper->self, 0.6s cast, range 30 ?-degree cone
 }
 
-public enum SID : uint {
+public enum SID : uint
+{
     LeftHandGlow = 2193, // none->ManticorePiece, extra=0x413
     RightHandGlow = 2056, // none->ManticorePiece, extra=0x414
 }
 
-public enum IconID : uint {
+public enum IconID : uint
+{
     TankBuster = 218, // player->self
 }
 
@@ -54,13 +58,16 @@ sealed class HeadsAndTails(BossModule module) : Components.SimpleAOEGroups(modul
     [(uint)AID.HeadsAndTailsFront, (uint)AID.HeadsAndTailsBack, (uint)AID.TailsAndHeadsBack, (uint)AID.TailsAndHeadsFront],
     new AOEShapeCone(40.0f, 90.0f.Degrees()));
 
-sealed class WildCharge(BossModule module) : Components.GenericAOEs(module) {
+sealed class WildCharge(BossModule module) : Components.GenericAOEs(module)
+{
     private readonly List<AOEInstance> aoes = [];
     private readonly List<ActorStatus> armGlows = [];
     private WPos lastTarget;
 
-    public override void OnCastStarted(Actor caster, ActorCastInfo spell) {
-        if (spell.Action.ID != (uint)AID.WildChargeVisual) {
+    public override void OnCastStarted(Actor caster, ActorCastInfo spell)
+    {
+        if (spell.Action.ID != (uint)AID.WildChargeVisual)
+        {
             return;
         }
 
@@ -73,46 +80,59 @@ sealed class WildCharge(BossModule module) : Components.GenericAOEs(module) {
         lastTarget = target;
 
         // Once the path has been fully created, create the two arm aoes that will happen later
-        if (aoes.Count == 4) {
-            foreach (var glows in armGlows) {
+        if (aoes.Count == 4)
+        {
+            foreach (var glows in armGlows)
+            {
                 var side = glows.ID == (uint)SID.LeftHandGlow ? 90.0f.Degrees() : -90.0f.Degrees();
                 aoes.Add(new(new AOEShapeCone(30.0f, 90.0f.Degrees()), lastTarget, Angle.FromDirection(direction) + side));
             }
         }
     }
 
-    public override void OnStatusGain(Actor actor, ref ActorStatus status) {
-        if (status.ID is (uint)SID.LeftHandGlow or (uint)SID.RightHandGlow) {
+    public override void OnStatusGain(Actor actor, ref ActorStatus status)
+    {
+        if (status.ID is (uint)SID.LeftHandGlow or (uint)SID.RightHandGlow)
+        {
             armGlows.Add(status);
         }
     }
 
-    public override void OnStatusLose(Actor actor, ref ActorStatus status) {
-        if (status.ID is (uint)SID.LeftHandGlow or (uint)SID.RightHandGlow) {
-            if (armGlows.Count > 0) {
+    public override void OnStatusLose(Actor actor, ref ActorStatus status)
+    {
+        if (status.ID is (uint)SID.LeftHandGlow or (uint)SID.RightHandGlow)
+        {
+            if (armGlows.Count > 0)
+            {
                 armGlows.RemoveAt(0);
             }
         }
     }
 
-    public override void OnEventCast(Actor caster, ActorCastEvent spell) {
-        if (spell.Action.ID is (uint)AID.WildCharge or (uint)AID.ArmAndHammer1 or (uint)AID.ArmAndHammer2) {
-            if (aoes.Count > 0) {
+    public override void OnEventCast(Actor caster, ActorCastEvent spell)
+    {
+        if (spell.Action.ID is (uint)AID.WildCharge or (uint)AID.ArmAndHammer1 or (uint)AID.ArmAndHammer2)
+        {
+            if (aoes.Count > 0)
+            {
                 aoes.RemoveAt(0);
             }
         }
     }
 
-    public override ReadOnlySpan<AOEInstance> ActiveAOEs(int slot, Actor actor) {
+    public override ReadOnlySpan<AOEInstance> ActiveAOEs(int slot, Actor actor)
+    {
         var count = aoes.Count;
-        if (count == 0) {
+        if (count == 0)
+        {
             return [];
         }
 
         var max = count > 2 ? 2 : count;
         var nextAOEs = CollectionsMarshal.AsSpan(aoes);
 
-        for (var i = 0; i < max; i++) {
+        for (var i = 0; i < max; i++)
+        {
             ref var aoe = ref nextAOEs[i];
             aoe.Color = i == 0 ? Colors.Danger : Colors.AOE;
             aoe.Risky = i == 0;
@@ -122,8 +142,10 @@ sealed class WildCharge(BossModule module) : Components.GenericAOEs(module) {
     }
 }
 
-sealed class ManticorePieceStates : StateMachineBuilder {
-    public ManticorePieceStates(BossModule module) : base(module) {
+sealed class ManticorePieceStates : StateMachineBuilder
+{
+    public ManticorePieceStates(BossModule module) : base(module)
+    {
         TrivialPhase()
             .ActivateOnEnter<ArmAndHammer>()
             .ActivateOnEnter<DeadlyHold>()
@@ -136,8 +158,7 @@ sealed class ManticorePieceStates : StateMachineBuilder {
 [ModuleInfo(BossModuleInfo.Maturity.WIP,
     PrimaryActorOID = (uint)OID.ManticorePiece,
     Contributors = "Equilius",
-    Category = BossModuleInfo.Category.BeastMaster,
-    GroupType = BossModuleInfo.GroupType.CFC,
+    GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken,
     GroupID = 1089u,
     NameID = 14545u,
     SortOrder = 1)]

@@ -1,13 +1,15 @@
-﻿namespace BossMod.Dawntrail.BeastMaster.SecondBoard.VoidmancerPiece;
+﻿namespace BossMod.Global.CrucibleOfTheUnbroken.SecondBoard.VoidmancerPiece;
 
-public enum OID : uint {
+public enum OID : uint
+{
     VoidmancerPiece = 0x4C5C,
     Helper = 0x233C,
     ZombiePiece = 0x4C5D, // R0.750, x20
     Malady = 0x4C5E, // R1.000, x0 (spawn during fight)
 }
 
-public enum AID : uint {
+public enum AID : uint
+{
     AutoAttackWater = 50793, // VoidmancerPiece->player, no cast, single-target
     AutoAttackZombie = 48251, // 4C5D->player, no cast, single-target
     DeathDriveBait = 48181, // VoidmancerPiece->self, 7.0s cast, single-target
@@ -19,18 +21,21 @@ public enum AID : uint {
     Mindjack = 48187, // VoidmancerPiece->self, 4.0s cast, range 100 circle
 }
 
-public enum SID : uint {
+public enum SID : uint
+{
     WitsEnd = 5424, // 4C5D/4C5E->player, extra=0x1/0x2/0x4/0x5/0x6/0x7/0x8 - reaching 12 stacks will cause confuse on the player
     LeftFace = 2163, // VoidmancerPiece->player, extra=0x0
     RightFace = 2164, // VoidmancerPiece->player, extra=0x0
     ForcedMarch = 1257, // VoidmancerPiece->player, extra=0x4
 }
 
-public enum IconID : uint {
+public enum IconID : uint
+{
     DeathDrive = 707, // player->self
 }
 
-public enum TetherID : uint {
+public enum TetherID : uint
+{
     ZombieTether = 17, // 4C5D->player
 }
 
@@ -38,18 +43,22 @@ sealed class DeathDrive(BossModule module) : Components.SimpleAOEs(module, (uint
 sealed class DarkOrb(BossModule module) : Components.SimpleAOEs(module, (uint)AID.DarkOrb, 18.0f);
 sealed class Malady(BossModule module) : Components.Voidzone(module, 8.0f, module => module.Enemies((uint)OID.Malady).Where(z => z.EventState != 7));
 
-sealed class DeathDriveBait(BossModule module) : Components.BaitAwayIcon(module, 10.0f, (uint)IconID.DeathDrive, (uint)AID.DeathDriveBait, 7.5f) {
-    public override void DrawArenaForeground(int pcSlot, Actor pc) {
+sealed class DeathDriveBait(BossModule module) : Components.BaitAwayIcon(module, 10.0f, (uint)IconID.DeathDrive, (uint)AID.DeathDriveBait, 7.5f)
+{
+    public override void DrawArenaForeground(int pcSlot, Actor pc)
+    {
         base.DrawArenaForeground(pcSlot, pc);
 
-        if (!IsBaitTarget(pc) || CurrentBaits.Count == 0) {
+        if (!IsBaitTarget(pc) || CurrentBaits.Count == 0)
+        {
             return;
         }
 
         var bait = CurrentBaits[0];
         var baitRadius = ((AOEShapeCircle)bait.Shape).Radius;
 
-        foreach (var zombie in Module.Enemies((uint)OID.ZombiePiece)) {
+        foreach (var zombie in Module.Enemies((uint)OID.ZombiePiece))
+        {
             var reach = baitRadius + zombie.HitboxRadius;
 
             var onHitbox = (zombie.Position - bait.Target.Position).LengthSq() <= reach * reach;
@@ -57,8 +66,10 @@ sealed class DeathDriveBait(BossModule module) : Components.BaitAwayIcon(module,
         }
     }
 
-    public override void AddHints(int slot, Actor actor, TextHints hints) {
-        if (!IsBaitTarget(actor) || CurrentBaits.Count == 0) {
+    public override void AddHints(int slot, Actor actor, TextHints hints)
+    {
+        if (!IsBaitTarget(actor) || CurrentBaits.Count == 0)
+        {
             return;
         }
 
@@ -66,8 +77,10 @@ sealed class DeathDriveBait(BossModule module) : Components.BaitAwayIcon(module,
     }
 }
 
-sealed class Mindjack(BossModule module) : Components.StatusDrivenForcedMarch(module, 3.0f, default, default, (uint)SID.LeftFace, (uint)SID.RightFace) {
-    public override void AddAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints) {
+sealed class Mindjack(BossModule module) : Components.StatusDrivenForcedMarch(module, 3.0f, default, default, (uint)SID.LeftFace, (uint)SID.RightFace)
+{
+    public override void AddAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints)
+    {
         base.AddAIHints(slot, actor, assignment, hints);
         var state = State.GetValueOrDefault(actor.InstanceID);
         if (state == null || state.PendingMoves.Count == 0)
@@ -81,8 +94,10 @@ sealed class Mindjack(BossModule module) : Components.StatusDrivenForcedMarch(mo
     }
 }
 
-sealed class VoidmancerPieceStates : StateMachineBuilder {
-    public VoidmancerPieceStates(BossModule module) : base(module) {
+sealed class VoidmancerPieceStates : StateMachineBuilder
+{
+    public VoidmancerPieceStates(BossModule module) : base(module)
+    {
         TrivialPhase()
             .ActivateOnEnter<DeathDriveBait>()
             .ActivateOnEnter<DeathDrive>()
@@ -92,19 +107,14 @@ sealed class VoidmancerPieceStates : StateMachineBuilder {
     }
 }
 
-[ModuleInfo(BossModuleInfo.Maturity.WIP,
-    PrimaryActorOID = (uint)OID.VoidmancerPiece,
-    Contributors = "Equilius",
-    Category = BossModuleInfo.Category.BeastMaster,
-    GroupType = BossModuleInfo.GroupType.CFC,
-    GroupID = 1089u,
-    NameID = 14552u,
-    SortOrder = 3)]
-public sealed class VoidmancerPiece(WorldState ws, Actor primary) : BossModule(ws, primary, new(120f, 0f), new ArenaBoundsRect(20f, 20f)) {
+[ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.VoidmancerPiece, Contributors = "Equilius", GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken, GroupID = 1089u, NameID = 14552u, SortOrder = 3)]
+public sealed class VoidmancerPiece(WorldState ws, Actor primary) : BossModule(ws, primary, new(120f, 0f), new ArenaBoundsRect(20f, 20f))
+{
 
     public override bool ShouldPrioritizeAllEnemies => true;
 
-    protected override void DrawEnemies(int pcSlot, Actor pc) {
+    protected override void DrawEnemies(int pcSlot, Actor pc)
+    {
         Arena.Actor(PrimaryActor);
         Arena.Actors(Enemies((uint)OID.ZombiePiece));
     }

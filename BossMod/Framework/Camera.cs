@@ -76,6 +76,7 @@ sealed class Camera
     // The native world overlay only needs an empty present when transitioning from content to idle.
     // Once cleared, stop queueing presents entirely so an unused overlay cannot participate in window-resize churn.
     private bool _worldOverlayHadContent;
+    private float _cameraWorldY;
 
     private float _screenRiskOpacity;
     private float _screenRiskPhase;
@@ -125,6 +126,87 @@ sealed class Camera
 
         CameraAzimuth = MathF.Atan2(view.M13, view.M33);
         CameraAltitude = MathF.Asin(view.M23);
+        if (Matrix4x4.Invert(view, out var invView))
+        {
+            _cameraWorldY = invView.M42;
+        }
+    }
+
+    // Projected fills/outlines are composited without an OM depth test. A grate/opening can expose two
+    // authored horizontal receiver planes at the same screen pixel, so sort only distinct Y planes
+    // back-to-front while preserving caller order within one plane. Use the camera's actual world Y
+    // rather than its pitch: a camera above both planes needs lower->upper ordering, while a camera
+    // below both needs upper->lower. If the camera lies between the two planes they cannot both be
+    // forward intersections of the same view ray, so retaining caller order is safest.
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool ProjectedPlaneShouldMoveAfter(float existingY, float insertedY)
+    {
+        const float samePlaneEpsilon = 1e-4f;
+        if (Math.Abs(existingY - insertedY) <= samePlaneEpsilon)
+        {
+            return false;
+        }
+
+        var lowerY = Math.Min(existingY, insertedY);
+        var upperY = Math.Max(existingY, insertedY);
+        if (_cameraWorldY >= upperY)
+        {
+            return existingY > insertedY; // camera above: lower/far plane first
+        }
+        if (_cameraWorldY <= lowerY)
+        {
+            return existingY < insertedY; // camera below: upper/far plane first
+        }
+        return false;
+    }
+
+    private void SortProjectedArrowRunBackToFront(Span<Dx11ArenaRenderer.WorldProjectedArrowInstance> arrows)
+    {
+        var len = arrows.Length;
+        for (var i = 1; i < len; ++i)
+        {
+            var inserted = arrows[i];
+            var j = i - 1;
+            while (j >= 0 && ProjectedPlaneShouldMoveAfter(arrows[j].Origin.Y, inserted.Origin.Y))
+            {
+                arrows[j + 1] = arrows[j];
+                --j;
+            }
+            arrows[j + 1] = inserted;
+        }
+    }
+
+    private void SortProjectedShapeRunBackToFront(Span<Dx11ArenaRenderer.WorldProjectedShapeInstance> shapes, Span<WorldProjectedShapeBinding> bindings)
+    {
+        // Eye3D is an actual ray-intersected volume rather than a horizontal terrain projection. Do
+        // not move projected planes across it; sort each ordinary projected sub-run independently.
+        var subRunStart = 0;
+        var len = shapes.Length;
+        for (var i = 0; i <= len; ++i)
+        {
+            var isBarrier = i < len && (shapes[i].Packed & 0xFFu) == (uint)Dx11ArenaRenderer.WorldProjectedShapeKind.Eye3D;
+            if (i != len && !isBarrier)
+            {
+                continue;
+            }
+
+            for (var sorted = subRunStart + 1; sorted < i; ++sorted)
+            {
+                var insertedShape = shapes[sorted];
+                var insertedBinding = bindings[sorted];
+                var j = sorted - 1;
+                while (j >= subRunStart && ProjectedPlaneShouldMoveAfter(shapes[j].Origin.Y, insertedShape.Origin.Y))
+                {
+                    shapes[j + 1] = shapes[j];
+                    bindings[j + 1] = bindings[j];
+                    --j;
+                }
+                shapes[j + 1] = insertedShape;
+                bindings[j + 1] = insertedBinding;
+            }
+
+            subRunStart = i + 1;
+        }
     }
 
     public void DrawWorldPrimitives()
@@ -184,13 +266,24 @@ sealed class Camera
                         Dx11ArenaRenderer.AppendWorldCurves(curves.Slice(run.Start, run.Count), run.CurveLineCount);
                         break;
                     case WorldPrimitiveRunKind.ProjectedArrows:
+                        // Projected primitives are alpha blended and intentionally do not use the game's depth
+                        // buffer as an OM depth target. On authored multi-floor arenas, two virtual/reference-plane
+                        // receivers can therefore both survive through a physical hole (for example a grate), so
+                        // submission order becomes their only inter-projected depth ordering. Keep same-layer order
+                        // stable, but draw distinct horizontal layers back-to-front.
+                        SortProjectedArrowRunBackToFront(arrows.Slice(run.Start, run.Count));
                         Dx11ArenaRenderer.AppendWorldProjectedArrows(arrows.Slice(run.Start, run.Count));
                         break;
                     case WorldPrimitiveRunKind.ProjectedShapes:
                         var end = run.Start + run.Count;
 
-                        // Keep draw order identical while bulk-submitting consecutive shapes that use the
-                        // same custom/arena SDF resources. Standard AOEs normally share one arena binding
+                        // The same virtual-plane overlap can affect every terrain-projected fill/outline, not only
+                        // actor triangles. Sort the shape and its SDF binding as one pair; Eye3D is true volume
+                        // geometry and remains an ordering barrier. Equal-Y shapes retain caller painter order.
+                        SortProjectedShapeRunBackToFront(projectedShapes.Slice(run.Start, run.Count), projectedShapeBindings.Slice(run.Start, run.Count));
+
+                        // Bulk-submit consecutive shapes that use the same custom/arena SDF resources. The depth
+                        // sort often groups authored layers as a side effect, reducing binding switches as well.
                         var groupStart = run.Start;
                         while (groupStart < end)
                         {
@@ -272,10 +365,10 @@ sealed class Camera
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void AppendWorldProjectedShapeUnchecked(in Dx11ArenaRenderer.WorldProjectedShapeInstance shape,
         RelSimplifiedComplexPolygon? shapeSdf = null, WPos shapeSdfOrigin = default,
-        RelSimplifiedComplexPolygon? arenaSdf = null, WPos arenaSdfOrigin = default, float holeFillRadius = 0f)
+        RelSimplifiedComplexPolygon? arenaSdf = null, WPos arenaSdfOrigin = default, float holeFillRadius = 0f, bool applyProjectionLayers = true)
     {
         var index = _worldProjectedShapes.Count;
-        if (ProjectedShapeLayers is { Length: > 0 } layers && (shape.Packed & 0xFFu) != (uint)Dx11ArenaRenderer.WorldProjectedShapeKind.Eye3D)
+        if (applyProjectionLayers && ProjectedShapeLayers is { Length: > 0 } layers && (shape.Packed & 0xFFu) != (uint)Dx11ArenaRenderer.WorldProjectedShapeKind.Eye3D)
         {
             // All-layer mechanics keep one 2D copy, but get a terrain-projected copy on each
             // physical floor, with that floor's receiver height and independent world-only clip.
@@ -509,6 +602,15 @@ sealed class Camera
         RelSimplifiedComplexPolygon? arenaClip = null, WPos arenaOrigin = default, float holeFillRadius = 0f)
         => AppendWorldProjectedShapeUnchecked(Dx11ArenaRenderer.WorldProjectedShapeInstance.Triangle(a, b, c, color, projectionHeight, outlineWidth),
             arenaSdf: arenaClip, arenaSdfOrigin: arenaOrigin, holeFillRadius: holeFillRadius);
+
+    // Actor marker fast path: preserve PosRot.Y as the projection origin and derive the triangle directly
+    // from PosRot.W in the render instance. Exact-Y actor markers must not be replicated/rebased by an
+    // ambient all-floor projection scope, since doing so would throw away the height information again.
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DrawProjectedActorTriangle(ref Vector4 posRot, float scale, uint fillColor, uint outlineColor, float projectionHeight, float outlineWidth = 0f,
+        RelSimplifiedComplexPolygon? arenaClip = null, WPos arenaOrigin = default, float holeFillRadius = 0f)
+        => AppendWorldProjectedShapeUnchecked(Dx11ArenaRenderer.WorldProjectedShapeInstance.ActorTriangle(posRot, scale, fillColor, outlineColor, projectionHeight, outlineWidth),
+            arenaSdf: arenaClip, arenaSdfOrigin: arenaOrigin, holeFillRadius: holeFillRadius, applyProjectionLayers: false);
 
     // Filled projected triangle with an optional outline in one GPU instance. Actor markers use this
     // to avoid reconstructing scene depth and applying actor/UI masks twice for the same footprint.
