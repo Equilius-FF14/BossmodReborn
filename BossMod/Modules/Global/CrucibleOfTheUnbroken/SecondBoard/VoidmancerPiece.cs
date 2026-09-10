@@ -77,22 +77,7 @@ sealed class DeathDriveBait(BossModule module) : Components.BaitAwayIcon(module,
     }
 }
 
-sealed class Mindjack(BossModule module) : Components.StatusDrivenForcedMarch(module, 3.0f, default, default, (uint)SID.LeftFace, (uint)SID.RightFace)
-{
-    public override void AddAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints)
-    {
-        base.AddAIHints(slot, actor, assignment, hints);
-        var state = State.GetValueOrDefault(actor.InstanceID);
-        if (state == null || state.PendingMoves.Count == 0)
-        {
-            return;
-        }
-
-        var move0 = state.PendingMoves[0];
-        var requiredFacing = Angle.FromDirection((actor.Position - Module.PrimaryActor.Position).Normalized()) - move0.dir;
-        hints.ForbiddenDirections.Add((requiredFacing + 180.0f.Degrees(), 170.0f.Degrees(), move0.activation));
-    }
-}
+sealed class Mindjack(BossModule module) : Components.StatusDrivenForcedMarch(module, 3.0f, default, default, (uint)SID.LeftFace, (uint)SID.RightFace);
 
 sealed class VoidmancerPieceStates : StateMachineBuilder
 {

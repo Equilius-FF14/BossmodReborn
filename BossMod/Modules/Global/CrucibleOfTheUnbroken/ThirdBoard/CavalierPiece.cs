@@ -1,4 +1,4 @@
-﻿namespace BossMod.Dawntrail.BeastMaster.ThirdBoard.CavalierPiece;
+﻿namespace BossMod.Global.CrucibleOfTheUnbroken.ThirdBoard.CavalierPiece;
 
 public enum OID : uint {
     CavalierPiece = 0x4C8E,
@@ -19,8 +19,9 @@ public enum AID : uint {
     ValfodrActor = 48461, // 4C8F->self, 5.6+0.4s cast, single-target
     Valfodr = 48462, // Helper->self, 6.0s cast, range 60 width 8 rect
     CrushingBlade = 48471, // CavalierPiece->player, 5.0s cast, single-target
-    Unknown1 = 50551, // 4C92->CavalierPiece, no cast, single-target
-    Unknown2 = 50552, // 4C8F->CavalierPiece, no cast, single-target
+    FeintedCavalierTeleport = 50552, // 4C8F->CavalierPiece, no cast, single-target
+
+    Unknown1 = 50551, // 4C92->CavalierPiece, no cast, single-target - most likely the orb teleport
 }
 
 public enum IconID : uint {
@@ -33,12 +34,7 @@ public enum TetherID : uint {
 
 sealed class Hint(BossModule module) : BossComponent(module) {
     public override void AddGlobalHints(Actor actor, GlobalHints hints) {
-        hints.Add("This fight is easy if you kill every pack wave together and before the 4th pack spawn otherwise it starts getting complicated.\n" +
-                  "If you start getting the 4th pack spawn and you're not close to clearing then I would recommend the following: \n" +
-                  "1. Using the correct beast master pets\n" +
-                  "2. Leveling up your beasts and farming gear.\n" +
-                  "Otherwise, after the 4th pack spawn you will need to stagger them by only killing 4 mobs at a time and waiting for the doubling cast to happen." +
-                  " Killing 5 or more mobs will cause the map to get filled with aoes.");
+        hints.Add("This fight is easy if you kill every pack wave together and before the 4th pack spawn otherwise it starts getting complicated.");
     }
 }
 
@@ -65,6 +61,12 @@ sealed class CrushingBlade(BossModule module) : Components.GenericKnockback(modu
         }
     }
 
+    public override void OnCastFinished(Actor caster, ActorCastInfo spell) {
+        if (spell.Action.ID == (uint)AID.CrushingBlade) {
+            affectedPlayers.Reset();
+        }
+    }
+
     public override ReadOnlySpan<Knockback> ActiveKnockbacks(int slot, Actor actor) {
         if (affectedPlayers[slot] && activation != default && source != null) {
             return new Knockback[1] { new(source.Position, KnockbackDistance, activation) };
@@ -88,8 +90,7 @@ sealed class CavalierPieceStates : StateMachineBuilder {
 [ModuleInfo(BossModuleInfo.Maturity.WIP,
     PrimaryActorOID = (uint)OID.CavalierPiece,
     Contributors = "Equilius",
-    Category = BossModuleInfo.Category.BeastMaster,
-    GroupType = BossModuleInfo.GroupType.CFC,
+    GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken,
     GroupID = 1090u,
     NameID = 14564u,
     SortOrder = 10)]
@@ -105,4 +106,3 @@ public sealed class CavalierPiece : BossModule {
         Arena.Actors(Enemies((uint)OID.BoneBishop));
     }
 }
-
