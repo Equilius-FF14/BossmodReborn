@@ -3,7 +3,7 @@ namespace BossMod;
 // information relevant for AI decision making process for a specific player
 public sealed class AIHints
 {
-    public class Enemy(Actor actor, int priority, bool shouldBeTanked, string prioReason)
+    public class Enemy(Actor actor, int priority, bool shouldBeTanked)
     {
         public const int PriorityPointless = -1; // attacking enemy won't improve your parse, but will give gauge and advance combo (e.g. boss locked to 1 HP, useless add in raid, etc)
         public const int PriorityInvincible = -2; // attacking enemy will have no effect at all besides breaking your combo, but hitting it with AOEs is fine
@@ -610,7 +610,14 @@ public sealed class AIHints
         var effRsq = radius * radius;
         return p => (p - target).LengthSq() <= effRsq ? weight : default;
     }
-    public static Func<WPos, float> GoalSingleTarget(Actor target, Actor player, ActorState actorState, float range, float weight = 1f)
+
+    public static Func<WPos, float> GoalSingleTarget(Actor target, float radius, float weight = 1f)
+    {
+        var effRsq = radius * radius;
+        return p => (p - target.Position).LengthSq() <= effRsq ? weight : default;
+    }
+
+    public Func<WPos, float> GoalSingleTarget(Actor target, Actor player, ActorState actorState, float range, float weight = 1f)
     {
         var f = GoalSingleTarget(target.Position, range + target.HitboxRadius, weight);
         var g = FollowTarget(target, player, actorState, range);
@@ -651,6 +658,9 @@ public sealed class AIHints
             return inPositional ? 2f : 1f;
         };
     }
+
+    public static Func<WPos, float> GoalSingleTarget(Actor target, Positional positional, float range = 2.6f, float cushion = 0f)
+    => GoalSingleTarget(target.Position, target.Rotation, positional, range + target.HitboxRadius, cushion);
 
     public Func<WPos, float> GoalSingleTarget(Actor target, Positional positional, Actor player, ActorState actorState, float range = 2.6f, float cushion = 0f)
     {
@@ -847,10 +857,23 @@ public sealed class AIHints
         if (gcd < 0.5f)
         {
             var playerEffRange = player.Role is Role.Tank or Role.Melee ? 3 : 25;
-            distToGoal = MathF.Min(distToGoal, target.HitboxRadius + player.HitboxRadius + playerEffRange);
+            distToGoal = Math.Min(distToGoal, target.HitboxRadius + player.HitboxRadius + playerEffRange);
         }
 
-        var sh = new SDPrecisePosition(target.Position + dirToGoal.Normalized() * distToGoal, new(0f, 1f), PathfindMapBounds.MapResolution,  player.Position, 0.1f);
+        var sh = new SDPrecisePosition(target.Position + dirToGoal.Normalized() * distToGoal, new(0f, 1f), PathfindMapBounds.MapResolution, player.Position, 0.1f);
         return p => sh.Distance(p) > 0f ? 10f : 0f;
+    }
+
+    public static Func<WPos, float> GoalRectangle(WPos center, WDir direction, float halfWidth, float halfHeight, float weight = 1f)
+    {
+        var fwd = direction.Normalized();
+        var right = fwd.OrthoR();
+        return p =>
+        {
+            var offset = p - center;
+            var localX = fwd.Dot(offset);
+            var localY = right.Dot(offset);
+            return Math.Abs(localX) <= halfHeight && Math.Abs(localY) <= halfWidth ? weight : default;
+        };
     }
 }
