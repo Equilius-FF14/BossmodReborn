@@ -26,6 +26,11 @@ public enum AID : uint
     StormTrail = 48178, // Helper->self, 6.0s cast, range 25 60.000-degree cone
 }
 
+public enum SID : uint {
+    Burns = 3065, // none->player, extra=0x0
+    Burns1 = 3066, // none->player, extra=0x0
+}
+
 //sealed class TheStormsGrip(BossModule module) : Components.RaidwideCast(module, (uint)AID.TheStormsGrip); // TODO confirm this is not a raidwide
 sealed class Buffet(BossModule module) : Components.SimpleAOEs(module, (uint)AID.Buffet, new AOEShapeRect(40.0f, 5.0f));
 sealed class Typhoon(BossModule module) : Components.SimpleKnockbacks(module, (uint)AID.Typhoon, 10.0f); // TODO add AI
