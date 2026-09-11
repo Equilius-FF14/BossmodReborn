@@ -26,18 +26,7 @@ public sealed class BossModuleConfigWindow : UIWindow
     {
         if (_info.HasPrePullHints)
         {
-            var showPrePullHints = BossModuleManager.Config.ShowPrePullHintsFor(_info.PrimaryActorOID);
-            if (ImGui.Checkbox("Show pre-fight hint popup for this encounter", ref showPrePullHints))
-            {
-                BossModuleManager.Config.SetShowPrePullHintsFor(_info.PrimaryActorOID, showPrePullHints);
-            }
-
-            if (!BossModuleManager.Config.ShowPrePullHints)
-            {
-                ImGui.SameLine();
-                ImGui.TextDisabled("(globally disabled)");
-            }
-
+            ConfigUI.DrawPrePullHintSetting(_info);
             if (_node != null)
             {
                 ImGui.Separator();

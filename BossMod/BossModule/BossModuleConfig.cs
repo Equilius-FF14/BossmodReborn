@@ -132,8 +132,7 @@ public sealed class BossModuleConfig : ConfigNode
     [PropertyDisplay("Show pre-fight encounter hint popup", tooltip: "Shows encounter-specific notes before a pull. Individual encounters can be hidden permanently from the popup itself and re-enabled from that encounter's config window.")]
     public bool ShowPrePullHints = true;
 
-    // Persisted separately from module-specific config so every encounter can support "Never show again"
-    // without requiring a boilerplate setting in each ConfigNode. Primary actor OIDs are unique module IDs.
+    // Persisted separately from module-specific config so every encounter can support "Never show again". Primary actor OIDs are used as unique module IDs.
     public uint[] SuppressedPrePullHintOIDs = [];
 
     [JsonIgnore]

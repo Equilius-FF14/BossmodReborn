@@ -238,6 +238,11 @@ public abstract class BossModule : IDisposable
 
     public void Update()
     {
+        if (StateMachine.ActiveState == null)
+        {
+            UpdatePreModuleActivation();
+        }
+
         if (StateMachine.ActivePhaseIndex < 0 && CheckPull())
         {
             StateMachine.Start(WorldState.CurrentTime);
@@ -246,10 +251,7 @@ public abstract class BossModule : IDisposable
         if (StateMachine.ActiveState != null)
         {
             StateMachine.Update(WorldState.CurrentTime);
-        }
 
-        if (StateMachine.ActiveState != null)
-        {
             UpdateModule();
             var count = Components.Count;
             for (var i = 0; i < count; ++i)
@@ -516,6 +518,7 @@ public abstract class BossModule : IDisposable
     public virtual bool ShouldPrioritizeAllEnemies => false;
 
     protected virtual void UpdateModule() { }
+    protected virtual void UpdatePreModuleActivation() { }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal Actor? GetActor(uint enemy)
