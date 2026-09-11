@@ -127,4 +127,11 @@ sealed class LakhamuPieceStates : StateMachineBuilder {
     GroupID = 1090u,
     NameID = 14580u,
     SortOrder = 13)]
-public sealed class LakhamuPiece(WorldState ws, Actor primary) : BossModule(ws, primary, new(120f, 0f), new ArenaBoundsRect(20f, 20f));
+public sealed class LakhamuPiece(WorldState ws, Actor primary) : BossModule(ws, primary, new(120f, 0f), new ArenaBoundsRect(20f, 20f)) {
+    public override bool ShouldPrioritizeAllEnemies => true;
+
+    protected override void DrawEnemies(int pcSlot, Actor pc) {
+        Arena.Actor(PrimaryActor);
+        Arena.Actors(Enemies((uint)OID.GolemPiece));
+    }
+}
