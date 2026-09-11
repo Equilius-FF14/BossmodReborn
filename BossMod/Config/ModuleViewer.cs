@@ -301,7 +301,7 @@ public sealed class ModuleViewer : IDisposable
                                 continue;
                             }
 
-                            using (ImRaii.Disabled(mod.Info.ConfigType == null))
+                            using (ImRaii.Disabled(mod.Info.ConfigType == null && !mod.Info.HasPrePullHints))
                             {
                                 if (UIMisc.IconButton(FontAwesomeIcon.Cog, $"{mod.Info.ModuleType.FullName}_cfg"))
                                 {

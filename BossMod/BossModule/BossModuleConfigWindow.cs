@@ -4,6 +4,7 @@ namespace BossMod;
 
 public sealed class BossModuleConfigWindow : UIWindow
 {
+    private readonly BossModuleRegistry.Info _info;
     private readonly ConfigNode? _node;
     private readonly PartyRolesConfig _prc = Service.Config.Get<PartyRolesConfig>();
     private readonly WorldState _ws;
@@ -12,6 +13,7 @@ public sealed class BossModuleConfigWindow : UIWindow
 
     public BossModuleConfigWindow(BossModuleRegistry.Info info, WorldState ws) : base($"{info.ModuleType.Name} config", true, new(1200, 800))
     {
+        _info = info;
         _node = info.ConfigType != null ? Service.Config.Get<ConfigNode>(info.ConfigType) : null;
         _ws = ws;
         _tabs.Add("Encounter-specific config", DrawEncounterTab);
@@ -22,13 +24,33 @@ public sealed class BossModuleConfigWindow : UIWindow
 
     private void DrawEncounterTab()
     {
+        if (_info.HasPrePullHints)
+        {
+            var showPrePullHints = BossModuleManager.Config.ShowPrePullHintsFor(_info.PrimaryActorOID);
+            if (ImGui.Checkbox("Show pre-fight hint popup for this encounter", ref showPrePullHints))
+            {
+                BossModuleManager.Config.SetShowPrePullHintsFor(_info.PrimaryActorOID, showPrePullHints);
+            }
+
+            if (!BossModuleManager.Config.ShowPrePullHints)
+            {
+                ImGui.SameLine();
+                ImGui.TextDisabled("(globally disabled)");
+            }
+
+            if (_node != null)
+            {
+                ImGui.Separator();
+            }
+        }
+
         if (_node != null)
         {
             ConfigUI.DrawNode(_node, Service.Config, _tree, _ws);
         }
-        else
+        else if (!_info.HasPrePullHints)
         {
-            ImGui.TextUnformatted("This module does not expose any configuration");
+            ImGui.TextUnformatted("This module does not expose any additional configuration");
         }
     }
 
