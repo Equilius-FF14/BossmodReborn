@@ -122,8 +122,7 @@ sealed class LakhamuPieceStates : StateMachineBuilder {
 [ModuleInfo(BossModuleInfo.Maturity.WIP,
     PrimaryActorOID = (uint)OID.LakhamuPiece,
     Contributors = "Equilius",
-    Category = BossModuleInfo.Category.CrucibleOfTheUnbroken,
-    GroupType = BossModuleInfo.GroupType.CFC,
+    GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken,
     GroupID = 1090u,
     NameID = 14580u,
     SortOrder = 13)]

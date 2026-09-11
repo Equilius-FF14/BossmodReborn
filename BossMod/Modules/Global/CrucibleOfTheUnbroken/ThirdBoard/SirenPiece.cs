@@ -117,8 +117,7 @@ sealed class SirenPieceStates : StateMachineBuilder {
 [ModuleInfo(BossModuleInfo.Maturity.WIP,
     PrimaryActorOID = (uint)OID.SirenPiece,
     Contributors = "Equilius",
-    Category = BossModuleInfo.Category.CrucibleOfTheUnbroken,
-    GroupType = BossModuleInfo.GroupType.CFC,
+    GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken,
     GroupID = 1090u,
     NameID = 14583u,
     SortOrder = 14)]
