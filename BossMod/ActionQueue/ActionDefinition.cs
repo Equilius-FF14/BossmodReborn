@@ -204,6 +204,11 @@ public sealed class ActionDefinitions
     public static readonly ActionID IDPotionInt = new(ActionType.Item, 1049237u); // hq grade 4 gemdraught of intelligence
     public static readonly ActionID IDPotionMnd = new(ActionType.Item, 1049238u); // hq grade 4 gemdraught of mind
 
+    // TODO: remove later, this is for the ucob project
+    public static readonly ActionID IDClamCake = new(ActionType.Item, 1049247u);
+    public static readonly ActionID IDFruitcake = new(ActionType.Item, 1049242u);
+    public static readonly ActionID IDPopcorn = new(ActionType.Item, 1049240u);
+
     // content specific consumables
     public static readonly ActionID IDPotionSustaining = new(ActionType.Item, 20309u);
     public static readonly ActionID IDPotionMax = new(ActionType.Item, 1013637u);
@@ -249,6 +254,10 @@ public sealed class ActionDefinitions
         RegisterItem(IDPotionEureka, 1.1f);
         RegisterItem(IDPotionUltra, 1.1f);
         RegisterItem(IDPotionPilgrim, 1.1f);
+
+        RegisterItem(IDClamCake, 2.1f);
+        RegisterItem(IDFruitcake, 2.1f);
+        RegisterItem(IDPopcorn, 2.1f);
 
         RegisterItem(IDMiscItemGreens, 1.1f);
 
@@ -363,7 +372,7 @@ public sealed class ActionDefinitions
 
     public uint SpellUnlockLink(Lumina.Excel.Sheets.Action data) => data.UnlockLink.RowId;
     public uint SpellUnlockLink(uint spellId) => SpellUnlockLink(ActionData(spellId));
-    public uint ActionUnlockLink(ActionID aid) => aid.Type == ActionType.Spell ? SpellUnlockLink(aid.ID) : 0;
+    public uint ActionUnlockLink(ActionID aid) => aid.Type == ActionType.Spell ? SpellUnlockLink(aid.ID) : 0u;
 
     // see ActionManager.CanUseActionOnTarget
     public ActionTargets SpellAllowedTargets(Lumina.Excel.Sheets.Action data)

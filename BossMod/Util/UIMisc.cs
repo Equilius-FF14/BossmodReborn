@@ -83,7 +83,7 @@ public static class UIMisc
         }
         else
         {
-            return ImGui.Button("", size);
+            return ImGui.Button($"##ImageToggle_{text}", size);
         }
     }
 

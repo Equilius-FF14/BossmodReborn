@@ -1,6 +1,7 @@
 ﻿namespace BossMod.Global.CrucibleOfTheUnbroken.ThirdBoard.CatoblepasPiece;
 
-public enum OID : uint {
+public enum OID : uint
+{
     CatoblepasPiece = 0x4C9B,
     Helper = 0x233C,
     _Gen_Actor1ec0de = 0x1EC0DE, // R0.500, x1, EventObj type
@@ -8,7 +9,8 @@ public enum OID : uint {
     DemonicEyeDonut = 0x4C9D, // R1.500, x0 (spawn during fight)
 }
 
-public enum AID : uint {
+public enum AID : uint
+{
     AutoAttack = 49682, // CatoblepasPiece->player, no cast, single-target
     BestialRoar = 48504, // CatoblepasPiece->self, 3.0s cast, range 60 circle
 
@@ -20,12 +22,14 @@ public enum AID : uint {
     _Weaponskill_ShiftingGaze1 = 48954, // CatoblepasPiece->4C9D/4C9C, no cast, single-target
 }
 
-public enum SID : uint {
+public enum SID : uint
+{
     _Gen_RampantHeart = 4596, // none->player, extra=0x0
     _Gen_ = 2056, // CatoblepasPiece->4C9D/4C9C, extra=0xAE
 }
 
-public enum TetherID : uint {
+public enum TetherID : uint
+{
     _Gen_Tether_chn_ice_mouth01x = 195, // 4C9D/4C9C->CatoblepasPiece
 }
 

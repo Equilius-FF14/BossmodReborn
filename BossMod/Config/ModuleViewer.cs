@@ -27,6 +27,7 @@ public sealed class ModuleViewer : IDisposable
     private readonly uint _iconFATE;
     private readonly uint _iconHunt;
     private readonly List<ModuleGroup>[,] _groups;
+    private readonly Dictionary<Type, int> _supportedListOrder = [];
     private readonly Vector2 _iconSize = new(30f, 30f);
 
     private string _searchText = "";
@@ -72,7 +73,7 @@ public sealed class ModuleViewer : IDisposable
         Customize(BossModuleInfo.Category.Ultimate, contentType.GetRow(28u));
         Customize(BossModuleInfo.Category.VariantCriterion, contentType.GetRow(30u));
         Customize(BossModuleInfo.Category.HallOfTheNovice, contentType.GetRow(20u), "Hall of the Novice");
-        Customize(BossModuleInfo.Category.CrucibleOfTheUnbroken, contentType.GetRow(40u));
+        Customize(BossModuleInfo.Category.CrucibleOfTheUnbroken, contentType.GetRow(40u), "Beastmaster");
 
         var playStyle = Service.LuminaSheet<CharaCardPlayStyle>()!;
         Customize(BossModuleInfo.Category.Foray, playStyle.GetRow(6u));
@@ -114,6 +115,7 @@ public sealed class ModuleViewer : IDisposable
             groups[groupIndex].Modules.Add(moduleInfo);
         }
 
+        var supportedListOrder = 0;
         for (var i = 0; i < (int)BossModuleInfo.Expansion.Count; ++i)
         {
             for (var j = 0; j < (int)BossModuleInfo.Category.Count; ++j)
@@ -137,7 +139,8 @@ public sealed class ModuleViewer : IDisposable
                     var group = groups[g];
                     group.Modules.Sort(static (a, b) => a.SortOrder.CompareTo(b.SortOrder));
 
-                    var countM = group.Modules.Count - 1;
+                    var countModules = group.Modules.Count;
+                    var countM = countModules - 1;
                     for (var m = 0; m < countM; ++m)
                     {
                         var m1 = group.Modules[m];
@@ -145,6 +148,15 @@ public sealed class ModuleViewer : IDisposable
                         if (m1.SortOrder == m2.SortOrder)
                         {
                             Service.Log($"[ModuleViewer] Same sort order between modules {m1.Info.ModuleType.FullName} and {m2.Info.ModuleType.FullName}");
+                        }
+                    }
+
+                    for (var m = 0; m < countModules; ++m)
+                    {
+                        var module = group.Modules[m].Info;
+                        if (module.Maturity != BossModuleInfo.Maturity.Dummy)
+                        {
+                            _supportedListOrder[module.ModuleType] = supportedListOrder++;
                         }
                     }
                 }
@@ -155,6 +167,9 @@ public sealed class ModuleViewer : IDisposable
     public void Dispose()
     {
     }
+
+    internal int SupportedListOrder(BossModuleRegistry.Info info)
+        => _supportedListOrder.GetValueOrDefault(info.ModuleType, int.MaxValue);
 
     public void Draw(UITree tree, WorldState ws)
     {
@@ -301,7 +316,7 @@ public sealed class ModuleViewer : IDisposable
                                 continue;
                             }
 
-                            using (ImRaii.Disabled(mod.Info.ConfigType == null))
+                            using (ImRaii.Disabled(mod.Info.ConfigType == null && !mod.Info.HasPrePullHints))
                             {
                                 if (UIMisc.IconButton(FontAwesomeIcon.Cog, $"{mod.Info.ModuleType.FullName}_cfg"))
                                 {
