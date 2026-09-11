@@ -4,7 +4,7 @@ sealed class P3EarthShaker(UCOB module) : Components.GenericBaitAway(module, (ui
 {
     private List<Bait> _futureBaits = [];
     private readonly Actor _bahamut = module.BahamutPrime()!;
-    private readonly P3QuickmarchTrio _trio = module.FindComponent<P3QuickmarchTrio>()!;
+    private P3QuickmarchTrio? _trio;
 
     private readonly AOEShapeCone _shape = new(60f, 45f.Degrees());
 
@@ -21,6 +21,18 @@ sealed class P3EarthShaker(UCOB module) : Components.GenericBaitAway(module, (ui
     {
         if (CurrentBaits.Count > 0)
         {
+            if (_trio == null)
+            {
+                var comp = Module.FindComponent<P3QuickmarchTrio>();
+                if (comp != null)
+                {
+                    _trio = comp;
+                }
+                else
+                {
+                    return;
+                }
+            }
             var dirNorth = (_trio.RelativeNorth - Arena.Center).ToAngle();
             var baitIndex = -1;
 

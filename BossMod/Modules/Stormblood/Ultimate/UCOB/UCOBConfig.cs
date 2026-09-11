@@ -1,6 +1,5 @@
 ﻿using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility.Raii;
-using System.Reflection;
 
 namespace BossMod.Stormblood.Ultimate.UCOB;
 
@@ -28,7 +27,7 @@ public sealed class UCOBConfig() : ConfigNode()
 
 public sealed class RolesRenderer : PropertyRenderer
 {
-    public override bool Draw(PropertyDisplayAttribute attrs, bool nested, ConfigNode node, FieldInfo member, object value, ConfigRoot root, UITree tree, WorldState ws)
+    public override bool Draw(PropertyDisplayAttribute attrs, bool nested, ConfigNode node, object value, ConfigRoot root, UITree tree, WorldState ws)
     {
         var cfg = (UCOBConfig)node;
 

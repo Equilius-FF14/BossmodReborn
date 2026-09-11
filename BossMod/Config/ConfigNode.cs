@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -23,14 +22,16 @@ public sealed class SectionStartAttribute(string label = "", bool separator = tr
 
 // attribute that specifies how config node field or enumeration value is shown in the UI
 [AttributeUsage(AttributeTargets.Field)]
-public sealed class PropertyDisplayAttribute(string label, uint color = default, string tooltip = "", bool separator = false, string[]? tags = null, Type? renderer = null) : Attribute
+public sealed class PropertyDisplayAttribute(string label, uint color = default, string tooltip = "", string? since = null, string? depends = null, string[]? tags = null, Type? renderer = null, bool separator = false) : Attribute
 {
     public string Label { get; } = label;
     public uint Color => color == default ? Colors.TextColor1 : color;
     public string Tooltip { get; } = tooltip;
-    public bool Separator { get; } = separator;
+    public string? Since { get; } = since;
+    public string? Depends { get; } = depends;
     public string[] Tags { get; } = tags ?? [];
     public Type? Renderer { get; } = renderer;
+    public bool Separator { get; } = separator;
 }
 
 // attribute that specifies combobox should be used for displaying int/bool property
@@ -135,5 +136,5 @@ public sealed class ConfigListener<T>(T data, Action<T> modified) : IDisposable 
 
 public abstract class PropertyRenderer
 {
-    public abstract bool Draw(PropertyDisplayAttribute attrs, bool nested, ConfigNode node, FieldInfo member, object value, ConfigRoot root, UITree tree, WorldState ws);
+    public abstract bool Draw(PropertyDisplayAttribute attrs, bool nested, ConfigNode node, object value, ConfigRoot root, UITree tree, WorldState ws);
 }

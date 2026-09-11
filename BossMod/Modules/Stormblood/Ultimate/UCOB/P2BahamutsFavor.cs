@@ -186,9 +186,14 @@ sealed class P2BahamutsFavorChainLightning(UCOB module) : Components.UniformStac
         {
             return;
         }
+        var count = Spreads.Count;
+        if (count == 0)
+        {
+            return;
+        }
         var spreads = CollectionsMarshal.AsSpan(Spreads);
         var act = spreads[0].Activation;
-        var len = spreads.Length;
+
         if (IsSpreadTarget(actor))
         {
             hints.GoalZonesEnabled = false;
@@ -200,7 +205,7 @@ sealed class P2BahamutsFavorChainLightning(UCOB module) : Components.UniformStac
                 var myOrder = -1;
                 var actorIndex = -1;
 
-                for (var i = 0; i < len; ++i)
+                for (var i = 0; i < count; ++i)
                 {
                     if (spreads[i].Target == actor)
                     {
@@ -209,12 +214,12 @@ sealed class P2BahamutsFavorChainLightning(UCOB module) : Components.UniformStac
                     }
                 }
 
-                if (actorIndex >= 0)
+                if (actorIndex >= 0 && count > actorIndex + 1)
                 {
                     var myAssignment = ordered[Raid.FindSlot(spreads[actorIndex].Target.InstanceID)];
                     myOrder = 0;
 
-                    for (var i = 0; i < len; ++i)
+                    for (var i = 0; i < count; ++i)
                     {
                         if (i == actorIndex)
                         {
@@ -251,7 +256,7 @@ sealed class P2BahamutsFavorChainLightning(UCOB module) : Components.UniformStac
                 }
             }
 
-            for (var i = 0; i < len; ++i)
+            for (var i = 0; i < count; ++i)
             {
                 ref var spread = ref spreads[i];
                 hints.AddForbiddenZone(new SDCircle(spread.Target.Position, 5f + ExtraAISpreadThreshold), act);
@@ -341,7 +346,18 @@ sealed class P2BahamutsFavorDeathstorm(BossModule module) : BossComponent(module
                         }
 
                         // despite our best efforts, it's possible that a wings puddle can spawn on top of the cleanse puddle
-                        _wings ??= Module.FindComponent<P2BahamutsFavorWingsOfSalvation>()!;
+                        if (_wings == null)
+                        {
+                            var comp = Module.FindComponent<P2BahamutsFavorWingsOfSalvation>();
+                            if (comp != null)
+                            {
+                                _wings = comp;
+                            }
+                            else
+                            {
+                                return;
+                            }
+                        }
                         var aoes = _wings.ActiveAOEs(slot, actor);
                         var len = aoes.Length;
                         var isCovered = false;

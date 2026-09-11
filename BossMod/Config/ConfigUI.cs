@@ -29,6 +29,7 @@ public sealed class ConfigUI : IDisposable
     private readonly UIPresetDatabaseEditor? _presets;
 
     private readonly List<List<string>> _filterNodes = [];
+    private static readonly Dictionary<Type, PropertyRenderer> _propertyRenderers = [];
 
     public ConfigUI(ConfigRoot config, WorldState ws, DirectoryInfo? replayDir, RotationDatabase? rotationDB)
     {
@@ -230,7 +231,7 @@ public sealed class ConfigUI : IDisposable
         foreach (var field in GeneratedConfigMetadata.Get(node.Node).DisplayFields)
         {
             var props = field.Display!;
-            if (Utils.TextMatch(props.Label, _searchText) || TagsMatch(props.Tags))
+            if (Utils.TextMatch(props.Label, _searchText) || TagsMatch(props.Tags) || (field.SectionStart is { Label.Length: > 0 } section && Utils.TextMatch(section.Label, _searchText)))
             {
                 var matchPath = new List<string>(path) { node.Name, props.Label };
                 results.Add(matchPath);
@@ -260,7 +261,8 @@ public sealed class ConfigUI : IDisposable
     public static void DrawNode(ConfigNode node, ConfigRoot root, UITree tree, WorldState ws, Func<PropertyDisplayAttribute, bool>? filter = null)
     {
         // draw standard properties
-        foreach (var field in GeneratedConfigMetadata.Get(node).DisplayFields)
+        var metadata = GeneratedConfigMetadata.Get(node);
+        foreach (var field in metadata.DisplayFields)
         {
             var props = field.Display!;
 
@@ -269,8 +271,28 @@ public sealed class ConfigUI : IDisposable
                 continue;
             }
 
+            if (field.SectionStart is { } section)
+            {
+                if (section.Separator)
+                {
+                    ImGui.Separator();
+                }
+                if (section.Label.Length > 0)
+                {
+                    ImGui.TextUnformatted(section.Label);
+                }
+            }
+
             var value = field.Getter(node);
-            if (DrawProperty(props.Label, props.Tooltip, node, field, value, root, tree, ws))
+            var enabled = IsPropertyEnabled(node, metadata, field);
+            bool modified;
+            using (ImRaii.Disabled(!enabled))
+            {
+                modified = props.Renderer is { } rendererType
+                    ? GetPropertyRenderer(rendererType).Draw(props, false, node, value!, root, tree, ws)
+                    : DrawProperty(props.Label, props.Tooltip, node, field, value, root, tree, ws);
+            }
+            if (modified)
             {
                 node.Modified.Fire();
             }
@@ -284,6 +306,48 @@ public sealed class ConfigUI : IDisposable
         // draw custom stuff
         node.DrawCustom(tree, ws);
     }
+
+    private static bool IsPropertyEnabled(ConfigNode node, ConfigTypeMetadata metadata, ConfigFieldMetadata field)
+    {
+        var depends = field.Display?.Depends;
+        if (string.IsNullOrEmpty(depends))
+        {
+            return true;
+        }
+
+        return IsDependencyEnabled(node, metadata, depends, metadata.Fields.Length) ?? true;
+    }
+
+    private static bool? IsDependencyEnabled(ConfigNode node, ConfigTypeMetadata metadata, string fieldName, int remainingDepth)
+    {
+        // Invalid and circular dependencies fail open. Silently locking the setting would make an
+        // authoring mistake unnecessarily difficult to recover from.
+        if (remainingDepth <= 0 || !metadata.FieldsByName.TryGetValue(fieldName, out var dependency))
+        {
+            return null;
+        }
+
+        if (dependency.Display?.Depends is { Length: > 0 } parentDependency)
+        {
+            var parentEnabled = IsDependencyEnabled(node, metadata, parentDependency, remainingDepth - 1);
+            if (parentEnabled != true)
+            {
+                return parentEnabled;
+            }
+        }
+
+        // Dependencies are deliberately boolean for now. Nullable bool boxes as bool when it has a
+        // value; null is treated as disabled. Other field types are considered an invalid dependency.
+        return dependency.Getter(node) switch
+        {
+            bool value => value,
+            null when dependency.FieldType == typeof(bool?) => false,
+            _ => null
+        };
+    }
+
+    private static PropertyRenderer GetPropertyRenderer(Type type)
+        => _propertyRenderers.TryGetValue(type, out var renderer) ? renderer : (_propertyRenderers[type] = GeneratedFactories.CreatePropertyRenderer(type));
 
     private static string GenerateNodeName(Type t) => t.Name.EndsWith("Config", StringComparison.Ordinal) ? t.Name[..^"Config".Length] : t.Name;
 

@@ -30,7 +30,7 @@ sealed class P1LiquidHell(BossModule module) : LiquidHellBase(module)
     DateTime NextCast;
     private readonly PartyRolesConfig _config = Service.Config.Get<PartyRolesConfig>();
     private readonly Hatch _hatch = module.FindComponent<Hatch>()!;
-    private readonly P1Fireball _fireball = module.FindComponent<P1Fireball>()!;
+    private P1Fireball? _fireball;
     private readonly List<Actor> _neurolinks = module.Enemies((uint)OID.Neurolink);
 
     public Actor? Baiter;
@@ -73,7 +73,9 @@ sealed class P1LiquidHell(BossModule module) : LiquidHellBase(module)
             var assignments = _config.SlotsPerAssignment(Raid);
 
             if (assignments.Length == 0)
+            {
                 return;
+            }
 
             bool isBaiter;
 
@@ -128,8 +130,19 @@ sealed class P1LiquidHell(BossModule module) : LiquidHellBase(module)
                     hints.AddForbiddenZone(new SDCircle(p.Position, 0.5f), DateTime.MaxValue);
                 }
             }
-
-            if (actor == Baiter && _fireball.Destination is { } dest && dest != default)
+            if (_fireball == null)
+            {
+                var comp = Module.FindComponent<P1Fireball>();
+                if (comp != null)
+                {
+                    _fireball = comp;
+                }
+                else
+                {
+                    return;
+                }
+            }
+            if (actor == Baiter && _fireball.Destination is var dest && dest != default)
             {
                 hints.AddForbiddenZone(new SDInvertedCircle(dest, 11f), NextCast.AddSeconds(1.2d * (4 - NumCasts)));
                 hints.AddForbiddenZone(new SDCircle(dest, 7f), NextCast);

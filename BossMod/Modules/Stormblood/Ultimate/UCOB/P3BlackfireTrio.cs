@@ -133,7 +133,7 @@ sealed class P3MegaflareTower(BossModule module) : Components.CastTowers(module,
     BitMask _stackTargets;
     bool _assigned;
     int _numHypernovas;
-    private readonly P3BlackfireTrio _blackfire = module.FindComponent<P3BlackfireTrio>()!;
+    private P3BlackfireTrio? _blackfire;
     private readonly PartyRolesConfig _prc = Service.Config.Get<PartyRolesConfig>();
 
     public override void OnCastStarted(Actor caster, ActorCastInfo spell)
@@ -142,6 +142,18 @@ sealed class P3MegaflareTower(BossModule module) : Components.CastTowers(module,
 
         if (spell.Action.ID == WatchedAction && Towers.Count == 4)
         {
+            if (_blackfire == null)
+            {
+                var comp = Module.FindComponent<P3BlackfireTrio>();
+                if (comp != null)
+                {
+                    _blackfire = comp;
+                }
+                else
+                {
+                    return;
+                }
+            }
             var dirN = _blackfire.RelativeNorth.ToDirection();
             var count = Towers.Count;
             var towers = CollectionsMarshal.AsSpan(Towers);
@@ -185,7 +197,7 @@ sealed class P3MegaflareTower(BossModule module) : Components.CastTowers(module,
 
     public override void AddAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints)
     {
-        if (!_stackTargets.Any())
+        if (!_stackTargets.Any() && _blackfire != null)
         {
             hints.AddForbiddenZone(new SDInvertedRect(Arena.Center, _blackfire.RelativeNorth, 3f, 3f, 30f), DateTime.MaxValue);
             return;
@@ -223,6 +235,18 @@ sealed class P3MegaflareTower(BossModule module) : Components.CastTowers(module,
             {
                 towers[i].ForbiddenSoakers.Set(slot);
             }
+            if (_blackfire == null)
+            {
+                var comp = Module.FindComponent<P3BlackfireTrio>();
+                if (comp != null)
+                {
+                    _blackfire = comp;
+                }
+                else
+                {
+                    return;
+                }
+            }
             AssignTowers();
         }
     }
@@ -243,7 +267,7 @@ sealed class P3MegaflareTower(BossModule module) : Components.CastTowers(module,
             return;
         }
 
-        var relativeN = _blackfire.RelativeNorth.ToDirection();
+        var relativeN = _blackfire!.RelativeNorth.ToDirection();
         var relativeW = relativeN.OrthoL();
 
         var towers = CollectionsMarshal.AsSpan(Towers);
