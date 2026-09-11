@@ -33,10 +33,7 @@ public enum SID : uint
     Rehabilitation = 1263, // BoneKnight->BoneKnight, extra=0x0
 }
 
-
-sealed class DeathSpiral(BossModule module)
-    : Components.SimpleAOEs(module, (uint)AID.DeathSpiral1, new AOEShapeDonut(4f, 40f));
-
+sealed class DeathSpiral(BossModule module) : Components.SimpleAOEs(module, (uint)AID.DeathSpiral1, new AOEShapeDonut(4f, 40f));
 
 // Puts a shield in front of himself. Player should have pet snarl why they get behind and beat him up.
 sealed class ForwardGuard(BossModule module) : Components.DirectionalParry(module, [(uint)OID.BoneKnight])
@@ -48,17 +45,88 @@ sealed class ForwardGuard(BossModule module) : Components.DirectionalParry(modul
             PredictParrySide(caster.InstanceID, Side.Front);
         }
     }
+
+    public override void OnStatusLose(Actor actor, ref ActorStatus status)
+    {
+        if (status.ID == (uint)SID.DirectionalParry)
+        {
+            UpdateState(actor.InstanceID, 0);
+        }
+    }
 }
-
-sealed class BlackEruption(BossModule module)
-    : Components.SimpleAOEs(module, (uint)AID.BlackEruption1, new AOEShapeCircle(5));
-
-sealed class BlackEruption1(BossModule module) :Components.SimpleAOEs(module, (uint)AID.BlackEruption2, new AOEShapeCircle(5));
 
 sealed class AncientAero(BossModule module) : Components.SimpleAOEs(module, (uint)AID.AncientAero1, new AOEShapeRect(40f, 4f));
 
 sealed class Tumulus(BossModule module) : Components.SimpleAOEs(module, (uint)AID.Tumulus, new AOEShapeCircle(6f));
+sealed class BlackEruption(BossModule module) : Components.GenericAOEs(module)
+{
+    private readonly List<AOEInstance> _aoes = [];
+    private readonly AOEShapeCircle _circle = new(5f);
 
+    public override ReadOnlySpan<AOEInstance> ActiveAOEs(int slot, Actor actor)
+    {
+        if (_aoes.Count == 0)
+        {
+            return [];
+        }
+
+        var aoes = CollectionsMarshal.AsSpan(_aoes);
+        var count = aoes.Length;
+        var max = count > 4 ? 4 : count;
+        return aoes[..max];
+    }
+
+    public override void OnCastStarted(Actor caster, ActorCastInfo spell)
+    {
+        if (spell.Action.ID == (uint)AID.BlackEruption1)
+        {
+            _aoes.Add(new(_circle, spell.LocXZ, spell.Rotation, Module.CastFinishAt(spell), actorID: caster.InstanceID));
+        }
+    }
+
+    public override void OnCastFinished(Actor caster, ActorCastInfo spell)
+    {
+        if (spell.Action.ID == (uint)AID.BlackEruption1)
+        {
+            ++NumCasts;
+            if (_aoes.Count != 0)
+            {
+                _aoes.RemoveAt(0);
+            }
+            if (!caster.IsDeadOrDestroyed)
+            {
+                var position = spell.LocXZ;
+                var rotation = caster.Rotation;
+                var distance = 3f;
+                for (var i = 1; i <= 7; i++)
+                {
+                    for (var j = 0; j < 4; j++)
+                    {
+                        var rot = rotation + (j * 90f).Degrees();
+                        var dir = rot.ToDirection() * distance * i;
+                        _aoes.Add(new(_circle, position + dir, rot, Module.CastFinishAt(spell).AddSeconds(i * 2.5d)));
+                    }
+                }
+            }
+        }
+        else if (spell.Action.ID == (uint)AID.BlackEruption2)
+        {
+            ++NumCasts;
+            if (_aoes.Count != 0)
+            {
+                _aoes.RemoveAt(0);
+            }
+        }
+    }
+
+    public override void OnActorDeath(Actor actor)
+    {
+        if (actor.OID == (uint)OID.BoneBishop)
+        {
+            _aoes.Clear();
+        }
+    }
+}
 
 sealed class BoneBishopStates : StateMachineBuilder
 {
@@ -68,10 +136,8 @@ sealed class BoneBishopStates : StateMachineBuilder
             .ActivateOnEnter<DeathSpiral>()
             .ActivateOnEnter<ForwardGuard>()
             .ActivateOnEnter<BlackEruption>()
-            .ActivateOnEnter<BlackEruption1>()
             .ActivateOnEnter<AncientAero>()
             .ActivateOnEnter<Tumulus>()
-
             .Raw.Update = () => AllDeadOrDestroyed([(uint)OID.BoneKnight, (uint)OID.BoneBishop]);
     }
 }
@@ -83,8 +149,6 @@ sealed class BoneBishopStates : StateMachineBuilder
     GroupID = 1088u,
     NameID = 14532u,
     SortOrder = 1)]
-
-
 public sealed class BoneBishop(WorldState ws, Actor primary) : BossModule(ws, primary, new(120f, -420f), new ArenaBoundsCircle(20f))
 {
     public override bool ShouldPrioritizeAllEnemies => true;
