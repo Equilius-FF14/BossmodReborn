@@ -1,4 +1,6 @@
 ﻿using Dalamud.Bindings.ImGui;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace BossMod;
 
@@ -126,8 +128,17 @@ public sealed class BossModuleConfig : ConfigNode
     [PropertySlider(0.1f, 10f, Speed = 0.1f)]
     public float ActorScale = 1f;
 
-
     // hint window settings
+    [PropertyDisplay("Show pre-fight encounter hint popup", tooltip: "Shows encounter-specific notes before a pull. Individual encounters can be hidden permanently from the popup itself and re-enabled from that encounter's config window.")]
+    public bool ShowPrePullHints = true;
+
+    // Persisted separately from module-specific config so every encounter can support "Never show again"
+    // without requiring a boilerplate setting in each ConfigNode. Primary actor OIDs are unique module IDs.
+    public uint[] SuppressedPrePullHintOIDs = [];
+
+    [JsonIgnore]
+    internal HashSet<uint>? _suppressedPrePullHintOIDs;
+
     [PropertyDisplay("Show text hints in separate window", tooltip: "Separates the radar window from the hints window, allowing you to reposition the hints window")]
     public bool HintsInSeparateWindow = false;
 
@@ -153,4 +164,53 @@ public sealed class BossModuleConfig : ConfigNode
     [PropertyDisplay("Maximum load distance", tooltip: "Maximum load distance in yalms")]
     [PropertySlider(0.1f, 500f, Speed = 0.1f, Logarithmic = true)]
     public float MaxLoadDistance = 500f;
+
+    public override void Deserialize(JsonElement j, JsonSerializerOptions ser)
+    {
+        base.Deserialize(j, ser);
+        _suppressedPrePullHintOIDs = null;
+    }
+
+    public bool ShowPrePullHintsFor(uint primaryActorOID) => !SuppressedPrePullHintOIDSet().Contains(primaryActorOID);
+
+    public void SetShowPrePullHintsFor(uint primaryActorOID, bool show)
+    {
+        var set = SuppressedPrePullHintOIDSet();
+        var suppressed = set.Contains(primaryActorOID);
+        if (show == !suppressed)
+        {
+            return;
+        }
+
+        if (show)
+        {
+            set.Remove(primaryActorOID);
+        }
+        else
+        {
+            set.Add(primaryActorOID);
+        }
+
+        var persisted = new uint[set.Count];
+        set.CopyTo(persisted);
+        Array.Sort(persisted);
+        SuppressedPrePullHintOIDs = persisted;
+        Modified.Fire();
+    }
+
+    private HashSet<uint> SuppressedPrePullHintOIDSet()
+    {
+        if (_suppressedPrePullHintOIDs != null)
+        {
+            return _suppressedPrePullHintOIDs;
+        }
+
+        var len = SuppressedPrePullHintOIDs.Length;
+        var set = new HashSet<uint>(len);
+        for (var i = 0; i < len; ++i)
+        {
+            set.Add(SuppressedPrePullHintOIDs[i]);
+        }
+        return _suppressedPrePullHintOIDs = set;
+    }
 }

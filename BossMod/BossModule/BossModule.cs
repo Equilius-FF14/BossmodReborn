@@ -26,6 +26,10 @@ public abstract class BossModule : IDisposable
     public WPos Center => Arena.Center;
     public ArenaBounds Bounds => Arena.Bounds;
 
+    // Optional notes shown in a separate window while this encounter is loaded but not yet pulled.
+    // Override this in an encounter module to opt in; each entry is rendered as a separate bullet.
+    public virtual string[] PrePullHints => [];
+
     // per-oid enemy lists; filled on first request
     public readonly Dictionary<uint, List<Actor>> RelevantEnemies = []; // key = actor OID
 
