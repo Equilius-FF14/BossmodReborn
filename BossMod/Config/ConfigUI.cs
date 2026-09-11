@@ -353,7 +353,7 @@ public sealed class ConfigUI : IDisposable
         return false;
     }
 
-    private static void DrawHelp(string tooltip)
+    public static void DrawHelp(string tooltip, bool nested = false)
     {
         // draw tooltip marker with proper alignment
         ImGui.AlignTextToFramePadding();
@@ -367,6 +367,22 @@ public sealed class ConfigUI : IDisposable
             UIMisc.IconText(Dalamud.Interface.FontAwesomeIcon.InfoCircle);
         }
         ImGui.SameLine();
+        if (nested)
+            DrawNesting();
+    }
+
+    private static void DrawNesting()
+    {
+        var sHeight = ImGui.GetFrameHeight();
+        var sBox = new Vector2(sHeight, sHeight);
+
+        var bar = "└";
+        var pos = ImGui.GetCursorScreenPos();
+        var size = ImGui.CalcTextSize(bar);
+
+        ImGui.Dummy(new(sHeight - ImGui.GetStyle().ItemInnerSpacing.X, 0));
+        ImGui.SameLine();
+        ImGui.GetWindowDrawList().AddText(pos + (sBox - size) * 0.5f, ImGui.GetColorU32(ImGuiCol.Text), bar);
     }
 
     private static bool DrawProperty(string label, string tooltip, ConfigNode node, ConfigFieldMetadata member, object? value, ConfigRoot root, UITree tree, WorldState ws) => value switch

@@ -14,6 +14,13 @@ public sealed class ConfigDisplayAttribute : Attribute
     public string[]? Tags { get; set; }
 }
 
+[AttributeUsage(AttributeTargets.Field)]
+public sealed class SectionStartAttribute(string label = "", bool separator = true) : Attribute
+{
+    public string Label { get; } = label;
+    public bool Separator { get; } = separator;
+}
+
 // attribute that specifies how config node field or enumeration value is shown in the UI
 [AttributeUsage(AttributeTargets.Field)]
 public sealed class PropertyDisplayAttribute(string label, uint color = default, string tooltip = "", bool separator = false, string[]? tags = null, Type? renderer = null) : Attribute
