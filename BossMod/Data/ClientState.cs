@@ -675,7 +675,7 @@ public sealed class ClientState
         {
             output.EmitFourCC("CBST"u8);
             var len = Values.Length;
-            output.Emit(len);
+            output.Emit((byte)len);
             for (var i = 0; i < len; ++i)
             {
                 output.Emit(Values[i]);
