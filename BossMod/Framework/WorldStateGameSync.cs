@@ -962,6 +962,9 @@ sealed class WorldStateGameSync : IDisposable
         {
             _ws.Execute(new ClientState.OpBlueMageSpellsChange([.. actionManager->BlueMageActions]));
         }
+        if (!MemoryExtensions.SequenceEqual(_ws.Client.BeastmasterBeasts.AsSpan(), actionManager->BeastmasterPets))
+            _ws.Execute(new ClientState.OpBeastmasterBeastsChanged(actionManager->BeastmasterPets.ToArray()));
+
         var levels = uiState->PlayerState.ClassJobLevels;
         if (!MemoryExtensions.SequenceEqual(_ws.Client.ClassJobLevels.AsSpan(), levels))
         {

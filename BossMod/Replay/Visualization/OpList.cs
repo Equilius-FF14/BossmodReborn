@@ -258,6 +258,7 @@ sealed class OpList(Replay replay, Replay.Encounter? enc, BossModuleRegistry.Inf
         ClientState.OpBozjaHolsterChange op => $"Player bozja holster change: {GetOpBozjaHolsterChangeString(op.Contents)}",
         ClientState.OpPlayerStatsChange op => $"Player stats: sks={op.Value.SkillSpeed}, sps={op.Value.SpellSpeed}, haste={op.Value.Haste}",
         ClientState.OpBlueMageSpellsChange op => $"Player BLU spellbook: {GetOpBlueMageSpellsChangeString(op.Values)}",
+        ClientState.OpBeastmasterBeastsChanged op => $"Player BST horns: {string.Join(", ", op.Values.Select(v => Service.LuminaRow<Lumina.Excel.Sheets.Pet>((uint)(Service.LuminaRow<Lumina.Excel.Sheets.XBMPet>(v)?.Unknown4 ?? 0))?.Name ?? "<unknown>"))}",
         ClientState.OpClassJobLevelsChange op => $"Player levels: {string.Join(", ", op.Values)}",
         ClientState.OpActiveFateChange op => $"FATE: {op.Value.ID} '{Service.LuminaRow<Lumina.Excel.Sheets.Fate>(op.Value.ID)?.Name}' {op.Value.Progress}%",
         ClientState.OpActivePetChange op => $"Player pet: {ActorString(op.Value.InstanceID, op.Timestamp)}",
