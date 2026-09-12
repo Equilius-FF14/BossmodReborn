@@ -168,6 +168,8 @@ public sealed class ClientState
     public const int NumBlueMageSpells = 24;
     public const int NumDutyActions = 5;
     public const int NumHateTargets = 32;
+    public const int NumBeastmasterBeasts = 3;
+
     public float? CountdownRemaining;
     public Angle CameraAzimuth; // updated every frame by the frame-start event
     public Gauge GaugePayload; // updated every frame by the frame-start event
@@ -181,6 +183,7 @@ public sealed class ClientState
     public readonly byte[] BozjaHolster = new byte[(int)BozjaHolsterID.Count]; // number of copies in holster per item
     public readonly uint[] BlueMageSpells = new uint[NumBlueMageSpells];
     public readonly short[] ClassJobLevels = new short[NumClassLevels];
+    public readonly byte[] BeastmasterBeasts = new byte[NumBeastmasterBeasts];
     public Fate ActiveFate;
     public Pet ActivePet;
     public Companion ActiveCompanion;
@@ -319,6 +322,15 @@ public sealed class ClientState
             if (BlueMageSpells[i] != default)
             {
                 ops.Add(new OpBlueMageSpellsChange(BlueMageSpells));
+                break;
+            }
+        }
+
+        for (var i = 0; i < NumBeastmasterBeasts; ++i)
+        {
+            if (BeastmasterBeasts[i] != default)
+            {
+                ops.Add(new OpBeastmasterBeastsChanged(BeastmasterBeasts));
                 break;
             }
         }
@@ -603,7 +615,8 @@ public sealed class ClientState
         protected override void Exec(WorldState ws)
         {
             Array.Fill(ws.Client.BozjaHolster, (byte)0);
-            for (var i = 0; i < Contents.Count; ++i)
+            var count = Contents.Count;
+            for (var i = 0; i < count; ++i)
             {
                 var e = Contents[i];
                 ws.Client.BozjaHolster[(int)e.entry] = e.count;
@@ -639,7 +652,30 @@ public sealed class ClientState
         {
             var len = Values.Length;
             output.EmitFourCC("CBLU"u8);
-            output.Emit((byte)Values.Length);
+            output.Emit((byte)len);
+            for (var i = 0; i < len; ++i)
+            {
+                output.Emit(Values[i]);
+            }
+        }
+    }
+
+    public Event<OpBeastmasterBeastsChanged> BeastmasterBeastsChanged = new();
+    public sealed class OpBeastmasterBeastsChanged(byte[] values) : WorldState.Operation
+    {
+        public readonly byte[] Values = values;
+
+        protected override void Exec(WorldState ws)
+        {
+            Array.Copy(Values, ws.Client.BeastmasterBeasts, NumBeastmasterBeasts);
+            ws.Client.BeastmasterBeastsChanged.Fire(this);
+        }
+
+        public override void Write(ReplayRecorder.Output output)
+        {
+            output.EmitFourCC("CBST"u8);
+            var len = Values.Length;
+            output.Emit(len);
             for (var i = 0; i < len; ++i)
             {
                 output.Emit(Values[i]);

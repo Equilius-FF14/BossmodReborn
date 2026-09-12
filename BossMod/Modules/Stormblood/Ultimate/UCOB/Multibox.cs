@@ -13,7 +13,7 @@ sealed class Multibox(RotationModuleManager manager, Actor player) : RotationMod
 
     public override void Execute(StrategyValues strategy, Actor? primaryTarget, float estimatedAnimLockDelay, bool isMoving)
     {
-        if (World.Party.WithoutSlot(includeDead: true).Any(p => p.IsDead || p.FindStatus((uint)SID.Paralysis) != null) && Bossmods.ActiveModule!.StateMachine.ActivePhaseIndex < 4)
+        if (World.Party.WithoutSlot(true, true, true).Any(p => p.IsDead || p.FindStatus((uint)SID.Paralysis) != null) && Bossmods.ActiveModule!.StateMachine.ActivePhaseIndex < 4)
         {
             Hints.ForcedMovement = -Player.DirectionTo(default(WPos)).ToVec3();
         }

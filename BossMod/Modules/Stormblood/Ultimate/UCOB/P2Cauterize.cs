@@ -41,10 +41,6 @@ sealed class P2Cauterize(BossModule module) : Components.GenericAOEs(module)
     {
         base.AddAIHints(slot, actor, assignment, hints);
 
-        // bait spots are inside the arena border. pathfinder doesn't try to walk out of blocked pixels unless there is a goal to move toward
-        // normally player will have nael targeted, but for cursed pattern 3rd bait she is temporarily despawned
-        hints.GoalZones.Add(AIHints.GoalSingleTarget(Arena.Center, 8f, 0.1f));
-
         var boSlot = BaitOrder[slot];
         var bo = boSlot.Order;
 
