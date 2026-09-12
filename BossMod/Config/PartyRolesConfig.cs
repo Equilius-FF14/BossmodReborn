@@ -408,18 +408,19 @@ public class PartyRolesConfig : ConfigNode
                 var assignments = (Assignment[])type.GeneratedEnumValues();
                 var len = assignments.Length;
                 var style = ImGui.GetStyle();
+                var stylepadding = style.CellPadding.X * 2f + style.FramePadding.X * 2f;
                 var names = type.GeneratedEnumNames();
                 for (var i = 0; i < len; ++i)
                 {
                     var name = names[i];
-                    var size = ImGui.CalcTextSize(name).X + style.CellPadding.X * 2f + style.FramePadding.X * 2f;
+                    var size = ImGui.CalcTextSize(name).X + stylepadding;
                     ImGui.TableSetupColumn(name, ImGuiTableColumnFlags.WidthFixed, size);
                 }
 
                 ImGui.TableSetupColumn("Name");
                 ImGui.TableHeadersRow();
 
-                List<(ulong cid, string name, char role, Assignment assignment)> party = [];
+                List<(ulong cid, string name, char role, Assignment assignment)> party = [with(PartyState.MaxPartySize)];
                 for (var i = 0; i < PartyState.MaxPartySize; ++i)
                 {
                     ref var m = ref ws.Party.Members[i];

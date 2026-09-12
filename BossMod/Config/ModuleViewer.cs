@@ -6,18 +6,38 @@ using Dalamud.Utility;
 using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
 using System.Globalization;
-using System.Text.RegularExpressions;
 
 namespace BossMod;
 
 public sealed class ModuleViewer : IDisposable
 {
-    private readonly struct ModuleInfo(BossModuleRegistry.Info info, string name, int sortOrder)
+    private readonly struct ModuleInfo
     {
-        public readonly BossModuleRegistry.Info Info = info;
-        public readonly string Name = name;
-        public readonly int SortOrder = sortOrder;
+        public readonly BossModuleRegistry.Info Info;
+        public readonly int SortOrder;
+        public readonly string DisplayName;
+        public readonly string EnableID;
+        public readonly string ConfigID;
+        public readonly string PlansID;
+        public readonly string PopupID;
+        public readonly Func<string> HelpText;
+
+        public ModuleInfo(BossModuleRegistry.Info info, string name, int sortOrder)
+        {
+            Info = info;
+            SortOrder = sortOrder;
+
+            var typeName = info.ModuleType.FullName ?? info.ModuleType.Name;
+            DisplayName = $"{name} [{info.ModuleType.Name}]";
+            EnableID = $"##enable-module-{info.PrimaryActorOID:X8}";
+            ConfigID = $"{typeName}_cfg";
+            PlansID = $"{typeName}_plans";
+            PopupID = $"{typeName}_popup";
+            var helpText = BuildModuleHelpText(info);
+            HelpText = () => helpText;
+        }
     }
+
     private readonly struct ModuleGroupInfo(string name, uint id, uint sortOrder, uint icon = default)
     {
         public readonly string Name = name;
@@ -32,12 +52,15 @@ public sealed class ModuleViewer : IDisposable
         public override readonly bool Equals(object? obj) => obj is ModuleGroupInfo other && Equals(other);
         public override readonly int GetHashCode() => (Name, Id, SortOrder, Icon).GetHashCode();
     }
-    private readonly struct ModuleGroup(ModuleGroupInfo info, List<ModuleInfo> modules, List<uint> moduleOIDs, List<uint> nonDummyModuleOIDs)
+
+    private readonly struct ModuleGroup(ModuleGroupInfo info, List<ModuleInfo> modules, List<uint> moduleOIDs, List<uint> nonDummyModuleOIDs, int expansion, int category)
     {
         public readonly ModuleGroupInfo Info = info;
         public readonly List<ModuleInfo> Modules = modules;
         public readonly List<uint> ModuleOIDs = moduleOIDs;
         public readonly List<uint> NonDummyModuleOIDs = nonDummyModuleOIDs;
+        public readonly string EnableID = $"##enable-group-{expansion}-{category}-{info.Id:X8}";
+        public readonly string NodeLabel = $"{info.Name}###{expansion}/{category}/{info.Id}";
     }
 
     private readonly PlanDatabase? _planDB;
@@ -51,7 +74,7 @@ public sealed class ModuleViewer : IDisposable
     private readonly (string name, uint icon)[] _categories = new (string, uint)[(int)BossModuleInfo.Category.Count];
     private readonly uint _iconFATE;
     private readonly uint _iconHunt;
-    private readonly List<ModuleGroup>[,] _groups;
+    private readonly List<ModuleGroup>?[,] _groups;
     private readonly Dictionary<Type, int> _supportedListOrder = [];
     private readonly Vector2 _iconSize = new(30f, 30f);
 
@@ -114,25 +137,20 @@ public sealed class ModuleViewer : IDisposable
         _iconFATE = contentType.GetRow(8u).Icon;
         _iconHunt = (uint)playStyle.GetRow(10u).Icon;
 
-        _groups = new List<ModuleGroup>[(int)BossModuleInfo.Expansion.Count, (int)BossModuleInfo.Category.Count];
-        for (var i = 0; i < (int)BossModuleInfo.Expansion.Count; ++i)
-        {
-            for (var j = 0; j < (int)BossModuleInfo.Category.Count; ++j)
-            {
-                _groups[i, j] = [];
-            }
-        }
+        _groups = new List<ModuleGroup>?[(int)BossModuleInfo.Expansion.Count, (int)BossModuleInfo.Category.Count];
 
         foreach (var info in BossModuleRegistry.RegisteredModules.Values)
         {
-            var groups = _groups[(int)info.Expansion, (int)info.Category];
+            var expansion = (int)info.Expansion;
+            var category = (int)info.Category;
+            var groups = _groups[expansion, category] ??= [];
+
             var infos = Classify(info);
             ref readonly var groupInfo = ref infos.Item1;
             ref readonly var moduleInfo = ref infos.Item2;
-
-            var count = groups.Count;
-            var groupIndex = -1;
             var groupsSpan = CollectionsMarshal.AsSpan(groups);
+            var groupIndex = -1;
+            var count = groups.Count;
             var id = groupInfo.Id;
             for (var i = 0; i < count; ++i)
             {
@@ -146,21 +164,21 @@ public sealed class ModuleViewer : IDisposable
 
             if (groupIndex < 0)
             {
-                groupIndex = count;
-                groups.Add(new(groupInfo, [], [], []));
+                groupIndex = groups.Count;
+                groups.Add(new(groupInfo, [], [], [], expansion, category));
                 groupsSpan = CollectionsMarshal.AsSpan(groups);
             }
-            else if (groups[groupIndex].Info != groupInfo)
+            else if (groupsSpan[groupIndex].Info != groupInfo)
             {
-                Service.Log($"[ModuleViewer] Group properties mismatch between {groupInfo} and {groups[groupIndex].Info}");
+                Service.Log($"[ModuleViewer] Group properties mismatch between {groupInfo} and {groupsSpan[groupIndex].Info}");
             }
 
-            ref readonly var gidx = ref groupsSpan[groupIndex];
-            gidx.Modules.Add(moduleInfo);
-            gidx.ModuleOIDs.Add(info.PrimaryActorOID);
+            ref readonly var group = ref groupsSpan[groupIndex];
+            group.Modules.Add(moduleInfo);
+            group.ModuleOIDs.Add(info.PrimaryActorOID);
             if (info.Maturity != BossModuleInfo.Maturity.Dummy)
             {
-                gidx.NonDummyModuleOIDs.Add(info.PrimaryActorOID);
+                group.NonDummyModuleOIDs.Add(info.PrimaryActorOID);
             }
         }
 
@@ -170,10 +188,16 @@ public sealed class ModuleViewer : IDisposable
             for (var j = 0; j < (int)BossModuleInfo.Category.Count; ++j)
             {
                 var groups = _groups[i, j];
+                if (groups == null)
+                {
+                    continue;
+                }
+
                 groups.Sort(static (a, b) => a.Info.SortOrder.CompareTo(b.Info.SortOrder));
                 var groupsSpan = CollectionsMarshal.AsSpan(groups);
                 var count = groups.Count;
-                for (var g = 0; g < count - 1; ++g)
+                var countAdj = count - 1;
+                for (var g = 0; g < countAdj; ++g)
                 {
                     ref readonly var g1 = ref groupsSpan[g];
                     ref readonly var g2 = ref groupsSpan[g + 1];
@@ -424,7 +448,13 @@ public sealed class ModuleViewer : IDisposable
                     continue;
                 }
 
-                var groups = CollectionsMarshal.AsSpan(_groups[i, j]);
+                var groupList = _groups[i, j];
+                if (groupList == null)
+                {
+                    continue;
+                }
+
+                var groups = CollectionsMarshal.AsSpan(groupList);
                 var countG = groups.Length;
                 for (var k = 0; k < countG; ++k)
                 {
@@ -456,7 +486,7 @@ public sealed class ModuleViewer : IDisposable
                         ImGuiP.PushItemFlag(ImGuiItemFlags.MixedValue, true);
                     }
                     CenterEnableCheckbox();
-                    var groupChanged = ImGui.Checkbox($"##enable-group-{i}-{j}-{group.Info.Id:X8}", ref groupEnabled);
+                    var groupChanged = ImGui.Checkbox(group.EnableID, ref groupEnabled);
                     if (groupMixed)
                     {
                         ImGuiP.PopItemFlag();
@@ -471,7 +501,7 @@ public sealed class ModuleViewer : IDisposable
                     }
 
                     ImGui.TableNextColumn();
-                    foreach (var ng in tree.Node($"{group.Info.Name}###{i}/{j}/{group.Info.Id}"))
+                    foreach (var ng in tree.Node(group.NodeLabel))
                     {
                         var modules = CollectionsMarshal.AsSpan(group.Modules);
                         var len = modules.Length;
@@ -490,7 +520,7 @@ public sealed class ModuleViewer : IDisposable
                             ImGui.TableNextColumn();
                             var moduleEnabled = _moduleConfig.IsModuleEnabled(mod.Info.PrimaryActorOID);
                             CenterEnableCheckbox();
-                            if (ImGui.Checkbox($"##enable-module-{mod.Info.PrimaryActorOID:X8}", ref moduleEnabled))
+                            if (ImGui.Checkbox(mod.EnableID, ref moduleEnabled))
                             {
                                 _moduleConfig.SetModuleEnabled(mod.Info.PrimaryActorOID, moduleEnabled);
                             }
@@ -502,7 +532,7 @@ public sealed class ModuleViewer : IDisposable
                             ImGui.TableNextColumn();
                             using (ImRaii.Disabled(mod.Info.ConfigType == null && !mod.Info.HasPrePullHints))
                             {
-                                if (UIMisc.IconButton(FontAwesomeIcon.Cog, $"{mod.Info.ModuleType.FullName}_cfg"))
+                                if (UIMisc.IconButton(FontAwesomeIcon.Cog, mod.ConfigID))
                                 {
                                     _ = new BossModuleConfigWindow(mod.Info, ws);
                                 }
@@ -511,15 +541,14 @@ public sealed class ModuleViewer : IDisposable
                             ImGui.SameLine();
                             using (ImRaii.Disabled(mod.Info.PlanLevel == 0))
                             {
-                                if (UIMisc.IconButton(FontAwesomeIcon.ClipboardList, $"{mod.Info.ModuleType.FullName}_plans"))
+                                if (UIMisc.IconButton(FontAwesomeIcon.ClipboardList, mod.PlansID))
                                 {
-                                    ImGui.OpenPopup($"{mod.Info.ModuleType.FullName}_popup");
+                                    ImGui.OpenPopup(mod.PopupID);
                                 }
                             }
 
                             ImGui.SameLine();
-                            var name = ModuleHelpText(in mod);
-                            UIMisc.HelpMarker(() => name);
+                            UIMisc.HelpMarker(mod.HelpText);
                             ImGui.SameLine();
                             var textColor = mod.Info.Maturity switch
                             {
@@ -531,10 +560,10 @@ public sealed class ModuleViewer : IDisposable
                             };
                             using (ImRaii.PushColor(ImGuiCol.Text, textColor))
                             {
-                                ImGui.TextUnformatted($"{mod.Name} [{mod.Info.ModuleType.Name}]");
+                                ImGui.TextUnformatted(mod.DisplayName);
                             }
 
-                            using (var popup = ImRaii.Popup($"{mod.Info.ModuleType.FullName}_popup"))
+                            using (var popup = ImRaii.Popup(mod.PopupID))
                             {
                                 if (popup)
                                 {
@@ -635,16 +664,12 @@ public sealed class ModuleViewer : IDisposable
         }
     }
 
-    private string ModuleHelpText(in ModuleInfo info)
+    private static string BuildModuleHelpText(BossModuleRegistry.Info info)
     {
-        var sb = new StringBuilder();
-        sb.AppendLine(CultureInfo.CurrentCulture, $"Cooldown planning: {(info.Info.PlanLevel > 0 ? $"L{info.Info.PlanLevel}" : "not supported")}");
-        if (info.Info.Contributors.Length > 0)
-        {
-            sb.AppendLine(CultureInfo.CurrentCulture, $"Contributors: {info.Info.Contributors}");
-        }
-
-        return sb.ToString();
+        var planning = info.PlanLevel > 0 ? $"L{info.PlanLevel}" : "not supported";
+        return info.Contributors.Length > 0
+            ? $"Cooldown planning: {planning}\nContributors: {info.Contributors}\n"
+            : $"Cooldown planning: {planning}\n";
     }
 
     private void ModulePlansPopup(BossModuleRegistry.Info info)
