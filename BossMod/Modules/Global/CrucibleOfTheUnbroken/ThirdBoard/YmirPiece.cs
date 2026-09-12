@@ -111,6 +111,19 @@ public sealed class YmirPiece(WorldState ws, Actor primary) : BossModule(ws, pri
 {
     public static readonly uint[] Bosses = [(uint)OID.YmirPiece, (uint)OID.SahaginPiece];
 
+    protected override void CalculateModuleAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints) {
+        var count = hints.PotentialTargets.Count;
+        for (var i = 0; i < count; ++i) {
+            var e = hints.PotentialTargets[i];
+            e.Priority = e.Actor.OID switch {
+                (uint)OID.YmirShell => 3,
+                (uint)OID.YmirPiece => 2,
+                (uint)OID.SahaginPiece => 1,
+                _ => 0
+            };
+        }
+    }
+
     protected override void DrawEnemies(int pcSlot, Actor pc)
     {
         Arena.Actors(this, Bosses);
