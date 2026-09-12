@@ -32,7 +32,6 @@ public enum IconID : uint {
 }
 
 sealed class Earthrender(BossModule module) : Components.SimpleAOEs(module, (uint)AID.Earthrender, 6.0f);
-sealed class Rockslide(BossModule module) : Components.SimpleAOEs(module, (uint)AID.Rockslide, new AOEShapeRect(45.0f, 5.0f));
 sealed class SandTempest(BossModule module) : Components.RaidwideCast(module, (uint)AID.SandTempest);
 sealed class EarthShaker(BossModule module) : Components.BaitAwayIcon(module, new AOEShapeCone(60.0f, 25.0f.Degrees()), (uint)IconID.EarthShake,
     (uint)AID.EarthShaker, 3.3f);
@@ -58,7 +57,48 @@ sealed class Burst(BossModule module) : Components.GenericAOEs(module) {
     public override ReadOnlySpan<AOEInstance> ActiveAOEs(int slot, Actor actor) => CollectionsMarshal.AsSpan(aoes);
 }
 
-sealed class Landslip(BossModule module) : Components.SimpleKnockbacks(module, (uint)AID.Landslip, 20.0f, shape: new AOEShapeRect(45.0f, 5.0f), maxCasts: 1) {
+sealed class Rockslide(BossModule module) : Components.GenericAOEs(module, (uint)AID.Rockslide) {
+    public readonly List<AOEInstance> aoes = [];
+    private readonly AOEShapeRect shape = new(45.0f, 5.0f);
+    private bool active = false;
+
+    public override void OnActorCreated(Actor actor) {
+        if (actor.OID == (uint)OID.GolemPiece) {
+            aoes.Add(new(shape, actor.Position, actor.Rotation, WorldState.FutureTime(9.7f)));
+        }
+    }
+
+    public override void OnCastStarted(Actor caster, ActorCastInfo spell) {
+        if (spell.Action.ID == (uint)AID.Landslip) {
+            active = true;
+        }
+    }
+
+    public override void OnEventCast(Actor caster, ActorCastEvent spell) {
+        if (spell.Action.ID == (uint)AID.Rockslide) {
+            if (aoes.Count > 0) {
+                aoes.RemoveAt(0);
+            }
+        }
+
+        if (spell.Action.ID == (uint)AID.Landslip) {
+            active = false;
+        }
+    }
+
+    public override ReadOnlySpan<AOEInstance> ActiveAOEs(int slot, Actor actor) => CollectionsMarshal.AsSpan(aoes);
+
+    public override void AddHints(int slot, Actor actor, TextHints hints) {
+        if (active) {
+            return;
+        }
+
+        base.AddHints(slot, actor, hints);
+    }
+}
+
+sealed class Landslip(BossModule module) : Components.SimpleKnockbacks(module, (uint)AID.Landslip, 20.0f, shape: new AOEShapeRect(45.0f, 5.0f), maxCasts: 1,
+    kind: Kind.DirForward) {
     private readonly Rockslide? rockslide = module.FindComponent<Rockslide>();
 
     // Grid map
@@ -70,7 +110,7 @@ sealed class Landslip(BossModule module) : Components.SimpleKnockbacks(module, (
     public override void DrawArenaForeground(int pcSlot, Actor pc) {
         base.DrawArenaForeground(pcSlot, pc);
 
-        if (rockslide == null || rockslide.Casters.Count == 0 || Casters.Count == 0) {
+        if (rockslide == null || rockslide.aoes.Count == 0 || Casters.Count == 0) {
             return;
         }
 
@@ -91,7 +131,7 @@ sealed class Landslip(BossModule module) : Components.SimpleKnockbacks(module, (
                     }
 
                     var tileSafe = true; // We have to check every rockslide cast since they can overlap
-                    foreach (var aoe in rockslide.Casters) {
+                    foreach (var aoe in rockslide.aoes) {
                         if (aoe.Check(destination)) {
                             tileSafe = false;
                             break;
@@ -127,7 +167,17 @@ sealed class LakhamuPieceStates : StateMachineBuilder {
     NameID = 14580u,
     SortOrder = 13)]
 public sealed class LakhamuPiece(WorldState ws, Actor primary) : BossModule(ws, primary, new(120f, 0f), new ArenaBoundsRect(20f, 20f)) {
-    public override bool ShouldPrioritizeAllEnemies => true;
+    protected override void CalculateModuleAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints) {
+        var count = hints.PotentialTargets.Count;
+        for (var i = 0; i < count; ++i) {
+            var e = hints.PotentialTargets[i];
+            e.Priority = e.Actor.OID switch {
+                (uint)OID.GolemPiece => 2,
+                (uint)OID.LakhamuPiece => 1,
+                _ => 0
+            };
+        }
+    }
 
     protected override void DrawEnemies(int pcSlot, Actor pc) {
         Arena.Actor(PrimaryActor);

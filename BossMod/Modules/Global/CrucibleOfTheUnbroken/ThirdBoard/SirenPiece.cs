@@ -18,8 +18,10 @@ public enum AID : uint {
     UnmooringMelody1 = 48566, // Helper->self, no cast, range 50 ?-degree cone
     FeralLungeBoss = 48569, // SirenPiece->self, 3.8+0.2s cast, single-target
     FeralLunge = 48570, // Helper->self, 4.0s cast, range 50 width 16 rect
-    DeadMansDirgeBoss = 48572, // SirenPiece->self, 5.6+1.4s cast, single-target
-    DeadMansDirge = 48573, // Helper->self, 7.0s cast, range 12 circle
+    DeadMansDirgeOuterBoss = 48572, // SirenPiece->self, 5.6+1.4s cast, single-target
+    DeadMansDirgeOuter = 48573, // Helper->self, 7.0s cast, range 12 circle
+    DeadMansDirgeInnerBoss = 48574, // SirenPiece->self, 6.2+0.8s cast, single-target
+    DeadMansDirgeInner = 48575, // Helper->self, 7.0s cast, range 3-43 donut
     DistantTune = 48576, // SirenPiece->self, 3.0s cast, single-target
     Burst = 48577, // 4CA2->self, 1.0s cast, range 9 circle
     InvitingVerse = 48571, // SirenPiece->self, 5.0s cast, range 40 circle
@@ -27,7 +29,10 @@ public enum AID : uint {
 
 public enum SID : uint {
     WitsEnd = 5424, // Helper->player, extra=0x1
+    Bleeding = 3077, // none->player, extra=0x0
+    Bleeding1 = 3078, // none->player, extra=0x0
     ForcedMarch = 1257, // SirenPiece->player, extra=0x4
+    ForwardMarch = 2161, // SirenPiece->player, extra=0x0
     LeftFace = 2163, // SirenPiece->player, extra=0x0
 }
 
@@ -41,8 +46,9 @@ public enum TetherID : uint {
 
 sealed class SongOfTorment(BossModule module) : Components.SingleTargetCast(module, (uint)AID.SongOfTorment);
 sealed class FeralLunge(BossModule module) : Components.SimpleAOEs(module, (uint)AID.FeralLunge, new AOEShapeRect(50.0f, 8.0f));
-sealed class DeadMansDirge(BossModule module) : Components.SimpleAOEs(module, (uint)AID.DeadMansDirge, 12.0f);
-sealed class InvitingVerse(BossModule module) : Components.StatusDrivenForcedMarch(module, 3.0f, default, default, (uint)SID.LeftFace, default);
+sealed class DeadMansDirgeOuter(BossModule module) : Components.SimpleAOEs(module, (uint)AID.DeadMansDirgeOuter, 12.0f);
+sealed class DeadMansDirgeInner(BossModule module) : Components.SimpleAOEs(module, (uint)AID.DeadMansDirgeInner, new AOEShapeDonut(3.0f, 43.0f));
+sealed class InvitingVerse(BossModule module) : Components.StatusDrivenForcedMarch(module, 3.0f, (uint)SID.ForwardMarch, default, (uint)SID.LeftFace, default);
 
 sealed class UnmooringMelody(BossModule module) : Components.GenericAOEs(module) {
     private readonly List<AOEInstance> aoes = [];
@@ -108,7 +114,8 @@ sealed class SirenPieceStates : StateMachineBuilder {
             .ActivateOnEnter<SongOfTorment>()
             .ActivateOnEnter<UnmooringMelody>()
             .ActivateOnEnter<FeralLunge>()
-            .ActivateOnEnter<DeadMansDirge>()
+            .ActivateOnEnter<DeadMansDirgeOuter>()
+            .ActivateOnEnter<DeadMansDirgeInner>()
             .ActivateOnEnter<Burst>()
             .ActivateOnEnter<InvitingVerse>();
     }

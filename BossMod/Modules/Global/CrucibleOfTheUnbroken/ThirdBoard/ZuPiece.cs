@@ -341,7 +341,7 @@ public sealed class ZuPiece(WorldState ws, Actor primary) : BossModule(ws, prima
     protected override void DrawEnemies(int pcSlot, Actor pc)
     {
         Arena.Actor(PrimaryActor);
-        Arena.Actors(Enemies((uint)OID.PulletPiece));
+        Arena.Actors(Enemies((uint)OID.PulletPiece), Colors.Vulnerable);
         Arena.Actors(Enemies((uint)OID.CockerelPiece));
     }
 
@@ -364,8 +364,10 @@ public sealed class ZuPiece(WorldState ws, Actor primary) : BossModule(ws, prima
     }
 
     private readonly string[] _prePullHints =
+        // PulletPiece
     [
-        "Avoid breaking the eggs!"
+        "Avoid breaking the eggs!",
+        "When adds spawn kill order is the following: PulletPiece (purple) -> CockerelPiece -> Boss"
     ];
 
     public override string[] PrePullHints => _prePullHints;
