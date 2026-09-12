@@ -1,5 +1,24 @@
 ﻿namespace BossMod.Stormblood.Ultimate.UCOB;
 
+sealed class P3HeavensfallPreposition(UCOB module) : Components.CastCounter(module, (uint)AID.HeavensfallTrio)
+{
+    // heavensfall cast start to dive bait
+    private readonly DateTime _diveAt = module.WorldState.FutureTime(8.5d);
+    private readonly Actor _bahamut = module.BahamutPrime()!;
+
+    public override void AddAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints)
+    {
+        if (_bahamut.IsTargetable)
+        {
+            hints.AddForbiddenZone(new SDInvertedCircle(Arena.Center, 5f), _diveAt.AddSeconds(-1d));
+        }
+        else
+        {
+            hints.AddForbiddenZone(new SDInvertedCircle(Arena.Center, 1f), _diveAt);
+        }
+    }
+}
+
 sealed class P3HeavensfallTrio(BossModule module) : BossComponent(module)
 {
     private Actor? _nael;
@@ -9,6 +28,7 @@ sealed class P3HeavensfallTrio(BossModule module) : BossComponent(module)
     private readonly UCOBConfig _config = Service.Config.Get<UCOBConfig>();
 
     public bool Active => _nael != null;
+    private bool _divesStarted;
 
     private readonly Angle[] _offsetsNaelCenter = [10f.Degrees(), 80f.Degrees(), 100f.Degrees(), 170f.Degrees()];
     private readonly Angle[] _offsetsNaelSide = [60f.Degrees(), 80f.Degrees(), 100f.Degrees(), 120f.Degrees()];
@@ -39,6 +59,22 @@ sealed class P3HeavensfallTrio(BossModule module) : BossComponent(module)
         {
             _baha = actor;
             InitIfReady();
+        }
+    }
+
+    public override void AddAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints)
+    {
+        if (_divesStarted)
+        {
+            hints.AddForbiddenZone(new SDInvertedCircle(_safeSpots[slot], 1f));
+        }
+    }
+
+    public override void OnCastStarted(Actor caster, ActorCastInfo spell)
+    {
+        if (spell.Action.ID == (uint)AID.MegaflareDive)
+        {
+            _divesStarted = true;
         }
     }
 
@@ -75,6 +111,17 @@ sealed class P3HeavensfallTowers(UCOB module) : Components.CastTowers(module, (u
 {
     private readonly UCOBConfig _config = Service.Config.Get<UCOBConfig>();
     private readonly Actor _nael = module.Nael()!;
+    bool _knockbackDone;
+
+    public override void OnEventCast(Actor caster, ActorCastEvent spell)
+    {
+        base.OnEventCast(caster, spell);
+
+        if (spell.Action.ID == (uint)AID.Heavensfall)
+        {
+            _knockbackDone = true;
+        }
+    }
 
     public override void OnCastStarted(Actor caster, ActorCastInfo spell)
     {
@@ -85,13 +132,11 @@ sealed class P3HeavensfallTowers(UCOB module) : Components.CastTowers(module, (u
             var center = Arena.Center;
             var dirToNael = Angle.FromDirection(_nael.Position - center);
 
-            Towers.Sort((a, b) =>
-                TowerSortKey(Angle.FromDirection(a.Position - center), dirToNael)
-                    .CompareTo(TowerSortKey(Angle.FromDirection(b.Position - center), dirToNael)));
+            var towers = CollectionsMarshal.AsSpan(Towers);
+            RefSort.Sort(towers, new TowerComparer(dirToNael, center));
 
             var assignments = _config.P3HeavensfallTrioTowers.Resolve(Raid);
             var count = assignments.Count;
-            var towers = CollectionsMarshal.AsSpan(Towers);
             for (var i = 0; i < count; ++i)
             {
                 var p = assignments[i];
@@ -100,15 +145,64 @@ sealed class P3HeavensfallTowers(UCOB module) : Components.CastTowers(module, (u
         }
     }
 
-    // order towers from nael's position CW
-    private float TowerSortKey(Angle tower, Angle reference)
+    // order towers from Nael's position CW
+    private readonly struct TowerComparer(Angle reference, WPos center) : IRefComparer<Tower>
     {
-        var cwDist = (reference - tower).Normalized().Deg;
-        if (cwDist < -5f) // towers are ~22.5 degrees apart
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int Compare(ref Tower a, ref Tower b)
         {
-            cwDist += 360f;
+            var aAngle = Angle.FromDirection(a.Position - center);
+            var bAngle = Angle.FromDirection(b.Position - center);
+
+            var aDist = (reference - aAngle).Normalized().Deg;
+            var bDist = (reference - bAngle).Normalized().Deg;
+
+            // towers are ~22.5 degrees apart; tolerate slight offset around reference
+            if (aDist < -5f)
+            {
+                aDist += 360f;
+            }
+
+            if (bDist < -5f)
+            {
+                bDist += 360f;
+            }
+
+            return aDist.CompareTo(bDist);
         }
-        return cwDist;
+    }
+
+    public override void AddAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints)
+    {
+        if (!EnableHints)
+        {
+            return;
+        }
+
+        if (_knockbackDone)
+        {
+            base.AddAIHints(slot, actor, assignment, hints);
+            return;
+        }
+
+        var index = -1;
+        var towers = CollectionsMarshal.AsSpan(Towers);
+        var len = towers.Length;
+        for (var i = 0; i < len; ++i)
+        {
+            if (!towers[i].ForbiddenSoakers[slot])
+            {
+                index = i;
+                break;
+            }
+        }
+        if (index >= 0)
+        {
+            var center = Arena.Center;
+            ref var myTower = ref towers[index];
+            var dir = myTower.Position - Arena.Center;
+            hints.AddForbiddenZone(new SDInvertedCone(center, 30f, dir.ToAngle(), 5f.Degrees()), myTower.Activation.AddSeconds(-2.5d));
+        }
     }
 }
 

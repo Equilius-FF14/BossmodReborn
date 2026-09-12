@@ -92,12 +92,12 @@ sealed class P1LiquidHell(BossModule module) : LiquidHellBase(module)
             if (isBaiter)
             {
                 hints.AddForbiddenZone(new SDCircle(Module.PrimaryActor.Position, 18f), NextCast);
-
+                var center = Arena.Center;
                 // encourage baiter to stay on the opposite half of the arena, because it tends to walk itself into a corner otherwise
-                hints.AddForbiddenZone(new SDInvertedCone(Module.PrimaryActor.Position, 50f, Module.PrimaryActor.DirectionTo(Arena.Center).ToAngle(), 45f.Degrees()), DateTime.MaxValue);
+                hints.AddForbiddenZone(new SDInvertedCone(Module.PrimaryActor.Position, 50f, Module.PrimaryActor.DirectionTo(center).ToAngle(), 45f.Degrees()), DateTime.MaxValue);
 
                 // encourage baiter to stay on arena edge if possible
-                hints.GoalZones.Add(p => p.InDonut(Arena.Center, 18, 22) ? 0.1f : 0);
+                hints.GoalZones.Add(p => p.InDonut(center, 18, 22) ? 0.1f : 0);
 
                 // don't drop on neurolinks
                 var countN = _neurolinks.Count;
@@ -127,7 +127,7 @@ sealed class P1LiquidHell(BossModule module) : LiquidHellBase(module)
                     {
                         continue;
                     }
-                    hints.AddForbiddenZone(new SDCircle(p.Position, 0.5f), DateTime.MaxValue);
+                    hints.AddForbiddenZone(new SDCircle(p.Position, 1f), DateTime.MaxValue);
                 }
             }
             if (_fireball == null)

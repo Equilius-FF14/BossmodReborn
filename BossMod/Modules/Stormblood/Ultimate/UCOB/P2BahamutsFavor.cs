@@ -201,7 +201,10 @@ sealed class P2BahamutsFavorChainLightning(UCOB module) : Components.UniformStac
             if (FirstSet)
             {
                 var ordered = partyRolesConfig.AssignmentsPerSlot(Raid);
-
+                if (ordered.Length == 0)
+                {
+                    return;
+                }
                 var myOrder = -1;
                 var actorIndex = -1;
 

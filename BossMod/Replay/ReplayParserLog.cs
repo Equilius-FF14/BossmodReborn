@@ -963,8 +963,10 @@ public sealed class ReplayParserLog : IDisposable
     {
         var contents = new byte[ClientState.NumBeastmasterBeasts];
         var count = _input.ReadByte(false);
-        for (var i = 0; i < count; i++)
+        for (var i = 0; i < count; ++i)
+        {
             contents[i] = _input.ReadByte(false);
+        }
         return new(contents);
     }
 

@@ -2,7 +2,7 @@ namespace BossMod.Stormblood.Ultimate.UCOB;
 
 sealed class P1Fireball(BossModule module) : Components.StackWithIcon(module, (uint)IconID.Fireball, (uint)AID.Fireball, 4f, 5.3d, 4, 4)
 {
-    private int _neurolinkCount = 0;
+    private int _neurolinkCount;
     private readonly PartyRolesConfig _prc = Service.Config.Get<PartyRolesConfig>();
     private readonly UCOBConfig _config = Service.Config.Get<UCOBConfig>();
 
