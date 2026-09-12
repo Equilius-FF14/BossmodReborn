@@ -2,18 +2,34 @@
 
 namespace BossMod.Stormblood.Ultimate.UCOB;
 
-sealed class P2Heavensfall(BossModule module) : Components.GenericKnockback(module, (uint)AID.Heavensfall)
+abstract class Heavensfall(BossModule module) : Components.GenericKnockback(module, (uint)AID.Heavensfall)
 {
     public DateTime Activation;
 
     public override ReadOnlySpan<Knockback> ActiveKnockbacks(int slot, Actor actor)
     {
-        return new Knockback[1] { new(Arena.Center, 11f, Activation, ignoreImmunes: true) }; // TODO: activation
+        return new Knockback[1] { new(Arena.Center, 11f, Activation, ignoreImmunes: true) };
     }
+}
+
+sealed class P2Heavensfall(BossModule module) : Heavensfall(module)
+{
+    public override void AddAIHints(int slot, Actor actor, Assignment assignment, AIHints hints)
+    {
+        hints.AddForbiddenZone(new SDPrecisePosition(new WPos(0, 9), new(0, 1), 0.5f, actor.Position, 0.1f), Activation);
+    }
+}
+
+sealed class P3Heavensfall(BossModule module) : Heavensfall(module)
+{
+    public bool EnableHints;
 
     public override void AddAIHints(int slot, Actor actor, Assignment assignment, AIHints hints)
     {
-        hints.AddForbiddenZone(new SDPrecisePosition(new WPos(0f, 9f), new(0f, 1f), 0.5f, actor.Position, 0.1f), Activation);
+        if (EnableHints)
+        {
+            hints.AddForbiddenZone(new SDInvertedDonut(Arena.Center, 8.5f, 10), Activation);
+        }
     }
 }
 

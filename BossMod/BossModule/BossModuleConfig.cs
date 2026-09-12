@@ -21,6 +21,11 @@ public sealed class BossModuleConfig : ConfigNode
     [PropertyDisplay("Minimal maturity for the module to be loaded", tooltip: "Some modules will have the \"WIP\" status and will not automatically load unless you change this")]
     public BossModuleInfo.Maturity MinMaturity = BossModuleInfo.Maturity.Contributed;
 
+    // Modules explicitly disabled from Supported fights. Primary actor OIDs are used as unique module IDs.
+    public uint[] DisabledModuleOIDs = [];
+    [JsonIgnore]
+    internal HashSet<uint>? _disabledModuleOIDs;
+
     [PropertyDisplay("Allow modules to automatically use actions", tooltip: "Example: modules can automatically use anti-knockback abilities before a knockback happens")]
     public bool AllowAutomaticActions = true;
 
@@ -160,14 +165,178 @@ public sealed class BossModuleConfig : ConfigNode
     [PropertyDisplay("Show melee range indicator")]
     public bool ShowMeleeRangeIndicator = false;
 
-    [PropertyDisplay("Maximum load distance", tooltip: "Maximum load distance in yalms")]
-    [PropertySlider(0.1f, 500f, Speed = 0.1f, Logarithmic = true)]
+    [PropertyDisplay("Maximum load distance", tooltip: "Maximum load distance in yalms (clamped to 100yalms for safety). If the boss is farther away than this, then a module will not be loaded or unloaded if already active.")]
+    [PropertySlider(100f, 500f, Speed = 0.1f, Logarithmic = true)]
     public float MaxLoadDistance = 500f;
 
     public override void Deserialize(JsonElement j, JsonSerializerOptions ser)
     {
         base.Deserialize(j, ser);
+        _disabledModuleOIDs = null;
         _suppressedPrePullHintOIDs = null;
+    }
+
+    public bool IsModuleEnabled(uint primaryActorOID) => !DisabledModuleOIDSet().Contains(primaryActorOID);
+
+    public bool IncludeInSupportedFightControls(BossModuleRegistry.Info info)
+        => info.Maturity != BossModuleInfo.Maturity.Dummy || MinMaturity == BossModuleInfo.Maturity.Dummy;
+
+    public void SetModuleEnabled(uint primaryActorOID, bool enabled)
+    {
+        var set = DisabledModuleOIDSet();
+        var disabled = set.Contains(primaryActorOID);
+        if (enabled == !disabled)
+        {
+            return;
+        }
+
+        if (enabled)
+        {
+            set.Remove(primaryActorOID);
+        }
+        else
+        {
+            set.Add(primaryActorOID);
+        }
+
+        PersistDisabledModuleOIDs(set);
+        Modified.Fire();
+    }
+
+    public void SetModulesEnabled(List<uint> primaryActorOIDs, bool enabled)
+    {
+        var set = DisabledModuleOIDSet();
+        var changed = false;
+        var count = primaryActorOIDs.Count;
+        for (var i = 0; i < count; ++i)
+        {
+            changed |= enabled ? set.Remove(primaryActorOIDs[i]) : set.Add(primaryActorOIDs[i]);
+        }
+
+        if (changed)
+        {
+            PersistDisabledModuleOIDs(set);
+            Modified.Fire();
+        }
+    }
+
+    public (bool anyEnabled, bool allEnabled) ModulesEnabledState(List<uint> primaryActorOIDs)
+    {
+        var set = DisabledModuleOIDSet();
+        var anyEnabled = false;
+        var allEnabled = true;
+        var count = primaryActorOIDs.Count;
+        for (var i = 0; i < count; ++i)
+        {
+            var enabled = !set.Contains(primaryActorOIDs[i]);
+            anyEnabled |= enabled;
+            allEnabled &= enabled;
+        }
+        return (anyEnabled, count > 0 && allEnabled);
+    }
+
+    public void SetExpansionEnabled(BossModuleInfo.Expansion expansion, bool enabled)
+    {
+        var set = DisabledModuleOIDSet();
+        var changed = false;
+        foreach (var info in BossModuleRegistry.RegisteredModules.Values)
+        {
+            if (info.Expansion != expansion || !IncludeInSupportedFightControls(info))
+            {
+                continue;
+            }
+            changed |= enabled ? set.Remove(info.PrimaryActorOID) : set.Add(info.PrimaryActorOID);
+        }
+
+        if (changed)
+        {
+            PersistDisabledModuleOIDs(set);
+            Modified.Fire();
+        }
+    }
+
+    public void SetCategoryEnabled(BossModuleInfo.Category category, bool enabled)
+    {
+        var set = DisabledModuleOIDSet();
+        var changed = false;
+        foreach (var info in BossModuleRegistry.RegisteredModules.Values)
+        {
+            if (info.Category != category || !IncludeInSupportedFightControls(info))
+            {
+                continue;
+            }
+            changed |= enabled ? set.Remove(info.PrimaryActorOID) : set.Add(info.PrimaryActorOID);
+        }
+
+        if (changed)
+        {
+            PersistDisabledModuleOIDs(set);
+            Modified.Fire();
+        }
+    }
+
+    public (bool anyEnabled, bool allEnabled) ExpansionEnabledState(BossModuleInfo.Expansion expansion)
+    {
+        var set = DisabledModuleOIDSet();
+        var anyEnabled = false;
+        var allEnabled = true;
+        var any = false;
+        foreach (var info in BossModuleRegistry.RegisteredModules.Values)
+        {
+            if (info.Expansion != expansion || !IncludeInSupportedFightControls(info))
+            {
+                continue;
+            }
+            any = true;
+            var enabled = !set.Contains(info.PrimaryActorOID);
+            anyEnabled |= enabled;
+            allEnabled &= enabled;
+        }
+        return (anyEnabled, any && allEnabled);
+    }
+
+    public (bool anyEnabled, bool allEnabled) CategoryEnabledState(BossModuleInfo.Category category)
+    {
+        var set = DisabledModuleOIDSet();
+        var anyEnabled = false;
+        var allEnabled = true;
+        var any = false;
+        foreach (var info in BossModuleRegistry.RegisteredModules.Values)
+        {
+            if (info.Category != category || !IncludeInSupportedFightControls(info))
+            {
+                continue;
+            }
+            any = true;
+            var enabled = !set.Contains(info.PrimaryActorOID);
+            anyEnabled |= enabled;
+            allEnabled &= enabled;
+        }
+        return (anyEnabled, any && allEnabled);
+    }
+
+    private HashSet<uint> DisabledModuleOIDSet()
+    {
+        if (_disabledModuleOIDs != null)
+        {
+            return _disabledModuleOIDs;
+        }
+
+        var len = DisabledModuleOIDs.Length;
+        var set = new HashSet<uint>(len);
+        for (var i = 0; i < len; ++i)
+        {
+            set.Add(DisabledModuleOIDs[i]);
+        }
+        return _disabledModuleOIDs = set;
+    }
+
+    private void PersistDisabledModuleOIDs(HashSet<uint> set)
+    {
+        var persisted = new uint[set.Count];
+        set.CopyTo(persisted);
+        Array.Sort(persisted);
+        DisabledModuleOIDs = persisted;
     }
 
     public bool ShowPrePullHintsFor(uint primaryActorOID) => !SuppressedPrePullHintOIDSet().Contains(primaryActorOID);

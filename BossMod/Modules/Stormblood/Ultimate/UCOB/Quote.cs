@@ -168,12 +168,12 @@ sealed class QuoteRavenDive(UCOB module) : Components.UniformStackSpread(module,
             WPos center;
             Angle north;
 
-            if (_nael.IsTargetable)
+            if (_nael.IsTargetable) // p2: clock spots around nael
             {
                 center = _nael.Position;
                 north = 180f.Degrees();
             }
-            else
+            else // p3 FRT: clock spots around arena center, relative north pointing towards bahamut so tanks naturally get tethers
             {
                 center = Arena.Center;
                 north = (_bahamut.Position - center).ToAngle();
@@ -184,9 +184,11 @@ sealed class QuoteRavenDive(UCOB module) : Components.UniformStackSpread(module,
     }
 }
 
-sealed class QuoteMeteorStream(BossModule module) : Components.UniformStackSpread(module, default, 4f)
+sealed class QuoteMeteorStream(UCOB module) : Components.UniformStackSpread(module, default, 4f)
 {
     private readonly Quote? _quote = module.FindComponent<Quote>();
+    private readonly Actor _bahamut = module.BahamutPrime()!;
+    public bool Fixed;
 
     public override void Update()
     {
@@ -200,6 +202,37 @@ sealed class QuoteMeteorStream(BossModule module) : Components.UniformStackSprea
             Spreads.Clear();
         }
         base.Update();
+    }
+
+    public override void AddAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints)
+    {
+        // fellruin: fixed spread spots, as usual
+        if (Fixed && IsSpreadTarget(actor) && SpreadSpot(_bahamut, assignment) is var spot && spot != default)
+        {
+            hints.AddForbiddenZone(new SDInvertedCircle(spot, 1f), Spreads.Ref(0).Activation);
+            return;
+        }
+
+        // p2: normal spread
+        base.AddAIHints(slot, actor, assignment, hints);
+    }
+
+    private WPos SpreadSpot(Actor bahamut, PartyRolesConfig.Assignment assignment)
+    {
+        var relN = (bahamut.Position - Arena.Center).ToAngle();
+        var a45 = 45f.Degrees();
+        return assignment switch
+        {
+            PartyRolesConfig.Assignment.MT => bahamut.Position + (relN + a45).ToDirection() * 5f,
+            PartyRolesConfig.Assignment.OT => bahamut.Position + (relN - a45).ToDirection() * 5f,
+            PartyRolesConfig.Assignment.M1 => bahamut.Position + (relN - a45).ToDirection() * -5f,
+            PartyRolesConfig.Assignment.M2 => bahamut.Position + (relN + a45).ToDirection() * -5f,
+            PartyRolesConfig.Assignment.H1 => bahamut.Position + (relN - a45).ToDirection() * -5f + relN.ToDirection() * -8f,
+            PartyRolesConfig.Assignment.H2 => bahamut.Position + (relN + a45).ToDirection() * -5f + relN.ToDirection() * -8f,
+            PartyRolesConfig.Assignment.R1 => bahamut.Position + (relN - a45).ToDirection() * -12f + relN.ToDirection() * -8f,
+            PartyRolesConfig.Assignment.R2 => bahamut.Position + (relN + a45).ToDirection() * -12f + relN.ToDirection() * -8f,
+            _ => default,
+        };
     }
 }
 

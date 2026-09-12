@@ -244,10 +244,7 @@ sealed class EndlessSwipes(BossModule module) : Components.GenericRotatingAOE(mo
 }
 
 sealed class TonzeSlash100(BossModule module) : Components.BaitAwayIcon(module, new AOEShapeRect(65.0f, 4.0f), (uint)IconID.TankBuster, (uint)AID.TonzeSlash100,
-    9.1D, tankbuster: true, damageType: AIHints.PredictedDamageType.Tankbuster)
-{
-    public override Actor? BaitSource(Actor target) => Module.Enemies((uint)OID.ElderTablitaurPiece).First();
-}
+    9.1d, source: module.Enemies((uint)OID.ElderTablitaurPiece)[0], tankbuster: true, damageType: AIHints.PredictedDamageType.Tankbuster);
 
 sealed class YoungerTablitaurPieceStates : StateMachineBuilder
 {
@@ -265,11 +262,7 @@ sealed class YoungerTablitaurPieceStates : StateMachineBuilder
     }
 }
 
-[ModuleInfo(BossModuleInfo.Maturity.WIP,
-    PrimaryActorOID = (uint)OID.YoungerTablitaurPiece,
-    Contributors = "Equilius",
-    GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken,
-    GroupID = 1089u, NameID = 14556u, SortOrder = 4)]
+[ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.YoungerTablitaurPiece, Contributors = "Equilius", GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken, GroupID = 1089u, NameID = 14556u, SortOrder = 4)]
 public sealed class YoungerTablitaurPiece : BossModule
 {
     public static readonly uint[] Bosses = [(uint)OID.YoungerTablitaurPiece, (uint)OID.ElderTablitaurPiece];

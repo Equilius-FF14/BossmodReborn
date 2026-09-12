@@ -14,6 +14,7 @@ sealed class P3QuickmarchTrio(UCOB module) : BossComponent(module)
     private DateTime _diveAt;
     private bool _divesDone;
     private bool _earthshakersDone;
+    public bool PuddleDodgeHint;
 
     public override void DrawArenaForeground(int pcSlot, Actor pc)
     {
@@ -409,9 +410,16 @@ sealed class P3TempestWing(BossModule module) : Components.TankbusterTether(modu
             for (var i = 0; i < count; ++i)
             {
                 var side = _tethers[i];
+                // don't steal from tank
                 if (side.Player.Role == Role.Tank)
                 {
-                    hints.AddForbiddenZone(new SDRect(side.Enemy.Position, side.Player.Position, 1), TetherDeadline);
+                    hints.AddForbiddenZone(new SDRect(side.Enemy.Position, side.Player.Position, 1f), TetherDeadline);
+                }
+
+                // don't move too close to source, or tank will be unable to grab tether
+                if (side.Player == actor)
+                {
+                    hints.AddForbiddenZone(new SDCircle(side.Enemy.Position, 2f));
                 }
             }
             if (EnableRaidHints)
