@@ -1,6 +1,4 @@
-﻿
-
-namespace BossMod.Global.CrucibleOfTheUnbroken.SecondBoard.TaurusPiece;
+﻿namespace BossMod.Global.CrucibleOfTheUnbroken.SecondBoard.TaurusPiece;
 
 public enum OID : uint
 {
@@ -360,6 +358,5 @@ sealed class TaurusPieceStates : StateMachineBuilder
     }
 }
 
-[ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.TaurusPiece, Contributors = "gynorhino", Expansion = BossModuleInfo.Expansion.Global, Category = BossModuleInfo.Category.CrucibleOfTheUnbroken,
-GroupType = BossModuleInfo.GroupType.CFC, GroupID = 1089u, NameID = 14546u, SortOrder = 6)]
+[ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.TaurusPiece, Contributors = "gynorhino", GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken, GroupID = 1089u, NameID = 14546u, SortOrder = 6)]
 public sealed class TaurusPiece(WorldState ws, Actor primary) : BossModule(ws, primary, new(520f, 0f), new ArenaBoundsRect(19.5f, 15f));

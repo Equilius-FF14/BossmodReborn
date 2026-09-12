@@ -1,6 +1,4 @@
-﻿using BossMod.Autorotation.xan;
-
-namespace BossMod.Global.CrucibleOfTheUnbroken.SecondBoard.LooserfroxInkyjots;
+﻿namespace BossMod.Global.CrucibleOfTheUnbroken.SecondBoard.LooserfroxInkyjots;
 
 public enum OID : uint
 {
@@ -152,8 +150,7 @@ sealed class LoosefroxInkyjotsStates : StateMachineBuilder
     }
 }
 
-[ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.LoosefroxInkyjots, Contributors = "gynorhino", Expansion = BossModuleInfo.Expansion.Global, Category = BossModuleInfo.Category.CrucibleOfTheUnbroken,
-GroupType = BossModuleInfo.GroupType.CFC, GroupID = 1089u, NameID = 14561u, SortOrder = 5)]
+[ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.LoosefroxInkyjots, Contributors = "gynorhino", GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken, GroupID = 1089u, NameID = 14561u, SortOrder = 5)]
 public sealed class LoosefroxInkyjots(WorldState ws, Actor primary) : BossModule(ws, primary, new(520f, -420f), new ArenaBoundsCircle(22f))
 {
     public static readonly uint[] Bosses = [(uint)OID.LoosefroxInkyjots, (uint)OID.ChewchumPopoto];

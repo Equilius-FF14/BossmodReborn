@@ -566,8 +566,7 @@ public sealed class ModuleViewer : IDisposable
                 groupId |= module.GroupID;
                 var cfcRow = Service.LuminaRow<ContentFinderCondition>(module.GroupID)!.Value;
                 var cfcSort = cfcRow.SortKey;
-                var fixedName = RegexHelper.RemoveTags(cfcRow.Name.ToString());
-                return (new(FixCase(fixedName), groupId, cfcSort != 0 ? cfcSort : groupId),
+                return (new(FixCase(cfcRow.Name), groupId, cfcSort != 0 ? cfcSort : groupId),
                         new(module, BNpcName(module.NameID), module.SortOrder));
             case BossModuleInfo.GroupType.MaskedCarnivale:
                 groupId |= module.GroupID;
@@ -580,6 +579,12 @@ public sealed class ModuleViewer : IDisposable
                 var bmRow = Service.LuminaRow<ContentFinderCondition>(module.GroupID)!.Value;
                 var bmSort = uint.Parse(bmRow.ShortCode.ToString().AsSpan(3), CultureInfo.InvariantCulture);
                 var bmName = $"Crucible of the Unbroken: {FixCase(bmRow.Name)}";
+                const string suffix = " Of the Unbroken";
+
+                if (bmName.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+                {
+                    bmName = bmName[..^suffix.Length];
+                }
                 return (new(bmName, groupId, bmSort), new(module, BNpcName(module.NameID), module.SortOrder));
             case BossModuleInfo.GroupType.RemovedUnreal:
                 return (new("Removed Content", groupId, groupId), new(module, BNpcName(module.NameID), module.SortOrder));
@@ -676,12 +681,4 @@ public sealed class ModuleViewer : IDisposable
             }
         }
     }
-}
-
-public static partial class RegexHelper
-{
-    [GeneratedRegex("<italic\\(\\d\\)>|<-->")]
-    private static partial Regex TagsRegex();
-
-    public static string RemoveTags(string input) => TagsRegex().Replace(input, string.Empty);
 }

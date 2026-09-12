@@ -26,7 +26,8 @@ public enum AID : uint
     StormTrail = 48178, // Helper->self, 6.0s cast, range 25 60.000-degree cone
 }
 
-public enum SID : uint {
+public enum SID : uint
+{
     Burns = 3065, // none->player, extra=0x0
     Burns1 = 3066, // none->player, extra=0x0
 }
@@ -95,11 +96,5 @@ sealed class WyvernPieceStates : StateMachineBuilder
     }
 }
 
-[ModuleInfo(BossModuleInfo.Maturity.WIP,
-    PrimaryActorOID = (uint)OID.WyvernPiece,
-    Contributors = "Equilius",
-    GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken,
-    GroupID = 1089u,
-    NameID = 14549u,
-    SortOrder = 2)]
+[ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.WyvernPiece, Contributors = "Equilius", GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken, GroupID = 1089u, NameID = 14549u, SortOrder = 2)]
 public sealed class WyvernPiece(WorldState ws, Actor primary) : BossModule(ws, primary, new(520f, 0f), new ArenaBoundsRect(20f, 14.8f));
