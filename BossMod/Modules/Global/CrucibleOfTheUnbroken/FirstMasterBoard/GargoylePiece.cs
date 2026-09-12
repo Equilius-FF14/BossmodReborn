@@ -335,11 +335,5 @@ sealed class GargoylePieceStates : StateMachineBuilder {
     }
 }
 
-[ModuleInfo(BossModuleInfo.Maturity.WIP,
-    PrimaryActorOID = (uint)OID.GargoylePiece,
-    Contributors = "Equilius",
-    GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken,
-    GroupID = 1091u,
-    NameID = 14608u,
-    SortOrder = 3)]
+[ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.GargoylePiece, Contributors = "Equilius", GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken, GroupID = 1091u, NameID = 14608u, SortOrder = 3)]
 public sealed class GargoylePiece(WorldState ws, Actor primary) : BossModule(ws, primary, new(120f, 0f), new ArenaBoundsRect(20f, 20f));

@@ -200,13 +200,7 @@ sealed class StrixPieceStates : StateMachineBuilder {
     }
 }
 
-[ModuleInfo(BossModuleInfo.Maturity.WIP,
-    PrimaryActorOID = (uint)OID.StrixPiece,
-    Contributors = "Equilius",
-    GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken,
-    GroupID = 1091u,
-    NameID = 14596u,
-    SortOrder = 1)]
+[ModuleInfo(BossModuleInfo.Maturity.WIP, PrimaryActorOID = (uint)OID.StrixPiece, Contributors = "Equilius", GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken, GroupID = 1091u, NameID = 14596u, SortOrder = 1)]
 public sealed class StrixPiece(WorldState ws, Actor primary) : BossModule(ws, primary, new(120f, -420f), new ArenaBoundsCircle(20f)) {
     protected override void CalculateModuleAIHints(int slot, Actor actor, PartyRolesConfig.Assignment assignment, AIHints hints) {
         var count = hints.PotentialTargets.Count;
