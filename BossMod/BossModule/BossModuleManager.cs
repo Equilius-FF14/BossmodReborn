@@ -76,10 +76,14 @@ public sealed class BossModuleManager : IDisposable
         BossModule? bestModule = null;
         var anyModuleActivated = false;
 
-        var maxDist = Config.MaxLoadDistance;
         if (WorldState.Party[0]?.PosRot.AsVector3() is Vector3 playerPos)
         {
             var countP = PendingModules.Count - 1;
+            var maxDist = Config.MaxLoadDistance;
+            if (maxDist < 100f) // protect users from themselves, distances smaller than 100 could make make modules disappear if boss and player stand at the opposite sides of an arena
+            {
+                maxDist = 100f;
+            }
             var maxSq = maxDist * maxDist;
             for (var i = countP; i >= 0; --i)
             {

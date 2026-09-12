@@ -165,7 +165,7 @@ public sealed class BossModuleConfig : ConfigNode
     [PropertyDisplay("Show melee range indicator")]
     public bool ShowMeleeRangeIndicator = false;
 
-    [PropertyDisplay("Maximum load distance", tooltip: "Maximum load distance in yalms, it is recommended to leave this setting at 100 or more yalms to not unload modules during combat")]
+    [PropertyDisplay("Maximum load distance", tooltip: "Maximum load distance in yalms (clamped to 100yalms for safety). If the boss is farther away than this, then a module will not be loaded or unloaded if already active.")]
     [PropertySlider(100f, 500f, Speed = 0.1f, Logarithmic = true)]
     public float MaxLoadDistance = 500f;
 
