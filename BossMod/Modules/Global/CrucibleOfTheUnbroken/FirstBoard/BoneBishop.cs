@@ -145,8 +145,6 @@ sealed class BoneBishopStates : StateMachineBuilder
 [ModuleInfo(BossModuleInfo.Maturity.Contributed, PrimaryActorOID = (uint)OID.BoneBishop, Contributors = "wen", GroupType = BossModuleInfo.GroupType.CrucibleOfTheUnbroken, GroupID = 1088u, NameID = 14532u, SortOrder = 1)]
 public sealed class BoneBishop(WorldState ws, Actor primary) : BossModule(ws, primary, new(120f, -420f), new ArenaBoundsCircle(20f))
 {
-    public override bool ShouldPrioritizeAllEnemies => true;
-
     protected override void DrawEnemies(int pcSlot, Actor pc)
     {
         Arena.Actor(PrimaryActor);
