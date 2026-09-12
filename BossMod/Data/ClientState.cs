@@ -381,6 +381,13 @@ public sealed class ClientState
                 }
             }
         }
+        foreach (var (id, quant) in Inventory)
+        {
+            if (quant > 0u)
+            {
+                ops.Add(new OpInventoryChange(id, quant));
+            }
+        }
         return ops;
     }
 
