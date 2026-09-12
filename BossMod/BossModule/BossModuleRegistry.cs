@@ -86,15 +86,14 @@ public static class BossModuleRegistry
 
     public static BossModule? CreateModule(Info? info, WorldState ws, Actor primary) => info?.ModuleFactory(ws, primary);
 
-    public static BossModule? CreateModuleForActor(WorldState ws, Actor primary, BossModuleInfo.Maturity minMaturity)
+    public static BossModule? CreateModuleForActor(WorldState ws, Actor primary)
     {
         if (primary.Type is not ActorType.Enemy and not ActorType.EventObj)
         {
             return null;
         }
 
-        var info = FindByOID(primary.OID);
-        return info?.Maturity >= minMaturity ? CreateModule(info, ws, primary) : null;
+        return CreateModule(FindByOID(primary.OID), ws, primary);
     }
 
     // TODO: this is a hack...

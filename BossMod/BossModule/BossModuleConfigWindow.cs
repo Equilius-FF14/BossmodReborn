@@ -28,19 +28,13 @@ public sealed class BossModuleConfigWindow : UIWindow
         {
             ConfigUI.DrawPrePullHintSetting(_info);
             if (_node != null)
-            {
                 ImGui.Separator();
-            }
         }
 
         if (_node != null)
-        {
             ConfigUI.DrawNode(_node, Service.Config, _tree, _ws);
-        }
         else if (!_info.HasPrePullHints)
-        {
             ImGui.TextUnformatted("This module does not expose any additional configuration");
-        }
     }
 
     private void DrawPartyRolesAssignmentsTab()

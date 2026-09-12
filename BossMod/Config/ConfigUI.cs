@@ -197,7 +197,7 @@ public sealed class ConfigUI : IDisposable
         ImGui.Separator();
         for (var i = 0; i < 30; ++i)
         {
-            ref readonly var text = ref _availableAICommands[i];
+            ref var text = ref _availableAICommands[i];
             ImGui.Text($"/bmrai {text.Item1}: {text.Item2}");
         }
         ImGui.Separator();
@@ -205,7 +205,7 @@ public sealed class ConfigUI : IDisposable
         ImGui.Separator();
         for (var i = 0; i < 6; ++i)
         {
-            ref readonly var text = ref _autorotationCommands[i];
+            ref var text = ref _autorotationCommands[i];
             ImGui.Text($"/bmr {text.Item1}: {text.Item2}");
         }
         ImGui.Separator();
@@ -213,7 +213,7 @@ public sealed class ConfigUI : IDisposable
         ImGui.Separator();
         for (var i = 0; i < 9; ++i)
         {
-            ref readonly var text = ref _availableOtherCommands[i];
+            ref var text = ref _availableOtherCommands[i];
             ImGui.Text($"/bmr {text.Item1}: {text.Item2}");
         }
     }
@@ -227,11 +227,14 @@ public sealed class ConfigUI : IDisposable
             return;
         }
 
-        foreach (var r in _roots)
+        var count = _roots.Count;
+        for (var i = 0; i < count; ++i)
         {
-            foreach (var path in WalkNodes(r))
+            var paths = WalkNodes(_roots[i]);
+            var countP = paths.Count;
+            for (var j = 0; j < countP; ++j)
             {
-                _filterNodes.Add(path);
+                _filterNodes.Add(paths[j]);
             }
         }
     }
